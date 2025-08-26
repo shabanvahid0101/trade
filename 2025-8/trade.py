@@ -40,30 +40,34 @@ def fetch_ohlcv(exchange, symbol, timeframe='1d', limit=30):
     except Exception as e:
         logger.error(f"خطا در گرفتن داده‌های {symbol}: {e}")
         return None
-
-def analyze_growth_potential(df):
-    """تحلیل احتمال رشد 20% در یک هفته"""
-    if df is None or len(df) < 7:
+def analyze_growth_potential(df, symbol):
+    if df is None or len(df) < 26:
+        logger.warning(f"داده کافی برای {symbol} نیست (کمتر از 26 دوره).")
         return False, 0.0
 
-    # محاسبه اندیکاتورها
-    df['rsi'] = ta.rsi(df['close'], length=14)
-    df['macd'] = ta.macd(df['close'])['MACD_12_26_9']
-    df['signal'] = ta.macd(df['close'])['MACDs_12_26_9']
+    try:
+        df['rsi'] = ta.rsi(df['close'], length=14)
+        macd_result = ta.macd(df['close'])
+        if macd_result is None or 'MACD_12_26_9' not in macd_result:
+            logger.warning(f"MACD برای {symbol} محاسبه نشد یا داده کافی نیست.")
+            return False, 0.0
+        df['macd'] = macd_result['MACD_12_26_9']
+        df['signal'] = macd_result['MACDs_12_26_9']
+    except Exception as e:
+        logger.error(f"خطا در محاسبه اندیکاتورها برای {symbol}: {e}")
+        return False, 0.0
 
-    # آخرین مقادیر
     last_rsi = df['rsi'].iloc[-1]
     last_macd = df['macd'].iloc[-1]
     last_signal = df['signal'].iloc[-1]
     last_close = df['close'].iloc[-1]
-    prev_close = df['close'].iloc[-2]
+    first_close = df['close'].iloc[0]  # قیمت 7 روز پیش
 
-    # محاسبه رشد اخیر
-    growth = ((last_close - prev_close) / prev_close) * 100
-    potential_growth = growth + (last_rsi / 100) * 20  # تخمین ساده
+    weekly_growth = ((last_close - first_close) / first_close) * 100
+    potential_growth = weekly_growth + (last_rsi / 100) * 20
 
-    # شرایط: RSI پایین (اشباع فروش) و MACD صعودی
-    is_potential = last_rsi < 30 and last_macd > last_signal and potential_growth > 20
+    # شرایط جدید: RSI < 50 و رشد پتانسیل > 10
+    is_potential = last_rsi < 50 and last_macd > last_signal and potential_growth > 10
     return is_potential, potential_growth
 
 def main():
@@ -78,13 +82,13 @@ def main():
 
     # بررسی 10 ارز اول برای تست (می‌تونی همه رو ببینی)
     potential_coins = []
-    for symbol in list(markets.keys())[:10]:  # برای تست، 10 تای اول
+    for symbol in list(markets.keys()):  # برای تست، 10 تای اول
         if '/USDT' not in symbol and '/USDC' not in symbol:
             continue  # فقط جفت‌های USDT/USDC
         logger.info(f"تحلیل {symbol}...")
         df = fetch_ohlcv(exchange, symbol)
         if df is not None:
-            is_potential, growth = analyze_growth_potential(df)
+            is_potential, growth = analyze_growth_potential(df, symbol)
             if is_potential:
                 potential_coins.append((symbol, growth))
 
