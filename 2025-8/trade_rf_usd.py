@@ -90,7 +90,7 @@ def prepare_features(df):
     logger.info(f"تعداد نمونه‌ها بعد از پیش‌پردازش: {len(X)}")
     return df, X, y, timestamps
 
-def train_and_test_model(X, y, timestamps):
+def train_and_test_model(X, y, timestamps, symbol):
     """آموزش و تست مدل با TimeSeriesSplit و GridSearchCV"""
     if len(X) < 10:
         return None, None, None, None
@@ -122,9 +122,9 @@ def train_and_test_model(X, y, timestamps):
     plt.plot(timestamps[test_idx], predicted, label='پیش‌بینی‌شده', color='red')
     plt.xlabel('زمان')
     plt.ylabel('قیمت')
-    plt.title('دقت پیش‌بینی مدل برای BTC/USDT (Test Set)')
+    plt.title(f'دقت پیش‌بینی مدل برای {symbol} (Test Set)')
     plt.legend()
-    plt.savefig('model_accuracy_improved.png')
+    plt.savefig(f'model_accuracy_{symbol.replace("/", "_")}.png')
     plt.show()
 
     return best_model, scaler, mse, r2
@@ -140,43 +140,45 @@ def predict_current_close(model, scaler, last_data):
     noise = np.random.uniform(-0.0005, 0.001)
     return predicted_close * (1 + noise)
 
-def simulate_hourly_profit(model, scaler, df_processed, initial_capital=100):
-    """شبیه‌سازی سود یک ساعته با سرمایه اولیه 100 دلار"""
-    if model is None or len(df_processed) < 12:  # حداقل 12 کندل برای یک ساعت (15 دقیقه‌ای ≈ 4 کندل)
-        logger.warning("داده کافی برای شبیه‌سازی یک ساعته نیست.")
+def simulate_hourly_profit(model, scaler, df_processed, symbol, initial_capital=100):
+    """شبیه‌سازی سود دو ساعته با سرمایه اولیه 100 دلار"""
+    if model is None or len(df_processed) < 12:  # حداقل 12 کندل برای دو ساعت (15 دقیقه‌ای ≈ 8 کندل)
+        logger.warning("داده کافی برای شبیه‌سازی دو ساعته نیست.")
         return 0.0
 
     capital = initial_capital
-    position = 0  # مقدار بیت‌کوین در دست (بر حسب تعداد)
+    position = 0  # مقدار ارز در دست (بر حسب تعداد)
     last_price = df_processed['close'].iloc[-1]
     predictions = []
+    rsi = df_processed['rsi'].iloc[-1]  # RSI فعلی
 
-    # پیش‌بینی برای 4 کندل بعدی (یک ساعت با تایم‌فریم 15 دقیقه)
-    for i in range(4):
+    # پیش‌بینی برای 8 کندل بعدی (دو ساعت با تایم‌فریم 15 دقیقه)
+    for i in range(8):
         last_data = df_processed[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi', 'momentum'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
         predicted_close = predict_current_close(model, scaler, last_data)
         predictions.append(predicted_close)
 
-        # استراتژی با آستانه 0.05%
+        # استراتژی با آستانه 0.03% و فیلتر RSI
         trade_amount = capital * 0.1 / last_price
-        growth_threshold = 0.0005  # 0.05% آستانه
-        if predicted_close > last_price * (1 + growth_threshold) and position == 0:  # خرید با رشد حداقل 0.05%
-            position += trade_amount
-            capital -= trade_amount * last_price
-            logger.info(f"کندل {i+1}: خرید {trade_amount:.6f} BTC در قیمت {last_price:.2f}")
-        elif predicted_close < last_price * (1 - growth_threshold) and position > 0:  # فروش با افت حداقل 0.05%
-            capital += position * last_price
-            profit = (last_price - (last_price * 0.1)) * position  # سود ساده (بدون کارمزد)
-            capital += profit
-            logger.info(f"کندل {i+1}: فروش {position:.6f} BTC در قیمت {last_price:.2f}, سود: {profit:.2f}$")
-            position = 0
+        growth_threshold = 0.0003  # 0.03% آستانه
+        if rsi < 70 and rsi > 30:  # فیلتر برای جلوگیری از بیش‌خرید/بیش‌فروش
+            if predicted_close > last_price * (1 + growth_threshold) and position == 0:  # خرید با رشد حداقل 0.03%
+                position += trade_amount
+                capital -= trade_amount * last_price
+                logger.info(f"کندل {i+1}: خرید {trade_amount:.6f} {symbol.split('/')[0]} در قیمت {last_price:.2f}")
+            elif predicted_close < last_price * (1 - growth_threshold) and position > 0:  # فروش با افت حداقل 0.03%
+                capital += position * last_price
+                profit = (last_price - (last_price * 0.1)) * position  # سود ساده (بدون کارمزد)
+                capital += profit
+                logger.info(f"کندل {i+1}: فروش {position:.6f} {symbol.split('/')[0]} در قیمت {last_price:.2f}, سود: {profit:.2f}$")
+                position = 0
 
         last_price = predicted_close  # قیمت جدید برای کندل بعدی
 
     # محاسبه سود نهایی
     if position > 0:
         capital += position * last_price
-        logger.info(f"پایان: فروش باقی‌مونده {position:.6f} BTC در قیمت {last_price:.2f}")
+        logger.info(f"پایان: فروش باقی‌مونده {position:.6f} {symbol.split('/')[0]} در قیمت {last_price:.2f}")
 
     total_profit = capital - initial_capital
     logger.info(f"سرمایه اولیه: {initial_capital}$, سرمایه نهایی: {capital:.2f}$, سود کل: {total_profit:.2f}$")
@@ -189,7 +191,7 @@ def analyze_growth_potential(df, symbol):
         return False, 0.0
 
     df_processed, X, y, timestamps = prepare_features(df)
-    model, scaler, mse, r2 = train_and_test_model(X, y, timestamps)
+    model, scaler, mse, r2 = train_and_test_model(X, y, timestamps, symbol)
     if model is None:
         return False, 0.0
 
@@ -200,9 +202,9 @@ def analyze_growth_potential(df, symbol):
     logger.info(f"پیش‌بینی قیمت بسته شدن کندل فعلی: {predicted_close}, رشد پیش‌بینی‌شده: {predicted_growth:.2f}%")
     is_potential = predicted_growth > 20
 
-    # شبیه‌سازی سود یک ساعته
-    hourly_profit = simulate_hourly_profit(model, scaler, df_processed, initial_capital=100)
-    logger.info(f"سود پیش‌بینی‌شده برای یک ساعت با 100 دلار: {hourly_profit:.2f}$")
+    # شبیه‌سازی سود دو ساعته
+    hourly_profit = simulate_hourly_profit(model, scaler, df_processed, symbol, initial_capital=100)
+    logger.info(f"سود پیش‌بینی‌شده برای دو ساعت با 100 دلار: {hourly_profit:.2f}$")
 
     return is_potential, predicted_growth
 
@@ -212,19 +214,20 @@ def main():
     if not exchange:
         return
 
-    symbol = "ADA/USDT"
-    logger.info(f"تحلیل {symbol}...")
-    df = fetch_ohlcv(exchange, symbol, timeframe='15m', total_limit=2000)
-    if df is None:
-        return
+    symbols = ["ADA/USDT", "ETH/USDT", "XRP/USDT"]  # لیست ارزها برای تست
+    for symbol in symbols:
+        logger.info(f"تحلیل {symbol}...")
+        df = fetch_ohlcv(exchange, symbol, timeframe='15m', total_limit=2000)
+        if df is None:
+            continue
 
-    is_potential, growth = analyze_growth_potential(df, symbol)
-    if is_potential:
-        logger.info(f"{symbol}: پتانسیل رشد {growth:.2f}%")
-        with open('potential_coins.csv', 'a') as f:
-            f.write(f"{symbol},{growth:.2f}\n")
-    else:
-        logger.info(f"{symbol} پتانسیل رشد بالای 20% ندارد.")
+        is_potential, growth = analyze_growth_potential(df, symbol)
+        if is_potential:
+            logger.info(f"{symbol}: پتانسیل رشد {growth:.2f}%")
+            with open('potential_coins.csv', 'a') as f:
+                f.write(f"{symbol},{growth:.2f}\n")
+        else:
+            logger.info(f"{symbol} پتانسیل رشد بالای 20% ندارد.")
 
 if __name__ == "__main__":
     main()
