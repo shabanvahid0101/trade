@@ -4,8 +4,9 @@ import ccxt
 import logging
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -34,79 +35,132 @@ def connect_to_coinex():
         logger.error(f"خطا در اتصال به CoinEx: {e}")
         return None
 
-def fetch_ohlcv(exchange, symbol, timeframe='1d', limit=90):
-    """گرفتن داده‌های قیمتی OHLCV"""
+def fetch_ohlcv(exchange, symbol, timeframe='4h', total_limit=2000):
+    """گرفتن داده‌های قیمتی OHLCV با جمع‌آوری 1000 تایی"""
     try:
-        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
-        df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+        all_ohlcv = []
+        limit = 1000
+        since = None
+
+        while len(all_ohlcv) < total_limit:
+            ohlcv = exchange.fetch_ohlcv(symbol, timeframe, since=since, limit=limit)
+            if not ohlcv or len(ohlcv) == 0:
+                break
+            all_ohlcv.extend(ohlcv)
+            since = ohlcv[-1][0] + 1
+
+            if len(ohlcv) < limit:
+                break
+
+            logger.info(f"گرفتن {len(all_ohlcv)} کندل...")
+
+        df = pd.DataFrame(all_ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-        return df
+        return df.iloc[:total_limit]
     except Exception as e:
         logger.error(f"خطا در گرفتن داده‌های {symbol}: {e}")
         return None
 
-def train_and_test_model(df):
-    """آموزش و تست مدل با داده‌های واقعی"""
-    if df is None or len(df) < 7:
-        return None, None
+def calculate_rsi(data, periods=14):
+    """محاسبه RSI"""
+    delta = data.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=periods).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=periods).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs.replace([np.inf, -np.inf], np.nan).fillna(0)))
 
-    # آماده‌سازی داده‌ها با ویژگی‌های بیشتر
-    features = ['open', 'high', 'low', 'close', 'volume']
-    X = df[features].values
-    y = df['close'].values
+def prepare_features(df):
+    """آماده‌سازی ویژگی‌ها با lagged values و شاخص‌ها"""
+    df = df.copy()
+    df = df.dropna()  # حذف ردیف‌های با NaN
+    df['next_close'] = df['close'].shift(-1)
+    df = df.dropna()
+    df['ma5'] = df['close'].rolling(window=5).mean()
+    df['pct_change'] = df['close'].pct_change()
+    df['rsi'] = calculate_rsi(df['close'])
+    df['volume_norm'] = (df['volume'] - df['volume'].mean()) / df['volume'].std()
+    features = ['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi']
+    for lag in [1, 2, 3]:
+        df.loc[:, f'close_lag_{lag}'] = df['close'].shift(lag)
+    df = df.dropna()
+    X = df[features + [f'close_lag_{lag}' for lag in [1, 2, 3]]].values
+    y = df['next_close'].values
+    timestamps = df['timestamp'].values
+    logger.info(f"تعداد نمونه‌ها بعد از پیش‌پردازش: {len(X)}")
+    return X, y, timestamps
 
-    # تقسیم داده‌ها به آموزش و تست
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+def train_and_test_model(X, y, timestamps):
+    """آموزش و تست مدل با TimeSeriesSplit و GridSearchCV"""
+    if len(X) < 10:
+        return None, None, None, None
 
-    # آموزش مدل
-    model = RandomForestRegressor(n_estimators=200, random_state=42, max_depth=10)  # 200 درخت، عمق محدود
-    model.fit(X_train, y_train)
+    tscv = TimeSeriesSplit(n_splits=5)
+    param_grid = {'n_estimators': [50, 100], 'max_depth': [3, 5]}
+    model = GridSearchCV(RandomForestRegressor(random_state=42), param_grid, cv=tscv, scoring='neg_mean_squared_error')
+    scaler = MinMaxScaler()
+    X_scaled = scaler.fit_transform(X)
+    model.fit(X_scaled, y)
 
-    # تست مدل
-    predicted = model.predict(X_test)
-    mse = mean_squared_error(y_test, predicted)
-    logger.info(f"Mean Squared Error: {mse}")
+    logger.info(f"بهترین پارامترها: {model.best_params_}")
+    best_model = model.best_estimator_
+    predicted = best_model.predict(X_scaled)
+    mse = mean_squared_error(y, predicted)
+    r2 = r2_score(y, predicted)
 
-    # رسم نمودار دقت
+    logger.info(f"MSE: {mse}, R2: {r2}")
+
     plt.figure(figsize=(10, 6))
-    plt.plot(df['timestamp'].iloc[-len(y_test):], y_test, label='واقعی', color='blue')
-    plt.plot(df['timestamp'].iloc[-len(y_test):], predicted, label='پیش‌بینی‌شده', color='red')
+    plt.plot(timestamps[-len(y)//5:], y[-len(y)//5:], label='واقعی', color='blue')
+    plt.plot(timestamps[-len(y)//5:], predicted[-len(y)//5:], label='پیش‌بینی‌شده', color='red')
     plt.xlabel('زمان')
     plt.ylabel('قیمت')
     plt.title('دقت پیش‌بینی مدل برای BTC/USDT')
     plt.legend()
-    plt.savefig('model_accuracy.png')
+    plt.savefig('model_accuracy_improved.png')
     plt.show()
 
-    return model, mse
+    return best_model, scaler, mse, r2
 
-def predict_growth(model, df):
+def predict_growth(model, scaler, last_data):
     """پیش‌بینی رشد با مدل آموزش‌دیده"""
     if model is None:
         return 0.0
 
-    # استفاده از آخرین داده‌ها برای پیش‌بینی
-    last_data = df[['open', 'high', 'low', 'close', 'volume']].iloc[-1].values.reshape(1, -1)
-    future_days = np.array([last_data[0] * np.ones(5)])  # فرض ساده: ویژگی‌ها ثابت می‌مونن
+    last_data_scaled = scaler.transform(last_data.reshape(1, -1))
+    future_data = last_data_scaled.copy()
+    predicted_growths = []
+
     for _ in range(7):
-        pred = model.predict(future_days)
-        future_days = np.vstack((future_days, [last_data[0][0], last_data[0][1], last_data[0][2], pred[0], last_data[0][4]]))
-    predicted_close = future_days[-1][3]  # قیمت پیش‌بینی‌شده روز هفتم
-    last_close = df['close'].iloc[-1]
+        pred = model.predict(future_data)[0]
+        new_data = last_data_scaled.copy()
+        new_data[0][0] = pred  # open
+        new_data[0][1] = pred * 1.01  # high
+        new_data[0][2] = pred * 0.99  # low
+        new_data[0][3] = last_data[3]  # volume_norm
+        new_data[0][4] = np.mean(predicted_growths[-5:] + [pred]) if len(predicted_growths) >= 5 else pred  # ma5
+        new_data[0][5] = (pred - last_data[0]) / last_data[0] if len(predicted_growths) > 0 else 0  # pct_change
+        new_data[0][6] = 50  # RSI ساده‌سازی شده
+        future_data = new_data
+        predicted_growths.append(pred)
+
+    predicted_close = predicted_growths[-1]
+    last_close = last_data[0]
     predicted_growth = ((predicted_close - last_close) / last_close) * 100
     return predicted_growth
 
 def analyze_growth_potential(df, symbol):
-    """تحلیل احتمال رشد با یادگیری ماشین (Random Forest)"""
-    if df is None or len(df) < 7:
+    """تحلیل احتمال رشد با یادگیری ماشین"""
+    if df is None or len(df) < 10:
         logger.warning(f"داده کافی برای {symbol} نیست.")
         return False, 0.0
 
-    model, mse = train_and_test_model(df)
+    X, y, timestamps = prepare_features(df)
+    model, scaler, mse, r2 = train_and_test_model(X, y, timestamps)
     if model is None:
         return False, 0.0
 
-    predicted_growth = predict_growth(model, df)
+    last_data = df[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
+    predicted_growth = predict_growth(model, scaler, last_data)
     is_potential = predicted_growth > 20
     return is_potential, predicted_growth
 
@@ -116,18 +170,19 @@ def main():
     if not exchange:
         return
 
-    # بررسی فقط یک ارز (BTC/USDT)
     symbol = "BTC/USDT"
     logger.info(f"تحلیل {symbol}...")
-    df = fetch_ohlcv(exchange, symbol)
-    if df is not None:
-        is_potential, growth = analyze_growth_potential(df, symbol)
-        if is_potential:
-            logger.info(f"{symbol}: پتانسیل رشد {growth:.2f}%")
-            with open('potential_coins.csv', 'a') as f:
-                f.write(f"{symbol},{growth:.2f}\n")
-        else:
-            logger.info(f"{symbol} پتانسیل رشد بالای 20% ندارد.")
+    df = fetch_ohlcv(exchange, symbol, timeframe='4h', total_limit=2000)
+    if df is None:
+        return
+
+    is_potential, growth = analyze_growth_potential(df, symbol)
+    if is_potential:
+        logger.info(f"{symbol}: پتانسیل رشد {growth:.2f}%")
+        with open('potential_coins.csv', 'a') as f:
+            f.write(f"{symbol},{growth:.2f}\n")
+    else:
+        logger.info(f"{symbol} پتانسیل رشد بالای 20% ندارد.")
 
 if __name__ == "__main__":
     main()
