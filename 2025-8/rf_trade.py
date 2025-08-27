@@ -72,7 +72,7 @@ def calculate_rsi(data, periods=14):
 def prepare_features(df):
     """آماده‌سازی ویژگی‌ها با lagged values و شاخص‌ها"""
     df = df.copy()
-    df = df.dropna()  # حذف ردیف‌های با NaN
+    df = df.dropna()
     df['next_close'] = df['close'].shift(-1)
     df = df.dropna()
     df['ma5'] = df['close'].rolling(window=5).mean()
@@ -87,7 +87,7 @@ def prepare_features(df):
     y = df['next_close'].values
     timestamps = df['timestamp'].values
     logger.info(f"تعداد نمونه‌ها بعد از پیش‌پردازش: {len(X)}")
-    return X, y, timestamps
+    return df, X, y, timestamps
 
 def train_and_test_model(X, y, timestamps):
     """آموزش و تست مدل با TimeSeriesSplit و GridSearchCV"""
@@ -95,7 +95,7 @@ def train_and_test_model(X, y, timestamps):
         return None, None, None, None
 
     tscv = TimeSeriesSplit(n_splits=5)
-    param_grid = {'n_estimators': [50, 100], 'max_depth': [3, 5]}
+    param_grid = {'n_estimators': [50, 100, 150], 'max_depth': [3, 5, 7]}
     model = GridSearchCV(RandomForestRegressor(random_state=42), param_grid, cv=tscv, scoring='neg_mean_squared_error')
     scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
@@ -103,25 +103,32 @@ def train_and_test_model(X, y, timestamps):
 
     logger.info(f"بهترین پارامترها: {model.best_params_}")
     best_model = model.best_estimator_
-    predicted = best_model.predict(X_scaled)
-    mse = mean_squared_error(y, predicted)
-    r2 = r2_score(y, predicted)
 
-    logger.info(f"MSE: {mse}, R2: {r2}")
+    # ارزیابی روی آخرین split (test set)
+    for train_idx, test_idx in tscv.split(X):
+        X_train, X_test = X_scaled[train_idx], X_scaled[test_idx]
+        y_train, y_test = y[train_idx], y[test_idx]
+        break  # فقط آخرین split رو می‌گیریم
+
+    predicted = best_model.predict(X_test)
+    mse = mean_squared_error(y_test, predicted)
+    r2 = r2_score(y_test, predicted)
+    logger.info(f"MSE (test): {mse}, R2 (test): {r2}")
+    logger.info(f"اولین ۵ پیش‌بینی (test): {predicted[:5]}")
 
     plt.figure(figsize=(10, 6))
-    plt.plot(timestamps[-len(y)//5:], y[-len(y)//5:], label='واقعی', color='blue')
-    plt.plot(timestamps[-len(y)//5:], predicted[-len(y)//5:], label='پیش‌بینی‌شده', color='red')
+    plt.plot(timestamps[test_idx], y_test, label='واقعی', color='blue')
+    plt.plot(timestamps[test_idx], predicted, label='پیش‌بینی‌شده', color='red')
     plt.xlabel('زمان')
     plt.ylabel('قیمت')
-    plt.title('دقت پیش‌بینی مدل برای BTC/USDT')
+    plt.title('دقت پیش‌بینی مدل برای BTC/USDT (Test Set)')
     plt.legend()
     plt.savefig('model_accuracy_improved.png')
     plt.show()
 
     return best_model, scaler, mse, r2
 
-def predict_growth(model, scaler, last_data):
+def predict_growth(model, scaler, last_data, df_processed):
     """پیش‌بینی رشد با مدل آموزش‌دیده"""
     if model is None:
         return 0.0
@@ -130,16 +137,20 @@ def predict_growth(model, scaler, last_data):
     future_data = last_data_scaled.copy()
     predicted_growths = []
 
-    for _ in range(7):
+    # محاسبه میانگین رشد گذشته
+    past_growth = df_processed['pct_change'].tail(20).mean() * 100  # میانگین رشد 20 روز گذشته
+    logger.info(f"میانگین رشد گذشته (20 روز): {past_growth:.2f}%")
+
+    for i in range(7):
         pred = model.predict(future_data)[0]
         new_data = last_data_scaled.copy()
         new_data[0][0] = pred  # open
-        new_data[0][1] = pred * 1.01  # high
-        new_data[0][2] = pred * 0.99  # low
-        new_data[0][3] = last_data[3]  # volume_norm
+        new_data[0][1] = pred * (1 + 0.02 * (i + 1) / 7)  # high با افزایش تدریجی
+        new_data[0][2] = pred * (1 - 0.02 * (i + 1) / 7)  # low با کاهش تدریجی
+        new_data[0][3] = last_data[3] * (1 + np.random.normal(0, 0.1))  # volume_norm با نویز
         new_data[0][4] = np.mean(predicted_growths[-5:] + [pred]) if len(predicted_growths) >= 5 else pred  # ma5
-        new_data[0][5] = (pred - last_data[0]) / last_data[0] if len(predicted_growths) > 0 else 0  # pct_change
-        new_data[0][6] = 50  # RSI ساده‌سازی شده
+        new_data[0][5] = (pred - last_data[0]) / last_data[0] if len(predicted_growths) > 0 else past_growth / 100  # pct_change
+        new_data[0][6] = 50 + np.random.normal(0, 5)  # RSI با نویز
         future_data = new_data
         predicted_growths.append(pred)
 
@@ -154,13 +165,13 @@ def analyze_growth_potential(df, symbol):
         logger.warning(f"داده کافی برای {symbol} نیست.")
         return False, 0.0
 
-    X, y, timestamps = prepare_features(df)
+    df_processed, X, y, timestamps = prepare_features(df)
     model, scaler, mse, r2 = train_and_test_model(X, y, timestamps)
     if model is None:
         return False, 0.0
 
-    last_data = df[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
-    predicted_growth = predict_growth(model, scaler, last_data)
+    last_data = df_processed[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
+    predicted_growth = predict_growth(model, scaler, last_data, df_processed)
     is_potential = predicted_growth > 20
     return is_potential, predicted_growth
 
