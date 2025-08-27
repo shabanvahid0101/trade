@@ -70,6 +70,14 @@ def calculate_rsi(data, periods=14):
     rs = gain / loss
     return 100 - (100 / (1 + rs.replace([np.inf, -np.inf], np.nan).fillna(0)))
 
+def calculate_atr(df, periods=14):
+    """محاسبه ATR (Average True Range)"""
+    df['high_low'] = df['high'] - df['low']
+    df['high_close'] = np.abs(df['high'] - df['close'].shift())
+    df['low_close'] = np.abs(df['low'] - df['close'].shift())
+    df['true_range'] = df[['high_low', 'high_close', 'low_close']].max(axis=1)
+    return df['true_range'].rolling(window=periods).mean()
+
 def prepare_features(df):
     """آماده‌سازی ویژگی‌ها با lagged values و شاخص‌ها"""
     df = df.copy()
@@ -80,7 +88,8 @@ def prepare_features(df):
     df['rsi'] = calculate_rsi(df['close'])
     df['volume_norm'] = (df['volume'] - df['volume'].mean()) / df['volume'].std()
     df['momentum'] = df['close'].diff(5)  # تغییرات 5 کندل
-    features = ['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi', 'momentum']
+    df['atr'] = calculate_atr(df)
+    features = ['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi', 'momentum', 'atr']
     for lag in [1, 2, 3]:
         df.loc[:, f'close_lag_{lag}'] = df['close'].shift(lag)
     df = df.dropna()
@@ -150,28 +159,27 @@ def simulate_hourly_profit(model, scaler, df_processed, symbol, initial_capital=
     position = 0  # مقدار ارز در دست (بر حسب تعداد)
     last_price = df_processed['close'].iloc[-1]
     predictions = []
-    rsi = df_processed['rsi'].iloc[-1]  # RSI فعلی
+    atr = df_processed['atr'].iloc[-1]  # ATR فعلی
+    growth_threshold = atr / last_price * 0.2  # آستانه پویا با ضریب 0.2
 
     # پیش‌بینی برای 8 کندل بعدی (دو ساعت با تایم‌فریم 15 دقیقه)
     for i in range(8):
-        last_data = df_processed[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi', 'momentum'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
+        last_data = df_processed[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi', 'momentum', 'atr'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
         predicted_close = predict_current_close(model, scaler, last_data)
         predictions.append(predicted_close)
 
-        # استراتژی با آستانه 0.03% و فیلتر RSI
+        # استراتژی با آستانه پویا (بدون فیلتر RSI)
         trade_amount = capital * 0.1 / last_price
-        growth_threshold = 0.0003  # 0.03% آستانه
-        if rsi < 70 and rsi > 30:  # فیلتر برای جلوگیری از بیش‌خرید/بیش‌فروش
-            if predicted_close > last_price * (1 + growth_threshold) and position == 0:  # خرید با رشد حداقل 0.03%
-                position += trade_amount
-                capital -= trade_amount * last_price
-                logger.info(f"کندل {i+1}: خرید {trade_amount:.6f} {symbol.split('/')[0]} در قیمت {last_price:.2f}")
-            elif predicted_close < last_price * (1 - growth_threshold) and position > 0:  # فروش با افت حداقل 0.03%
-                capital += position * last_price
-                profit = (last_price - (last_price * 0.1)) * position  # سود ساده (بدون کارمزد)
-                capital += profit
-                logger.info(f"کندل {i+1}: فروش {position:.6f} {symbol.split('/')[0]} در قیمت {last_price:.2f}, سود: {profit:.2f}$")
-                position = 0
+        if predicted_close > last_price * (1 + growth_threshold) and position == 0:  # خرید
+            position += trade_amount
+            capital -= trade_amount * last_price
+            logger.info(f"کندل {i+1}: خرید {trade_amount:.6f} {symbol.split('/')[0]} در قیمت {last_price:.2f}")
+        elif predicted_close < last_price * (1 - growth_threshold) and position > 0:  # فروش
+            capital += position * last_price
+            profit = (last_price - (last_price * 0.1)) * position  # سود ساده (بدون کارمزد)
+            capital += profit
+            logger.info(f"کندل {i+1}: فروش {position:.6f} {symbol.split('/')[0]} در قیمت {last_price:.2f}, سود: {profit:.2f}$")
+            position = 0
 
         last_price = predicted_close  # قیمت جدید برای کندل بعدی
 
@@ -195,7 +203,7 @@ def analyze_growth_potential(df, symbol):
     if model is None:
         return False, 0.0
 
-    last_data = df_processed[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi', 'momentum'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
+    last_data = df_processed[['open', 'high', 'low', 'volume_norm', 'ma5', 'pct_change', 'rsi', 'momentum', 'atr'] + [f'close_lag_{lag}' for lag in [1, 2, 3]]].iloc[-1].values
     predicted_close = predict_current_close(model, scaler, last_data)
     last_close = df_processed['close'].iloc[-1]
     predicted_growth = ((predicted_close - last_close) / last_close) * 100
