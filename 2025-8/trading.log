@@ -1,0 +1,17 @@
+2025-08-28 12:36:43,451 - ERROR - جفت‌ارز ADAUSDT در CoinEx موجود نیست.
+2025-08-28 12:36:51,758 - ERROR - جفت‌ارز ETHUSDT در CoinEx موجود نیست.
+2025-08-28 12:36:57,914 - ERROR - جفت‌ارز XRPUSDT در CoinEx موجود نیست.
+2025-08-28 12:45:10,013 - ERROR - خطا در گرفتن داده‌های ADA/USDT (تلاش 1/7): coinex GET https://api.coinex.com/v2/spot/kline?market=ADAUSDT&period=5min&limit=1&since=1756352700000, پاسخ سرور: نامشخص
+2025-08-28 12:55:10,009 - ERROR - خطا در گرفتن داده‌های ETH/USDT (تلاش 1/7): coinex GET https://api.coinex.com/v2/spot/kline?market=ETHUSDT&period=5min&limit=1&since=1756353300000, پاسخ سرور: نامشخص
+INFO:__main__:\u0634\u0631\u0648\u0639 \u0628\u0631\u0646\u0627\u0645\u0647
+INFO:__main__:\u0627\u062a\u0635\u0627\u0644 \u0628\u0647 CoinEx \u0628\u0627 \u0645\u0648\u0641\u0642\u06cc\u062a \u0627\u0646\u062c\u0627\u0645 \u0634\u062f.
+INFO:__main__:\u062a\u062d\u0644\u06cc\u0644 \u0632\u0646\u062f\u0647 ADA/USDT...
+INFO:__main__:\u062a\u0639\u062f\u0627\u062f \u06a9\u0646\u062f\u0644\u200c\u0647\u0627\u06cc \u062c\u0645\u0639\u200c\u0622\u0648\u0631\u06cc\u200c\u0634\u062f\u0647: 1000
+INFO:__main__:\u062a\u0639\u062f\u0627\u062f \u0646\u0645\u0648\u0646\u0647\u200c\u0647\u0627 \u0628\u0639\u062f \u0627\u0632 \u067e\u06cc\u0634\u200c\u067e\u0631\u062f\u0627\u0632\u0634: 995
+INFO:__main__:\u0628\u0647\u062a\u0631\u06cc\u0646 \u067e\u0627\u0631\u0627\u0645\u062a\u0631\u0647\u0627: {'max_depth': 7, 'n_estimators': 150}
+INFO:__main__:MSE (test): 4.870150583956048e-07, R2 (test): 0.9968401800169477
+INFO:__main__:\u0627\u0648\u0644\u06cc\u0646 \u06f5 \u067e\u06cc\u0634\u200c\u0628\u06cc\u0646\u06cc (test): [0.87375483 0.87200945 0.86812732 0.86919173 0.8703114 ]
+2025-08-28 15:33:51,571 - ERROR - جفت‌ارز ADAUSDT در CoinEx موجود نیست.
+2025-08-28 15:33:54,725 - ERROR - جفت‌ارز ETHUSDT در CoinEx موجود نیست.
+2025-08-28 15:33:57,963 - ERROR - جفت‌ارز XRPUSDT در CoinEx موجود نیست.
+2025-08-28 15:40:10,014 - ERROR - خطا در گرفتن داده‌های ADA/USDT (تلاش 1/7): coinex GET https://api.coinex.com/v2/spot/kline?market=ADAUSDT&period=5min&limit=1, پاسخ سرور: نامشخص

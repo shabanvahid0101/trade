@@ -1,0 +1,2 @@
+2025-08-28 16:30:10,027 - ERROR - خطا در گرفتن داده‌های ADA/USDT (تلاش 1/7): coinex GET https://api.coinex.com/v2/spot/kline?market=ADAUSDT&period=5min&limit=1, پاسخ سرور: نامشخص
+2025-08-28 16:35:10,022 - ERROR - خطا در گرفتن داده‌های ADA/USDT (تلاش 1/7): coinex GET https://api.coinex.com/v2/spot/kline?market=ADAUSDT&period=5min&limit=1, پاسخ سرور: نامشخص
