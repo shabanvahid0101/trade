@@ -1,0 +1,6 @@
+ccxt
+pandas
+scikit-learn
+numpy
+requests
+python-dotenv
