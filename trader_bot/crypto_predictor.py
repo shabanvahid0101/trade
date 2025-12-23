@@ -185,7 +185,28 @@ def evaluate_model(model, X_test, y_test, scaler, df_original):
     
     return mae, rmse, r2
 
-
+def predict_next_price(model, df_processed, scaler, sequence_length=60):
+    # Take last sequence (آخرین توالی)
+    last_sequence = df_processed.drop(columns=['timestamp']).values[-sequence_length:]
+    last_sequence = last_sequence.reshape((1, sequence_length, last_sequence.shape[1]))
+    
+    pred_scaled = model.predict(last_sequence, verbose=0)
+    
+    # Inverse scale
+    dummy = np.zeros((1, scaler.scale_.shape[0]))
+    dummy[0, 3] = pred_scaled[0, 0]
+    pred_price = scaler.inverse_transform(dummy)[0, 3]
+    
+    current_price = df_processed['close'].iloc[-1] * (scaler.data_max_[3] - scaler.data_min_[3]) + scaler.data_min_[3]  # Approximate current
+    # Better: use df_original
+    current_price = df_original['close'].iloc[-1]
+    
+    print(f"\nNext Candle Prediction:")
+    print(f"Current Price: {current_price:.2f} USD")
+    print(f"Predicted Next Close: {pred_price:.2f} USD")
+    print(f"Expected Change: {pred_price - current_price:.2f} USD ({((pred_price/current_price)-1)*100:.2f}%)")
+    
+    return pred_price
 
 # Test in main (تست در بخش اصلی)
 if __name__ == "__main__":
@@ -212,3 +233,4 @@ if __name__ == "__main__":
         print("\nModel trained and saved as btc_lstm_model.h5")
         # ... preprocess, sequences, train ...
         mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)
+        next_price = predict_next_price(model, df_processed, scaler)
