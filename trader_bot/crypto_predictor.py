@@ -108,7 +108,6 @@ def create_sequences(df_scaled, sequence_length=60):  # Function to create seque
     logging.info(f"Sequences created: X shape {X.shape}, y shape {y.shape}")
     # مثال: X shape = (900, 60, 12) یعنی ۹۰۰ نمونه، هر کدام ۶۰ timestep، ۱۲ feature
     return X, y
-def build_and_train_model(X, y, sequence_length=60):
     # Train/Test split - NO shuffle! (تقسیم بدون بهم زدن)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=False)
@@ -138,7 +137,41 @@ def build_and_train_model(X, y, sequence_length=60):
                         verbose=1)
     
     return model, X_test, y_test, history, scaler
-
+def build_and_train_model(X, y, sequence_length=60):
+    # Train/Test split - NO shuffle for time series (تقسیم بدون بهم زدن برای سری زمانی)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=False)
+    
+    logging.info(f"Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
+    
+    # Build improved LSTM model (ساخت مدل بهبودیافته LSTM)
+    model = Sequential()  # <--- این خط فراموش شده بود! حالا اضافه شد
+    
+    # لایه‌های بیشتر برای دقت بالاتر
+    model.add(LSTM(150, return_sequences=True, input_shape=(sequence_length, X.shape[2])))
+    model.add(Dropout(0.3))
+    model.add(LSTM(100, return_sequences=True))
+    model.add(Dropout(0.3))
+    model.add(LSTM(50, return_sequences=False))
+    model.add(Dropout(0.3))
+    model.add(Dense(50, activation='relu'))
+    model.add(Dense(1))  # خروجی: قیمت بعدی
+    
+    model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])  # اضافه کردن mae به metrics
+    model.summary()  # چاپ ساختار مدل
+    
+    # Early stopping برای جلوگیری از اورفیتینگ
+    early_stop = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True, verbose=1)
+    
+    # Train مدل
+    history = model.fit(X_train, y_train,
+                        validation_data=(X_val, y_val),
+                        epochs=150,  # بیشتر برای یادگیری بهتر
+                        batch_size=32,
+                        callbacks=[early_stop],
+                        verbose=1)
+    
+    return model, X_test, y_test, history, scaler
 def evaluate_model(model, X_test, y_test, scaler, df_original):
     # Predict on test set (پیش‌بینی روی داده تست)
     y_pred_scaled = model.predict(X_test)  # Scaled predictions (پیش‌بینی نرمال‌شده)
