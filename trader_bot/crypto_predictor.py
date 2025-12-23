@@ -241,7 +241,32 @@ def predict_next_price(model, df_processed, scaler, sequence_length=60):
     
     return pred_price
 
-# Test in main (تست در بخش اصلی)
+def live_trading_loop(model, scaler, symbol='BTC/USDT', timeframe='5m', sequence_length=60):
+    print("Live bot started! Press Ctrl+C to stop.")
+    while True:
+        try:
+            new_data = fetch_data(symbol, timeframe, limit=sequence_length + 100)
+            if new_data is not None:
+                _, _, df_original = preprocess_data(new_data)  # فقط برای current price
+                df_processed, _, _ = preprocess_data(new_data)
+                
+                predicted = predict_next_price(model, df_processed, scaler, sequence_length)
+                current = df_original['close'].iloc[-1]
+                
+                change_pct = ((predicted / current) - 1) * 100
+                if change_pct > 0.3:  # Threshold (آستانه)
+                    print(f"BUY SIGNAL! Expected +{change_pct:.2f}%")
+                    # send_telegram_message(...) اگر تلگرام داری
+                elif change_pct < -0.3:
+                    print(f"SELL SIGNAL! Expected {change_pct:.2f}%")
+                else:
+                    print(f"HOLD - Change: {change_pct:.2f}%")
+                
+            time.sleep(300)  # Every 5 minutes (هر ۵ دقیقه)
+        except Exception as e:
+            logging.error(f"Live loop error: {e}")
+            time.sleep(60)
+
 if __name__ == "__main__":
     data = fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000)
     if data is not None:
@@ -265,5 +290,6 @@ if __name__ == "__main__":
         model.save('btc_lstm_model.h5')  # Save model (ذخیره مدل)
         print("\nModel trained and saved as btc_lstm_model.h5")
         # ... preprocess, sequences, train ...
-        mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)
+        # mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)
         next_price = predict_next_price(model, df_processed, scaler)
+        live_trading_loop(model, scaler)

@@ -121,3 +121,38 @@
 2025-12-23 21:36:03,254 - Train: (569, 60, 13), Val: (143, 60, 13), Test: (179, 60, 13)
 2025-12-23 21:36:29,278 - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
 2025-12-23 21:36:29,843 - Evaluation - MAE: 189.87, RMSE: 229.37, R2: 0.7541
+2025-12-23 21:39:39,294 - Fetched 1000 rows for BTC/USDT
+2025-12-23 21:39:39,318 - Preprocessed data shape: (951, 14)
+2025-12-23 21:39:39,345 - Preprocessed data shape: (951, 14)
+2025-12-23 21:39:39,346 - Sequences created: X shape (891, 60, 13), y shape (891,)
+2025-12-23 21:39:39,348 - Train: (569, 60, 13), Val: (143, 60, 13), Test: (179, 60, 13)
+2025-12-23 21:39:56,023 - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-12-23 21:39:56,601 - Evaluation - MAE: 155.69, RMSE: 201.95, R2: 0.8094
+2025-12-23 21:40:12,008 - Fetched 160 rows for BTC/USDT
+2025-12-23 21:40:12,019 - Preprocessed data shape: (111, 14)
+2025-12-23 21:40:12,022 - Preprocessed data shape: (111, 14)
+2025-12-23 21:45:13,422 - Fetched 160 rows for BTC/USDT
+2025-12-23 21:45:13,432 - Preprocessed data shape: (111, 14)
+2025-12-23 21:45:13,435 - Preprocessed data shape: (111, 14)
+2025-12-23 22:09:14,677 - Fetched 1000 rows for BTC/USDT
+2025-12-23 22:09:14,704 - Preprocessed data shape: (951, 14)
+2025-12-23 22:09:14,730 - Preprocessed data shape: (951, 14)
+2025-12-23 22:09:14,732 - Sequences created: X shape (891, 60, 13), y shape (891,)
+2025-12-23 22:09:14,734 - Train: (569, 60, 13), Val: (143, 60, 13), Test: (179, 60, 13)
+2025-12-23 22:09:30,751 - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-12-23 22:09:31,274 - Evaluation - MAE: 168.28, RMSE: 227.76, R2: 0.7561
+2025-12-23 22:09:40,815 - Fetched 160 rows for BTC/USDT
+2025-12-23 22:09:40,825 - Preprocessed data shape: (111, 14)
+2025-12-23 22:09:40,827 - Preprocessed data shape: (111, 14)
+2025-12-23 22:13:42,425 - Fetched 1000 rows for BTC/USDT
+2025-12-23 22:13:42,451 - Preprocessed data shape: (951, 14)
+2025-12-23 22:13:42,481 - Preprocessed data shape: (951, 14)
+2025-12-23 22:13:42,482 - Sequences created: X shape (891, 60, 13), y shape (891,)
+2025-12-23 22:13:42,484 - Train: (569, 60, 13), Val: (143, 60, 13), Test: (179, 60, 13)
+2025-12-23 22:14:09,268 - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-12-23 22:14:10,894 - Fetched 160 rows for BTC/USDT
+2025-12-23 22:14:10,906 - Preprocessed data shape: (111, 14)
+2025-12-23 22:14:10,910 - Preprocessed data shape: (111, 14)
+2025-12-23 22:19:13,387 - Fetched 160 rows for BTC/USDT
+2025-12-23 22:19:13,402 - Preprocessed data shape: (111, 14)
+2025-12-23 22:19:13,407 - Preprocessed data shape: (111, 14)
