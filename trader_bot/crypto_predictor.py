@@ -4,6 +4,8 @@ import time  # For delays (برای تأخیرها)
 import logging  # For logs (برای لاگ‌ها)
 from dotenv import load_dotenv  # For env variables (برای متغیرهای محیطی)
 import os  # For OS operations (برای عملیات سیستم‌عامل)
+import numpy as np  # For calculations (برای محاسبات عددی)
+from sklearn.preprocessing import MinMaxScaler  # For scaling (برای نرمال‌سازی)
 
 load_dotenv()  # Load .env file (بارگذاری فایل .env)
 ACCESS_ID = os.getenv('Access_ID')  # API key (کلید API)
@@ -24,10 +26,52 @@ def fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000, retries=3):  # Fun
             logging.error(f"Retry {attempt+1}/{retries}: {e}")  # Log error (لاگ خطا)
             time.sleep(5)  # Wait (انتظار)
     return None  # If failed (اگر شکست خورد)
+def preprocess_data(df):  # Function for data preparation (تابع آماده‌سازی داده)
+    # Manual indicators (اندیکاتورهای دستی – بدون pandas_ta)
+    df['sma_50'] = df['close'].rolling(window=50).mean()  # Simple Moving Average (میانگین متحرک ساده)
+    df['ema_20'] = df['close'].ewm(span=20, adjust=False).mean()  # Exponential Moving Average (میانگین متحرک نمایی)
+    
+    # RSI manual (شاخص قدرت نسبی دستی)
+    delta = df['close'].diff()  # Price change (تغییر قیمت)
+    gain = delta.where(delta > 0, 0).rolling(window=14).mean()  # Average gain (میانگین سود)
+    loss = -delta.where(delta < 0, 0).rolling(window=14).mean()  # Average loss (میانگین ضرر)
+    rs = gain / loss  # Relative strength (قدرت نسبی)
+    df['rsi_14'] = 100 - (100 / (1 + rs))  # RSI formula (فرمول RSI)
+    
+    # Lagged features (ویژگی‌های تأخیری) – خیلی مهم برای time series
+    for lag in [1, 3, 5, 10]:  # Previous prices (قیمت‌های قبلی)
+        df[f'close_lag_{lag}'] = df['close'].shift(lag)
+    
+    # Volatility feature (نوسان قیمت – مفید برای پیش‌بینی)
+    df['volatility'] = df['high'] - df['low']
+    
+    df = df.dropna().reset_index(drop=True)  # Drop rows with NaN (حذف ردیف‌های ناقص)
+    
+    # Normalization (نرمال‌سازی به 0-1)
+    scaler = MinMaxScaler()
+    features = ['open', 'high', 'low', 'close', 'volume', 
+                'sma_50', 'ema_20', 'rsi_14', 
+                'close_lag_1', 'close_lag_3', 'close_lag_5', 'close_lag_10',
+                'volatility']
+    df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), 
+                             columns=features, 
+                             index=df.index)
+    df_scaled['timestamp'] = df['timestamp'].values  # Keep time (نگه داشتن زمان)
+    
+    logging.info(f"Preprocessed data shape: {df_scaled.shape}")  # Log shape (لاگ اندازه)
+    return df_scaled, scaler, df  # Return scaled, scaler, original (بازگشت داده اسکیل‌شده، اسکیلر، اصلی)
 
-if __name__ == "__main__":  # Main execution (اجرای اصلی)
-    data = fetch_data()  # Fetch data (گرفتن داده)
-    if data is not None:  # If data is valid (اگر داده معتبر است)
-        print(data.head())  # Print first rows (چاپ اولین ردیف‌ها)
-    else:
-        print("Failed to fetch data after retries.")  # Print failure message (چاپ پیام شکست)
+# Test in main (تست در بخش اصلی)
+if __name__ == "__main__":
+    data = fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000)
+    if data is not None:
+        print("Raw data head:")
+        print(data.head())
+        
+        df_processed, scaler, df_original = preprocess_data(data)
+        print("\nPreprocessed data head:")
+        print(df_processed.head())
+        
+        # Save to CSV for checking (ذخیره برای بررسی)
+        df_processed.to_csv('btc_preprocessed.csv')
+        print("\nData saved to btc_preprocessed.csv")
