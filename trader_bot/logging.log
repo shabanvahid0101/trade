@@ -6,3 +6,9 @@
 2025-12-23 14:09:37,346 - Preprocessed data shape: (951, 14)
 2025-12-23 14:14:18,942 - Fetched 1000 rows for BTC/USDT
 2025-12-23 14:14:18,969 - Preprocessed data shape: (951, 14)
+2025-12-23 15:55:57,991 - Fetched 1000 rows for BTC/USDT
+2025-12-23 15:55:58,013 - Preprocessed data shape: (951, 14)
+2025-12-23 15:56:58,612 - Fetched 1000 rows for BTC/USDT
+2025-12-23 15:56:58,635 - Preprocessed data shape: (951, 14)
+2025-12-23 15:56:58,662 - Preprocessed data shape: (951, 14)
+2025-12-23 15:57:06,118 - Sequences created: X shape (891, 60, 13), y shape (891,)

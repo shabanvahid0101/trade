@@ -87,6 +87,23 @@ def eda(df_original, df_processed):
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
     plt.title('Feature Correlation')
     plt.show()
+def create_sequences(df_scaled, sequence_length=60):  # Function to create sequences (تابع ساخت توالی)
+    X, y = [], []  # X: input sequences, y: target price (X: توالی‌های ورودی، y: قیمت هدف)
+    
+    # Drop timestamp for modeling (حذف زمان برای مدل‌سازی)
+    data_values = df_scaled.drop(columns=['timestamp']).values
+    
+    for i in range(sequence_length, len(data_values)):  # Loop over data (حلقه روی داده)
+        X.append(data_values[i-sequence_length:i])  # Last 60 rows as input (۶۰ ردیف قبلی)
+        y.append(data_values[i, 3])  # Index 3 = 'close' column (ستون close هدف پیش‌بینی)
+    
+    X = np.array(X)  # Convert to numpy array (تبدیل به آرایه نامپای)
+    y = np.array(y)
+    
+    logging.info(f"Sequences created: X shape {X.shape}, y shape {y.shape}")
+    # مثال: X shape = (900, 60, 12) یعنی ۹۰۰ نمونه، هر کدام ۶۰ timestep، ۱۲ feature
+    return X, y
+
 # Test in main (تست در بخش اصلی)
 if __name__ == "__main__":
     data = fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000)
@@ -100,4 +117,11 @@ if __name__ == "__main__":
         # Save to CSV for checking (ذخیره برای بررسی)
         df_processed.to_csv('btc_preprocessed.csv')
         print("\nData saved to btc_preprocessed.csv")
+        df_processed, scaler, df_original = preprocess_data(data)
+        eda(df_original, df_processed)  # قبلی
+        
+        X, y = create_sequences(df_processed, sequence_length=60)
+        print(f"\nSequences ready!")
+        print(f"X shape: {X.shape}  -> (samples, timesteps, features)")
+        print(f"y shape: {y.shape}  -> target close prices (normalized)")
         eda(df_original, df_processed)
