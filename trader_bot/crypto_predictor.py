@@ -5,10 +5,11 @@ import logging  # For logs (برای لاگ‌ها)
 from dotenv import load_dotenv  # For env variables (برای متغیرهای محیطی)
 import os  # For OS operations (برای عملیات سیستم‌عامل)
 import numpy as np  # For calculations (برای محاسبات عددی)
-from sklearn.preprocessing import MinMaxScaler  # For scaling (برای نرمال‌سازی)
 import matplotlib.pyplot as plt  # For plotting (برای رسم نمودار)
 import seaborn as sns  # For better plots (برای نمودارهای زیباتر)
+from sklearn.preprocessing import MinMaxScaler  # For scaling (برای نرمال‌سازی)
 from sklearn.model_selection import train_test_split  # For splitting (برای تقسیم داده)
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score  # Metrics (معیارهای ارزیابی)
 from tensorflow.keras.models import Sequential  # Keras model (مدل کراس)
 from tensorflow.keras.layers import LSTM, Dense, Dropout  # Layers (لایه‌ها)
 from tensorflow.keras.callbacks import EarlyStopping  # To stop early (توقف زودهنگام)
@@ -138,6 +139,54 @@ def build_and_train_model(X, y, sequence_length=60):
     
     return model, X_test, y_test, history, scaler
 
+def evaluate_model(model, X_test, y_test, scaler, df_original):
+    # Predict on test set (پیش‌بینی روی داده تست)
+    y_pred_scaled = model.predict(X_test)  # Scaled predictions (پیش‌بینی نرمال‌شده)
+    
+    # Inverse transform only 'close' column (معکوس نرمال‌سازی فقط برای ستون close)
+    # Create dummy array with same shape as features
+    dummy_pred = np.zeros((len(y_pred_scaled), scaler.scale_.shape[0]))
+    dummy_pred[:, 3] = y_pred_scaled.flatten()  # Index 3 = close column
+    y_pred = scaler.inverse_transform(dummy_pred)[:, 3]
+    
+    dummy_test = np.zeros((len(y_test), scaler.scale_.shape[0]))
+    dummy_test[:, 3] = y_test
+    y_test_actual = scaler.inverse_transform(dummy_test)[:, 3]
+    
+    # Calculate metrics (محاسبه معیارها)
+    mae = mean_absolute_error(y_test_actual, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test_actual, y_pred))
+    r2 = r2_score(y_test_actual, y_pred)
+    
+    logging.info(f"Evaluation - MAE: {mae:.2f}, RMSE: {rmse:.2f}, R2: {r2:.4f}")
+    print(f"\nModel Evaluation Results:")
+    print(f"MAE (Mean Absolute Error): {mae:.2f} USD")
+    print(f"RMSE (Root Mean Squared Error): {rmse:.2f} USD")
+    print(f"R² Score: {r2:.4f} (closer to 1 = better)")
+    
+    # Plot actual vs predicted (نمودار واقعی در مقابل پیش‌بینی)
+    plt.figure(figsize=(14, 6))
+    plt.plot(y_test_actual[-200:], label='Actual Price', alpha=0.8)  # Last 200 points (۲۰۰ نقطه آخر)
+    plt.plot(y_pred[-200:], label='Predicted Price', alpha=0.8)
+    plt.title('Actual vs Predicted BTC Price (Test Set)')
+    plt.xlabel('Time Steps')
+    plt.ylabel('Price (USD)')
+    plt.legend()
+    plt.show()
+    
+    # Plot prediction error (نمودار خطا)
+    errors = y_test_actual - y_pred
+    plt.figure(figsize=(14, 4))
+    plt.plot(errors[-200:])
+    plt.title('Prediction Errors (Actual - Predicted)')
+    plt.axhline(0, color='red', linestyle='--')
+    plt.ylabel('Error (USD)')
+    plt.show()
+    
+    return mae, rmse, r2
+
+
+
 # Test in main (تست در بخش اصلی)
 if __name__ == "__main__":
     data = fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000)
@@ -161,3 +210,5 @@ if __name__ == "__main__":
         model, X_test, y_test, history, scaler = build_and_train_model(X, y)
         model.save('btc_lstm_model.h5')  # Save model (ذخیره مدل)
         print("\nModel trained and saved as btc_lstm_model.h5")
+        # ... preprocess, sequences, train ...
+        mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)
