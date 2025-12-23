@@ -6,6 +6,8 @@ from dotenv import load_dotenv  # For env variables (برای متغیرهای �
 import os  # For OS operations (برای عملیات سیستم‌عامل)
 import numpy as np  # For calculations (برای محاسبات عددی)
 from sklearn.preprocessing import MinMaxScaler  # For scaling (برای نرمال‌سازی)
+import matplotlib.pyplot as plt  # For plotting (برای رسم نمودار)
+import seaborn as sns  # For better plots (برای نمودارهای زیباتر)
 
 load_dotenv()  # Load .env file (بارگذاری فایل .env)
 ACCESS_ID = os.getenv('Access_ID')  # API key (کلید API)
@@ -61,6 +63,30 @@ def preprocess_data(df):  # Function for data preparation (تابع آماده�
     logging.info(f"Preprocessed data shape: {df_scaled.shape}")  # Log shape (لاگ اندازه)
     return df_scaled, scaler, df  # Return scaled, scaler, original (بازگشت داده اسکیل‌شده، اسکیلر، اصلی)
 
+def eda(df_original, df_processed):
+    # Price plot (نمودار قیمت)
+    plt.figure(figsize=(14, 6))
+    plt.plot(df_original['timestamp'], df_original['close'], label='Close Price')
+    plt.plot(df_original['timestamp'], df_original['sma_50'], label='SMA 50', alpha=0.7)
+    plt.plot(df_original['timestamp'], df_original['ema_20'], label='EMA 20', alpha=0.7)
+    plt.title('BTC Price with Moving Averages')
+    plt.legend()
+    plt.show()
+    
+    # RSI plot
+    plt.figure(figsize=(14, 4))
+    plt.plot(df_original['timestamp'], df_original['rsi_14'])
+    plt.axhline(70, color='r', linestyle='--', alpha=0.5)  # Overbought (اشباع خرید)
+    plt.axhline(30, color='g', linestyle='--', alpha=0.5)  # Oversold (اشباع فروش)
+    plt.title('RSI Indicator')
+    plt.show()
+    
+    # Correlation heatmap (نقشه حرارتی همبستگی)
+    plt.figure(figsize=(12, 10))
+    corr = df_processed.drop(columns=['timestamp']).corr()
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
+    plt.title('Feature Correlation')
+    plt.show()
 # Test in main (تست در بخش اصلی)
 if __name__ == "__main__":
     data = fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000)
@@ -71,7 +97,7 @@ if __name__ == "__main__":
         df_processed, scaler, df_original = preprocess_data(data)
         print("\nPreprocessed data head:")
         print(df_processed.head())
-        
         # Save to CSV for checking (ذخیره برای بررسی)
         df_processed.to_csv('btc_preprocessed.csv')
         print("\nData saved to btc_preprocessed.csv")
+        eda(df_original, df_processed)
