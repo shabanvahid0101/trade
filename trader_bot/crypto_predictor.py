@@ -25,9 +25,9 @@ def fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000, retries=3):  # Fun
             time.sleep(5)  # Wait (انتظار)
     return None  # If failed (اگر شکست خورد)
 
-# Test (تست)
-df = fetch_data()  # Call function (فراخوانی تابع)
-if df is not None:  # Check if data exists (چک اگر داده وجود داره)
-    logging.info("Data fetch successful.")  # Log success (لاگ موفقیت)
-else:
-    logging.error("Data fetch failed after retries.")  # Log failure (لاگ شکست)
+if __name__ == "__main__":  # Main execution (اجرای اصلی)
+    data = fetch_data()  # Fetch data (گرفتن داده)
+    if data is not None:  # If data is valid (اگر داده معتبر است)
+        print(data.head())  # Print first rows (چاپ اولین ردیف‌ها)
+    else:
+        print("Failed to fetch data after retries.")  # Print failure message (چاپ پیام شکست)
