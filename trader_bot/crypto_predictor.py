@@ -8,6 +8,10 @@ import numpy as np  # For calculations (برای محاسبات عددی)
 from sklearn.preprocessing import MinMaxScaler  # For scaling (برای نرمال‌سازی)
 import matplotlib.pyplot as plt  # For plotting (برای رسم نمودار)
 import seaborn as sns  # For better plots (برای نمودارهای زیباتر)
+from sklearn.model_selection import train_test_split  # For splitting (برای تقسیم داده)
+from tensorflow.keras.models import Sequential  # Keras model (مدل کراس)
+from tensorflow.keras.layers import LSTM, Dense, Dropout  # Layers (لایه‌ها)
+from tensorflow.keras.callbacks import EarlyStopping  # To stop early (توقف زودهنگام)
 
 load_dotenv()  # Load .env file (بارگذاری فایل .env)
 ACCESS_ID = os.getenv('Access_ID')  # API key (کلید API)
@@ -103,6 +107,36 @@ def create_sequences(df_scaled, sequence_length=60):  # Function to create seque
     logging.info(f"Sequences created: X shape {X.shape}, y shape {y.shape}")
     # مثال: X shape = (900, 60, 12) یعنی ۹۰۰ نمونه، هر کدام ۶۰ timestep، ۱۲ feature
     return X, y
+def build_and_train_model(X, y, sequence_length=60):
+    # Train/Test split - NO shuffle! (تقسیم بدون بهم زدن)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=False)
+    
+    logging.info(f"Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
+    
+    # Build LSTM model (ساخت مدل LSTM)
+    model = Sequential()
+    model.add(LSTM(100, return_sequences=True, input_shape=(sequence_length, X.shape[2])))  # First layer (لایه اول)
+    model.add(Dropout(0.2))  # Prevent overfitting (جلوگیری از اورفیتینگ)
+    model.add(LSTM(50, return_sequences=False))  # Second layer (لایه دوم)
+    model.add(Dropout(0.2))
+    model.add(Dense(25, activation='relu'))  # Fully connected (لایه تمام‌متصل)
+    model.add(Dense(1))  # Output: one price (خروجی: یک قیمت)
+    
+    model.compile(optimizer='adam', loss='mean_squared_error')  # Compile (کامپایل)
+    model.summary()  # Print model structure (چاپ ساختار مدل)
+    
+    # Early stopping (توقف اگر بهتر نشد)
+    early_stop = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+    # Train (آموزش مدل)
+    history = model.fit(X_train, y_train,
+                        validation_data=(X_val, y_val),
+                        epochs=100,  # Max epochs (حداکثر اپوک)
+                        batch_size=32,
+                        callbacks=[early_stop],
+                        verbose=1)
+    
+    return model, X_test, y_test, history, scaler
 
 # Test in main (تست در بخش اصلی)
 if __name__ == "__main__":
@@ -118,10 +152,12 @@ if __name__ == "__main__":
         df_processed.to_csv('btc_preprocessed.csv')
         print("\nData saved to btc_preprocessed.csv")
         df_processed, scaler, df_original = preprocess_data(data)
-        eda(df_original, df_processed)  # قبلی
         
         X, y = create_sequences(df_processed, sequence_length=60)
         print(f"\nSequences ready!")
         print(f"X shape: {X.shape}  -> (samples, timesteps, features)")
         print(f"y shape: {y.shape}  -> target close prices (normalized)")
-        eda(df_original, df_processed)
+        # eda(df_original, df_processed)
+        model, X_test, y_test, history, scaler = build_and_train_model(X, y)
+        model.save('btc_lstm_model.h5')  # Save model (ذخیره مدل)
+        print("\nModel trained and saved as btc_lstm_model.h5")
