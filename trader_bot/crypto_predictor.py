@@ -32,7 +32,7 @@ load_dotenv()  # Load .env file (بارگذاری فایل .env)
 ACCESS_ID = os.getenv('Access_ID')  # API key (کلید API)
 SECRET_KEY = os.getenv('Secret_Key')  # API secret (راز API)
 
-def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, file='btc_history.csv', retries=3):
+def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, file='dataset/btc_history.csv', retries=3):
     exchange = ccxt.coinex({'apiKey': ACCESS_ID, 'secret': SECRET_KEY, 'enableRateLimit': True})
     
     # Step 1: Load existing dataset if exists (بارگذاری دیتاست موجود اگر وجود داره)
@@ -111,7 +111,7 @@ def eda(df_original, df_processed):
     plt.plot(df_original['timestamp'], df_original['ema_20'], label='EMA 20', alpha=0.7)
     plt.title('BTC Price with Moving Averages')
     plt.legend()
-    plt.savefig('btc_price_ma.png')
+    plt.savefig('pic/new/btc_price_ma.png')
     plt.close()
     
     plt.figure(figsize=(14, 4))
@@ -119,14 +119,14 @@ def eda(df_original, df_processed):
     plt.axhline(70, color='r', linestyle='--', alpha=0.5)
     plt.axhline(30, color='g', linestyle='--', alpha=0.5)
     plt.title('RSI Indicator')
-    plt.savefig('rsi_indicator.png')
+    plt.savefig('pic/new/rsi_indicator.png')
     plt.close()
     
     plt.figure(figsize=(12, 10))
     corr = df_processed.drop(columns=['timestamp']).corr()
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
     plt.title('Feature Correlation')
-    plt.savefig('feature_correlation.png')
+    plt.savefig('pic/new/feature_correlation.png')
     plt.close()
 
 def create_sequences(df_scaled, sequence_length=60):
@@ -194,7 +194,7 @@ def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     plt.xlabel('Time Steps')
     plt.ylabel('Price (USD)')
     plt.legend()
-    plt.savefig('actual_vs_predicted.png')
+    plt.savefig('pic/new/actual_vs_predicted.png')
     plt.close()
     
     errors = y_test_actual - y_pred
@@ -203,7 +203,7 @@ def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     plt.title('Prediction Errors')
     plt.axhline(0, color='red', linestyle='--')
     plt.ylabel('Error (USD)')
-    plt.savefig('prediction_errors.png')
+    plt.savefig('pic/new/prediction_errors.png')
     plt.close()
     
     return mae, rmse, r2
@@ -231,7 +231,7 @@ def live_trading_loop(model, scaler, symbol='BTC/USDT', timeframe='5m', sequence
     print("Live bot started! Press Ctrl+C to stop.")
     while True:
         try:
-            new_data = fetch_and_update_data(symbol, timeframe, total_limit=sequence_length + 200)
+            new_data = fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, file='dataset/btc_history.csv', retries=3)
             if new_data is not None:
                 df_processed, scaler_new, df_original = preprocess_data(new_data)
                 predicted = predict_next_price(model, df_processed, scaler, sequence_length)
@@ -259,8 +259,8 @@ if __name__ == "__main__":
         df_processed, scaler, df_original = preprocess_data(data)
         print("\nPreprocessed data head:")
         print(df_processed.head())
-        df_processed.to_csv('btc_preprocessed.csv')
-        print("\nData saved to btc_preprocessed.csv")
+        df_processed.to_csv('dataset/btc_preprocessed.csv')
+        print("\nData saved to dataset/btc_preprocessed.csv")
         
         X, y = create_sequences(df_processed, sequence_length=60)
         print(f"\nSequences ready!")

@@ -199,3 +199,72 @@
 2025-12-24 19:14:25,142 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
 2025-12-24 19:15:25,143 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
 2025-12-24 19:16:25,142 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:41:03,002 - INFO - Existing dataset loaded: 1011 candles, fetching from since 1766570700001
+2025-12-24 21:41:06,111 - INFO - Fetched 31 new candles
+2025-12-24 21:41:06,115 - INFO - Updated dataset: 1042 candles (added 31 new)
+2025-12-24 21:41:06,179 - INFO - Sequences created: X shape (933, 60, 15), y shape (933,)
+2025-12-24 21:41:06,596 - INFO - Train: (596, 60, 15), Val: (150, 60, 15), Test: (187, 60, 15)
+2025-12-24 21:43:07,029 - INFO - Evaluation - MAE: 142.26, RMSE: 174.52, R2: 0.5716
+2025-12-24 21:43:07,231 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:44:07,231 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:45:07,233 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:46:07,234 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:47:07,235 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:48:07,236 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:49:07,237 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:50:07,238 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:51:07,238 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:52:07,239 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:53:07,241 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:54:07,241 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:55:07,242 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:56:07,243 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:57:07,244 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:58:07,245 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 21:59:07,246 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:00:07,247 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:04:16,910 - INFO - No existing dataset - fetching new
+2025-12-24 22:04:19,665 - INFO - Fetched 1000 new candles
+2025-12-24 22:04:19,670 - INFO - Updated dataset: 1000 candles (added 1000 new)
+2025-12-24 22:04:47,670 - INFO - No existing dataset - fetching new
+2025-12-24 22:04:55,163 - INFO - Fetched 1000 new candles
+2025-12-24 22:04:55,168 - INFO - Updated dataset: 1000 candles (added 1000 new)
+2025-12-24 22:04:55,229 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
+2025-12-24 22:05:23,990 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766581200001
+2025-12-24 22:05:25,145 - INFO - Fetched 1 new candles
+2025-12-24 22:05:25,149 - INFO - Updated dataset: 1001 candles (added 1 new)
+2025-12-24 22:05:25,212 - INFO - Sequences created: X shape (892, 60, 15), y shape (892,)
+2025-12-24 22:05:25,598 - INFO - Train: (570, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
+2025-12-24 22:09:03,462 - INFO - Evaluation - MAE: 126.55, RMSE: 154.16, R2: 0.5860
+2025-12-24 22:09:03,684 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:10:03,684 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:12:47,677 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:13:47,682 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:14:47,683 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:15:47,685 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:16:47,686 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:17:47,688 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:18:47,689 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:19:47,690 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:20:47,690 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:21:47,691 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:22:47,693 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:23:47,694 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:24:47,695 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:25:47,696 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:28:09,833 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
+2025-12-24 22:34:56,608 - INFO - Existing dataset loaded: 1001 candles, fetching from since 1766581500001
+2025-12-24 22:34:58,682 - INFO - Fetched 5 new candles
+2025-12-24 22:34:58,685 - INFO - Updated dataset: 1006 candles (added 5 new)
+2025-12-24 22:34:58,736 - INFO - Sequences created: X shape (897, 60, 15), y shape (897,)
+2025-12-24 22:34:59,139 - INFO - Train: (573, 60, 15), Val: (144, 60, 15), Test: (180, 60, 15)
+2025-12-24 22:37:21,719 - INFO - Evaluation - MAE: 119.01, RMSE: 142.12, R2: 0.6362
+2025-12-24 22:37:21,948 - INFO - Existing dataset loaded: 1006 candles, fetching from since 1766583000001
+2025-12-24 22:37:24,469 - INFO - Fetched 1 new candles
+2025-12-24 22:37:24,472 - INFO - Updated dataset: 1007 candles (added 1 new)
+2025-12-24 22:42:24,594 - INFO - Existing dataset loaded: 1007 candles, fetching from since 1766583300001
+2025-12-24 22:42:27,442 - INFO - Fetched 1 new candles
+2025-12-24 22:42:27,445 - INFO - Updated dataset: 1008 candles (added 1 new)
+2025-12-24 22:47:27,570 - INFO - Existing dataset loaded: 1008 candles, fetching from since 1766583600001
+2025-12-24 22:47:29,270 - INFO - Fetched 1 new candles
+2025-12-24 22:47:29,273 - INFO - Updated dataset: 1009 candles (added 1 new)
