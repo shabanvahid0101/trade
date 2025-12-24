@@ -13,12 +13,13 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score  #
 from tensorflow.keras.models import Sequential  # Keras model (مدل کراس)
 from tensorflow.keras.layers import LSTM, Dense, Dropout  # Layers (لایه‌ها)
 from tensorflow.keras.callbacks import EarlyStopping  # To stop early (توقف زودهنگام)
+import tensorflow as tf; tf.config.list_physical_devices('GPU')
 
 load_dotenv()  # Load .env file (بارگذاری فایل .env)
 ACCESS_ID = os.getenv('Access_ID')  # API key (کلید API)
 SECRET_KEY = os.getenv('Secret_Key')  # API secret (راز API)
 
-logging.basicConfig(filename='logging.log',level=logging.INFO,format='%(asctime)s - %(message)s',force=True)  # Set log level (تنظیم سطح لاگ)
+logging.basicConfig(filename='logging.log',level=logging.INFO,format='%(asctime)s - %(message)s',force=False)  # Set log level (تنظیم سطح لاگ)
 
 def fetch_data(symbol='BTC/USDT', timeframe='5m', limit=1000, retries=3):  # Function to get data (تابع برای گرفتن داده)
     exchange = ccxt.coinex({'apiKey': ACCESS_ID, 'secret': SECRET_KEY, 'enableRateLimit': True})  # Connect to exchange (اتصال به صرافی)
@@ -37,12 +38,16 @@ def preprocess_data(df):  # Function for data preparation (تابع آماده�
     # Manual indicators (اندیکاتورهای دستی – بدون pandas_ta)
     df['sma_50'] = df['close'].rolling(window=50).mean()  # Simple Moving Average (میانگین متحرک ساده)
     df['ema_20'] = df['close'].ewm(span=20, adjust=False).mean()  # Exponential Moving Average (میانگین متحرک نمایی)
-    
+    # در preprocess_data اضافه کن:
+    df['macd'] = df['ema_12'] = df['close'].ewm(span=12, adjust=False).mean()
+    df['macd_signal'] = df['ema_26'] = df['close'].ewm(span=26, adjust=False).mean()
+    df['macd'] = df['ema_12'] - df['ema_26']
+    df['macd_signal'] = df['macd'].ewm(span=9, adjust=False).mean()
     # RSI manual (شاخص قدرت نسبی دستی)
     delta = df['close'].diff()  # Price change (تغییر قیمت)
     gain = delta.where(delta > 0, 0).rolling(window=14).mean()  # Average gain (میانگین سود)
     loss = -delta.where(delta < 0, 0).rolling(window=14).mean()  # Average loss (میانگین ضرر)
-    rs = gain / loss  # Relative strength (قدرت نسبی)
+    rs = gain / loss.replace(0, np.nan).fillna(1e-10)  # Relative strength (قدرت نسبی)
     df['rsi_14'] = 100 - (100 / (1 + rs))  # RSI formula (فرمول RSI)
     
     # Lagged features (ویژگی‌های تأخیری) – خیلی مهم برای time series
@@ -56,10 +61,7 @@ def preprocess_data(df):  # Function for data preparation (تابع آماده�
     
     # Normalization (نرمال‌سازی به 0-1)
     scaler = MinMaxScaler()
-    features = ['open', 'high', 'low', 'close', 'volume', 
-                'sma_50', 'ema_20', 'rsi_14', 
-                'close_lag_1', 'close_lag_3', 'close_lag_5', 'close_lag_10',
-                'volatility']
+    features = [col for col in df.columns if col != 'timestamp']
     df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), 
                              columns=features, 
                              index=df.index)
@@ -76,7 +78,8 @@ def eda(df_original, df_processed):
     plt.plot(df_original['timestamp'], df_original['ema_20'], label='EMA 20', alpha=0.7)
     plt.title('BTC Price with Moving Averages')
     plt.legend()
-    plt.show()
+    plt.savefig('pic/btc_price_ma.png')
+    plt.close()
     
     # RSI plot
     plt.figure(figsize=(14, 4))
@@ -84,14 +87,17 @@ def eda(df_original, df_processed):
     plt.axhline(70, color='r', linestyle='--', alpha=0.5)  # Overbought (اشباع خرید)
     plt.axhline(30, color='g', linestyle='--', alpha=0.5)  # Oversold (اشباع فروش)
     plt.title('RSI Indicator')
-    plt.show()
+    plt.savefig('pic/btc_rsi.png')
+    plt.close()
     
     # Correlation heatmap (نقشه حرارتی همبستگی)
     plt.figure(figsize=(12, 10))
     corr = df_processed.drop(columns=['timestamp']).corr()
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
     plt.title('Feature Correlation')
-    plt.show()
+    plt.savefig('pic/btc_correlation_heatmap.png')
+    plt.close()
+
 def create_sequences(df_scaled, sequence_length=60):  # Function to create sequences (تابع ساخت توالی)
     X, y = [], []  # X: input sequences, y: target price (X: توالی‌های ورودی، y: قیمت هدف)
     
@@ -154,6 +160,7 @@ def build_and_train_model(X, y, sequence_length=60):
     model.add(Dropout(0.3))
     model.add(LSTM(50, return_sequences=False))
     model.add(Dropout(0.3))
+    model.add(Bidirectional(LSTM(50)))
     model.add(Dense(50, activation='relu'))
     model.add(Dense(1))  # خروجی: قیمت بعدی
     
@@ -205,7 +212,8 @@ def evaluate_model(model, X_test, y_test, scaler, df_original):
     plt.xlabel('Time Steps')
     plt.ylabel('Price (USD)')
     plt.legend()
-    plt.show()
+    plt.savefig('pic/btc_actual_vs_predicted.png')
+    plt.close()
     
     # Plot prediction error (نمودار خطا)
     errors = y_test_actual - y_pred
@@ -214,7 +222,8 @@ def evaluate_model(model, X_test, y_test, scaler, df_original):
     plt.title('Prediction Errors (Actual - Predicted)')
     plt.axhline(0, color='red', linestyle='--')
     plt.ylabel('Error (USD)')
-    plt.show()
+    plt.savefig('pic/btc_prediction_errors.png')
+    plt.close()
     
     return mae, rmse, r2
 
@@ -278,18 +287,16 @@ if __name__ == "__main__":
         print(df_processed.head())
         # Save to CSV for checking (ذخیره برای بررسی)
         df_processed.to_csv('btc_preprocessed.csv')
-        print("\nData saved to btc_preprocessed.csv")
-        df_processed, scaler, df_original = preprocess_data(data)
-        
+        print("\nData saved to btc_preprocessed.csv")        
         X, y = create_sequences(df_processed, sequence_length=60)
         print(f"\nSequences ready!")
         print(f"X shape: {X.shape}  -> (samples, timesteps, features)")
         print(f"y shape: {y.shape}  -> target close prices (normalized)")
-        # eda(df_original, df_processed)
+        eda(df_original, df_processed)
         model, X_test, y_test, history, scaler = build_and_train_model(X, y)
         model.save('btc_lstm_model.h5')  # Save model (ذخیره مدل)
         print("\nModel trained and saved as btc_lstm_model.h5")
         # ... preprocess, sequences, train ...
-        # mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)
+        mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)
         next_price = predict_next_price(model, df_processed, scaler)
         live_trading_loop(model, scaler)
