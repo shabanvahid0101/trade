@@ -395,3 +395,22 @@
 2025-12-25 13:58:29,706 - INFO - Existing dataset loaded: 1027 candles, fetching from since 1766638200001
 2025-12-25 13:58:33,834 - INFO - Fetched 1 new candles
 2025-12-25 13:58:33,843 - INFO - Updated dataset: 1028 candles (added 1 new)
+2025-12-25 14:14:08,416 - INFO - Existing dataset loaded: 1028 candles, fetching from since 1766638500001
+2025-12-25 14:14:09,747 - INFO - Fetched 3 new candles
+2025-12-25 14:14:09,760 - INFO - Updated dataset: 1031 candles (added 3 new)
+2025-12-25 14:14:09,795 - INFO - Sequences created: X shape (922, 60, 9), y shape (922,)
+2025-12-25 14:14:10,150 - INFO - Train: (589, 60, 9), Val: (148, 60, 9), Test: (185, 60, 9)
+2025-12-25 14:14:55,165 - INFO - Sequences created: X shape (922, 60, 9), y shape (922,)
+2025-12-25 14:14:57,254 - INFO - Evaluation - MAE: 45.63, RMSE: 54.56, R2: 0.9524
+2025-12-25 14:14:57,453 - INFO - Existing dataset loaded: 1031 candles, fetching from since 1766639400001
+2025-12-25 14:14:58,791 - INFO - No new data available
+2025-12-25 14:14:58,791 - INFO - No new data - returning existing
+2025-12-25 14:19:58,880 - INFO - Existing dataset loaded: 1031 candles, fetching from since 1766639400001
+2025-12-25 14:20:00,123 - INFO - Fetched 2 new candles
+2025-12-25 14:20:00,133 - INFO - Updated dataset: 1033 candles (added 2 new)
+2025-12-25 14:25:00,220 - INFO - Existing dataset loaded: 1033 candles, fetching from since 1766640000001
+2025-12-25 14:25:01,708 - INFO - Fetched 1 new candles
+2025-12-25 14:25:01,716 - INFO - Updated dataset: 1034 candles (added 1 new)
+2025-12-25 14:50:10,060 - INFO - Existing dataset loaded: 1034 candles, fetching from since 1766640300001
+2025-12-25 14:50:11,957 - INFO - Fetched 5 new candles
+2025-12-25 14:50:11,970 - INFO - Updated dataset: 1039 candles (added 5 new)

@@ -247,6 +247,58 @@ def live_trading_loop(model, scaler, sequence_length=60):
             logging.error(f"Live loop error: {e}")
             time.sleep(60)
 
+def backtest(data, model, scaler, sequence_length=60, initial_capital=10000, threshold=0.3):
+    df_processed, _, _ = preprocess_data(data.copy())
+    X, _ = create_sequences(df_processed, sequence_length)
+    
+    predictions = model.predict(X)
+    
+    # Inverse scale predictions (معکوس نرمال‌سازی پیش‌بینی‌ها)
+    dummy = np.zeros((len(predictions), scaler.scale_.shape[0]))
+    dummy[:, 3] = predictions.flatten()
+    predicted_prices = scaler.inverse_transform(dummy)[:, 3]
+    
+    actual_prices = data['close'].iloc[sequence_length:].values  # Actual next close (قیمت واقعی بعدی)
+    
+    capital = initial_capital
+    position = 0  # 0 = no position, 1 = long (خرید)
+    trades = []  # List of trades (لیست تریدها)
+    
+    for i in range(len(predicted_prices)):
+        current_price = actual_prices[i]
+        predicted = predicted_prices[i]
+        change_pct = (predicted - current_price) / current_price * 100
+        
+        if change_pct > threshold and position == 0:
+            position = 1
+            buy_price = current_price
+            trades.append(f"BUY at {current_price:.2f} on {data['timestamp'].iloc[sequence_length + i]}")
+        elif change_pct < -threshold and position == 1:
+            position = 0
+            sell_price = current_price
+            profit = (sell_price - buy_price) / buy_price * capital
+            capital += profit
+            trades.append(f"SELL at {sell_price:.2f}, Profit: {profit:.2f} USD")
+    
+    # Final sell if holding (فروش نهایی اگر نگه داشته)
+    if position == 1:
+        sell_price = actual_prices[-1]
+        profit = (sell_price - buy_price) / buy_price * capital
+        capital += profit
+        trades.append(f"FINAL SELL at {sell_price:.2f}, Profit: {profit:.2f} USD")
+    
+    total_return = (capital - initial_capital) / initial_capital * 100
+    print(f"\nBacktesting Results:")
+    print(f"Initial Capital: ${initial_capital:.2f}")
+    print(f"Final Capital: ${capital:.2f}")
+    print(f"Total Return: {total_return:.2f}%")
+    print(f"Number of Trades: {len(trades)//2 if position == 0 else len(trades)//2 + 1}")
+    print("\nTrades:")
+    for trade in trades:
+        print(trade)
+    
+    return capital, total_return
+
 if __name__ == "__main__":
 
     data = fetch_and_update_data(symbol='BTC/USDT', timeframe='5m')
@@ -269,7 +321,9 @@ if __name__ == "__main__":
         
         model, X_test, y_test, history, scaler = build_and_train_model(X, y)
         model.save('btc_lstm_model.keras')  # Use Keras format (فرمت جدید)
+
         print("\nModel trained and saved as btc_lstm_model.keras")
+        capital, return_pct = backtest(data, model, scaler)
         
         mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)
         
