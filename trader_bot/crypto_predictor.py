@@ -11,43 +11,42 @@ from sklearn.preprocessing import MinMaxScaler  # For scaling (برای نرما
 from sklearn.model_selection import train_test_split  # For splitting (برای تقسیم داده)
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score  # Metrics (معیارهای ارزیابی)
 from tensorflow.keras.models import Sequential  # Keras model (مدل کراس)
-from tensorflow.keras.layers import LSTM, Dense, Dropout,Bidirectional  # Layers (لایه‌ها)
+from tensorflow.keras.layers import LSTM, Dense, Dropout, Bidirectional, Input  # Layers (لایه‌ها)
 from tensorflow.keras.callbacks import EarlyStopping  # To stop early (توقف زودهنگام)
-import tensorflow as tf; tf.config.list_physical_devices('GPU')
-from logging.handlers import RotatingFileHandler  # Import for rotation (وارد کردن برای چرخش)
-from tensorflow.keras.layers import Input
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.mixed_precision import set_global_policy
+set_global_policy('mixed_float16')  # Speed up on M1 (سرعت روی M1)
 
+# Import for rotation (وارد کردن برای چرخش)
+from logging.handlers import RotatingFileHandler  
 # تنظیم rotating log (Setup rotating log)
-handler = RotatingFileHandler('logging.log', maxBytes=5*1024*1024, backupCount=5, encoding='utf-8')  # 5MB per file, 5 backups (۵ مگابایت هر فایل، ۵ پشتیبان)
-handler.setLevel(logging.INFO)  # Set level (تنظیم سطح)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')  # Log format (فرمت لاگ)
-handler.setFormatter(formatter)  # Apply formatter (اعمال فرمت)
+handler = RotatingFileHandler('logging.log', maxBytes=5*1024*1024, backupCount=5, encoding='utf-8')
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
 
-logger = logging.getLogger()  # Get root logger (گرفتن لاگر اصلی)
-logger.setLevel(logging.INFO)  # Set level (تنظیم سطح)
-logger.addHandler(handler)  # Add handler (اضافه کردن گرداننده)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
 
-load_dotenv()  # Load .env file (بارگذاری فایل .env)
-ACCESS_ID = os.getenv('Access_ID')  # API key (کلید API)
-SECRET_KEY = os.getenv('Secret_Key')  # API secret (راز API)
+load_dotenv()
+ACCESS_ID = os.getenv('Access_ID')
+SECRET_KEY = os.getenv('Secret_Key')
 
-def fetch_and_update_data(symbol='BTC/USDT', timeframe='1h', batch_limit=1000, file='dataset/btc_history.csv', retries=3):
+def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, file='dataset/5m_btc_history.csv', retries=3):
     exchange = ccxt.coinex({'apiKey': ACCESS_ID, 'secret': SECRET_KEY, 'enableRateLimit': True})
-    
-    # Step 1: Load existing dataset if exists (بارگذاری دیتاست موجود اگر وجود داره)
+
     try:
         old_df = pd.read_csv(file)
         old_df['timestamp'] = pd.to_datetime(old_df['timestamp'])
-        last_timestamp = old_df['timestamp'].max().value // 10**6  # Convert to ms (تبدیل به میلی‌ثانیه)
-        since = last_timestamp + 1  # From next after last (از بعدی بعد از آخرین)
+        last_timestamp = old_df['timestamp'].max().value // 10**6
+        since = last_timestamp + 1
         logging.info(f"Existing dataset loaded: {len(old_df)} candles, fetching from since {since}")
     except FileNotFoundError:
         old_df = pd.DataFrame()
-        since = None  # Fetch all if first time (گرفتن همه اگر اولین بار)
+        since = None
         logging.info("No existing dataset - fetching new")
     
-    # Step 2: Fetch new data (گرفتن داده جدید)
     new_data = []
     for attempt in range(retries):
         try:
@@ -65,21 +64,17 @@ def fetch_and_update_data(symbol='BTC/USDT', timeframe='1h', batch_limit=1000, f
     if new_data:
         new_df = pd.DataFrame(new_data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         new_df['timestamp'] = pd.to_datetime(new_df['timestamp'], unit='ms')
-        
-        # Step 3: Append and deduplicate (الحاق و حذف تکراری‌ها)
+      
         combined = pd.concat([old_df, new_df]).drop_duplicates(subset=['timestamp']).sort_values('timestamp').reset_index(drop=True)
-        logging.info(f"Updated dataset: {len(combined)} candles (added {len(new_df)} new)")
-        
-        # Step 4: Save updated dataset (ذخیره)
         combined.to_csv(file, index=False)
-        
-        return combined  # Return full updated dataset (بازگشت دیتاست کامل آپدیت‌شده)
+        logging.info(f"Updated dataset: {len(combined)} candles (added {len(new_df)} new)")
+        return combined
     else:
         logging.info("No new data - returning existing")
         return old_df
 def preprocess_data(df):
     df['sma_50'] = df['close'].rolling(window=50).mean()
-    df['ema_30'] = df['close'].ewm(span=30, adjust=False).mean()
+    df['ema_20'] = df['close'].ewm(span=20, adjust=False).mean()
     delta = df['close'].diff()
     gain = delta.where(delta > 0, 0).rolling(window=14).mean()
     loss = -delta.where(delta < 0, 0).rolling(window=14).mean()
@@ -99,7 +94,8 @@ def preprocess_data(df):
     df = df.dropna().reset_index(drop=True)
     
     scaler = MinMaxScaler()
-    features = ['open', 'high', 'low', 'close', 'volume', 'sma_50', 'ema_30', 'rsi_14', 'macd', 'macd_signal', 'close_lag_1', 'close_lag_3', 'close_lag_5', 'close_lag_10', 'volatility']
+    # Dropped high/low/open/lag_3/5/10 for multicollinearity (برای چندخطی)
+    features = ['close', 'volume', 'sma_50', 'ema_20', 'rsi_14', 'macd', 'macd_signal', 'close_lag_1', 'volatility']  
     df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), columns=features, index=df.index)
     df_scaled['timestamp'] = df['timestamp'].values
     return df_scaled, scaler, df
@@ -108,7 +104,7 @@ def eda(df_original, df_processed):
     plt.figure(figsize=(14, 6))
     plt.plot(df_original['timestamp'], df_original['close'], label='Close Price')
     plt.plot(df_original['timestamp'], df_original['sma_50'], label='SMA 50', alpha=0.7)
-    plt.plot(df_original['timestamp'], df_original['ema_30'], label='EMA 20', alpha=0.7)
+    plt.plot(df_original['timestamp'], df_original['ema_20'], label='EMA 20', alpha=0.7)
     plt.title('BTC Price with Moving Averages')
     plt.legend()
     plt.savefig('pic/new/btc_price_ma.png')
@@ -156,7 +152,7 @@ def build_and_train_model(X, y, sequence_length=60):
     model.add(Dropout(0.3))
     model.add(Dense(50, activation='relu'))
     model.add(Dense(1))
-    
+
     model.compile(optimizer=Adam(learning_rate=0.001), loss='mean_squared_error', metrics=['mae'])
     model.summary()
     
@@ -228,10 +224,11 @@ def predict_next_price(model, df_processed, scaler, sequence_length=60):
     return pred_price
 
 def live_trading_loop(model, scaler, sequence_length=60):
+
     print("Live bot started! Press Ctrl+C to stop.")
     while True:
         try:
-            new_data = fetch_and_update_data(symbol='BTC/USDT', timeframe='1h', batch_limit=1000, file='dataset/btc_history.csv', retries=3)
+            new_data = fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=200, file='dataset/5m_btc_history.csv', retries=3)
             if new_data is not None:
                 df_processed, scaler_new, df_original = preprocess_data(new_data)
                 predicted = predict_next_price(model, df_processed, scaler, sequence_length)
@@ -251,7 +248,8 @@ def live_trading_loop(model, scaler, sequence_length=60):
             time.sleep(60)
 
 if __name__ == "__main__":
-    data = fetch_and_update_data(symbol='BTC/USDT', timeframe='1h')
+
+    data = fetch_and_update_data(symbol='BTC/USDT', timeframe='5m')
     if data is not None:
         print("Raw data head:")
         print(data.head())
