@@ -1,346 +1,4 @@
-2025-12-24 11:19:29,650 - Fetched 1000 rows for BTC/USDT
-2025-12-24 11:19:29,675 - Preprocessed data shape: (951, 18)
-2025-12-24 11:19:29,703 - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 11:19:30,133 - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 12:53:06,308 - INFO - Fetched 1000 rows for BTC/USDT
-2025-12-24 12:53:06,327 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 12:53:06,350 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 12:53:06,777 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 12:53:47,607 - INFO - Fetched 1000 rows for BTC/USDT
-2025-12-24 12:53:47,632 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 12:53:47,664 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 12:53:48,071 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 12:56:00,327 - INFO - Fetched 1000 rows for BTC/USDT
-2025-12-24 12:56:00,342 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 12:56:00,365 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 12:56:00,780 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 12:58:01,135 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 12:58:01,349 - INFO - No more data available
-2025-12-24 12:58:01,355 - INFO - Fetched total 1000 candles
-2025-12-24 12:58:01,380 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 12:58:01,411 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 12:58:01,813 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 13:01:08,830 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 13:01:09,006 - INFO - No more data available
-2025-12-24 13:01:09,010 - INFO - Fetched total 1000 candles
-2025-12-24 13:01:09,034 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 13:01:09,064 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 13:01:09,472 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 13:05:09,772 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 13:05:09,925 - INFO - No more data available
-2025-12-24 13:05:09,928 - INFO - Fetched total 1000 candles
-2025-12-24 13:05:09,948 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 13:05:09,974 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 13:05:10,377 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 13:08:16,417 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 13:08:16,595 - INFO - No more data available
-2025-12-24 13:08:16,600 - INFO - Fetched total 1000 candles
-2025-12-24 13:08:16,628 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 13:08:16,660 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 13:08:17,072 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 13:08:41,053 - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
-2025-12-24 13:08:41,577 - INFO - Evaluation - MAE: 168.36, RMSE: 226.25, R2: 0.3029
-2025-12-24 13:08:41,777 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:09:41,776 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:10:41,774 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:11:41,772 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:12:41,771 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:13:41,770 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:14:07,619 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 13:14:07,818 - INFO - No more data available
-2025-12-24 13:14:07,822 - INFO - Fetched total 1000 candles
-2025-12-24 13:14:07,848 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 13:14:07,877 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 13:14:08,293 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 13:14:28,566 - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
-2025-12-24 13:14:29,072 - INFO - Evaluation - MAE: 184.36, RMSE: 243.19, R2: 0.1923
-2025-12-24 13:14:29,242 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:15:29,240 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:16:29,239 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:17:29,238 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:18:29,237 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:19:29,236 - ERROR - Live loop error: fetch_data() got an unexpected keyword argument 'limit'
-2025-12-24 13:20:28,476 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 13:20:28,742 - INFO - No more data available
-2025-12-24 13:20:28,746 - INFO - Fetched total 1000 candles
-2025-12-24 13:20:28,775 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 13:20:28,808 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 13:20:29,222 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 13:20:47,437 - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
-2025-12-24 13:20:47,944 - INFO - Evaluation - MAE: 183.18, RMSE: 242.60, R2: 0.1978
-2025-12-24 13:20:49,632 - INFO - Fetched 260 candles, total: 260
-2025-12-24 13:20:49,648 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:20:49,652 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:25:12,493 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 13:25:12,675 - INFO - No more data available
-2025-12-24 13:25:12,677 - INFO - Fetched total 1000 candles
-2025-12-24 13:25:12,691 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 13:25:12,712 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 13:25:13,111 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 13:25:32,565 - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
-2025-12-24 13:25:33,066 - INFO - Evaluation - MAE: 175.12, RMSE: 231.64, R2: 0.2678
-2025-12-24 13:25:35,029 - INFO - Fetched 260 candles, total: 260
-2025-12-24 13:25:35,052 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:25:35,058 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:30:36,921 - INFO - Fetched 260 candles, total: 260
-2025-12-24 13:30:36,944 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:30:36,950 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:35:38,043 - INFO - Fetched 260 candles, total: 260
-2025-12-24 13:35:38,064 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:35:38,068 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:43:56,933 - INFO - Fetched 260 candles, total: 260
-2025-12-24 13:43:56,951 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:43:56,955 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:57:51,335 - INFO - Fetched 260 candles, total: 260
-2025-12-24 13:57:51,358 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 13:57:51,364 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:06:34,028 - INFO - Fetched 260 candles, total: 260
-2025-12-24 14:06:34,050 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:06:34,055 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:18:11,809 - INFO - Fetched 260 candles, total: 260
-2025-12-24 14:18:11,827 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:18:11,831 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:26:59,536 - INFO - Fetched 260 candles, total: 260
-2025-12-24 14:26:59,550 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:26:59,554 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:32:01,439 - INFO - Fetched 260 candles, total: 260
-2025-12-24 14:32:01,450 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:32:01,452 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:37:03,223 - INFO - Fetched 260 candles, total: 260
-2025-12-24 14:37:03,240 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:37:03,245 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:52:41,719 - INFO - Test rotating log
-2025-12-24 14:52:42,883 - INFO - Fetched 1000 candles, total: 1000
-2025-12-24 14:52:43,064 - INFO - No more data available
-2025-12-24 14:52:43,068 - INFO - Fetched total 1000 candles
-2025-12-24 14:52:43,090 - INFO - Preprocessed data shape: (951, 18)
-2025-12-24 14:52:43,118 - INFO - Sequences created: X shape (891, 60, 17), y shape (891,)
-2025-12-24 14:52:43,533 - INFO - Train: (569, 60, 17), Val: (143, 60, 17), Test: (179, 60, 17)
-2025-12-24 14:53:00,213 - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
-2025-12-24 14:53:00,749 - INFO - Evaluation - MAE: 177.77, RMSE: 231.49, R2: 0.3770
-2025-12-24 14:53:02,167 - INFO - Fetched 260 candles, total: 260
-2025-12-24 14:53:02,182 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 14:58:03,930 - INFO - Fetched 260 candles, total: 260
-2025-12-24 14:58:03,945 - INFO - Preprocessed data shape: (211, 18)
-2025-12-24 16:47:42,935 - INFO - Fetched 1000 candles, total: 1000, since updated to 1762959600000
-2025-12-24 16:47:44,235 - INFO - Fetched 1000 candles, total: 2000, since updated to 1762959600000
-2025-12-24 16:47:45,435 - INFO - Fetched 1000 candles, total: 3000, since updated to 1762959600000
-2025-12-24 16:47:46,660 - INFO - Fetched 1000 candles, total: 4000, since updated to 1762959600000
-2025-12-24 16:47:47,877 - INFO - Fetched 1000 candles, total: 5000, since updated to 1762959600000
-2025-12-24 16:47:48,905 - INFO - Final unique historical data: 1000 candles
-2025-12-24 16:47:48,961 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 16:47:49,384 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 16:49:13,219 - INFO - Fetched 1000 candles, total: 1000, since updated to 1762959600000
-2025-12-24 16:49:14,437 - INFO - Fetched 1000 candles, total: 2000, since updated to 1762959600000
-2025-12-24 16:49:15,746 - INFO - Fetched 1000 candles, total: 3000, since updated to 1762959600000
-2025-12-24 16:49:16,994 - INFO - Fetched 1000 candles, total: 4000, since updated to 1762959600000
-2025-12-24 16:49:18,192 - INFO - Fetched 1000 candles, total: 5000, since updated to 1762959600000
-2025-12-24 16:49:19,218 - INFO - Final unique historical data: 1000 candles
-2025-12-24 16:49:19,264 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 16:49:19,684 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 16:53:22,083 - INFO - Evaluation - MAE: 433.07, RMSE: 654.08, R2: 0.5848
-2025-12-24 16:53:23,835 - INFO - Fetched 260 candles, total: 260, since updated to 1766484600000
-2025-12-24 16:53:24,845 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:03:13,512 - INFO - Fetched 1000 candles, total: 1000, since updated to 1762963200000
-2025-12-24 17:03:14,747 - INFO - Fetched 1000 candles, total: 2000, since updated to 1762963200000
-2025-12-24 17:03:15,953 - INFO - Fetched 1000 candles, total: 3000, since updated to 1762963200000
-2025-12-24 17:03:17,181 - INFO - Fetched 1000 candles, total: 4000, since updated to 1762963200000
-2025-12-24 17:03:18,421 - INFO - Fetched 1000 candles, total: 5000, since updated to 1762963200000
-2025-12-24 17:03:19,442 - INFO - Final unique historical data: 1000 candles
-2025-12-24 17:03:19,496 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 17:03:19,895 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 17:06:40,574 - INFO - Evaluation - MAE: 409.97, RMSE: 619.57, R2: 0.6293
-2025-12-24 17:06:41,933 - INFO - Fetched 260 candles, total: 260, since updated to 1766485500000
-2025-12-24 17:06:42,940 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:11:44,915 - INFO - Fetched 260 candles, total: 260, since updated to 1766485800000
-2025-12-24 17:11:45,923 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:16:47,703 - INFO - Fetched 260 candles, total: 260, since updated to 1766486100000
-2025-12-24 17:16:48,712 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:35:02,450 - INFO - Fetched 260 candles, total: 260, since updated to 1766487300000
-2025-12-24 17:35:03,461 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:40:04,924 - INFO - Fetched 260 candles, total: 260, since updated to 1766487600000
-2025-12-24 17:40:05,933 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:45:07,371 - INFO - Fetched 260 candles, total: 260, since updated to 1766487900000
-2025-12-24 17:45:08,381 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:50:10,106 - INFO - Fetched 260 candles, total: 260, since updated to 1766488200000
-2025-12-24 17:50:11,114 - INFO - Final unique historical data: 260 candles
-2025-12-24 17:55:12,771 - INFO - Fetched 260 candles, total: 260, since updated to 1766488500000
-2025-12-24 17:55:13,781 - INFO - Final unique historical data: 260 candles
-2025-12-24 18:00:15,307 - INFO - Fetched 260 candles, total: 260, since updated to 1766488800000
-2025-12-24 18:00:16,315 - INFO - Final unique historical data: 260 candles
-2025-12-24 18:05:18,102 - INFO - Fetched 260 candles, total: 260, since updated to 1766489100000
-2025-12-24 18:05:19,111 - INFO - Final unique historical data: 260 candles
-2025-12-24 18:11:34,278 - INFO - No existing dataset - fetching new
-2025-12-24 18:11:36,155 - INFO - Fetched 1000 new candles
-2025-12-24 18:11:36,161 - INFO - Updated dataset: 1000 candles (added 1000 new)
-2025-12-24 18:11:36,224 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 18:11:36,637 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 18:13:10,468 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766567400001
-2025-12-24 18:13:12,092 - INFO - No new data available
-2025-12-24 18:13:12,092 - INFO - No new data - returning existing
-2025-12-24 18:13:12,151 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 18:13:12,570 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 18:14:29,116 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766567400001
-2025-12-24 18:14:30,625 - INFO - No new data available
-2025-12-24 18:14:30,626 - INFO - No new data - returning existing
-2025-12-24 18:14:30,683 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 18:14:31,082 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 18:15:30,096 - INFO - Evaluation - MAE: 287.25, RMSE: 328.63, R2: 0.0502
-2025-12-24 19:06:44,589 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766567400001
-2025-12-24 19:06:46,328 - INFO - Fetched 11 new candles
-2025-12-24 19:06:46,336 - INFO - Updated dataset: 1011 candles (added 11 new)
-2025-12-24 19:06:46,400 - INFO - Sequences created: X shape (902, 60, 15), y shape (902,)
-2025-12-24 19:06:46,813 - INFO - Train: (576, 60, 15), Val: (145, 60, 15), Test: (181, 60, 15)
-2025-12-24 19:10:24,935 - INFO - Evaluation - MAE: 193.70, RMSE: 229.49, R2: 0.5235
-2025-12-24 19:10:25,145 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 19:11:25,144 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 19:12:25,143 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 19:13:25,143 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 19:14:25,142 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 19:15:25,143 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 19:16:25,142 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:41:03,002 - INFO - Existing dataset loaded: 1011 candles, fetching from since 1766570700001
-2025-12-24 21:41:06,111 - INFO - Fetched 31 new candles
-2025-12-24 21:41:06,115 - INFO - Updated dataset: 1042 candles (added 31 new)
-2025-12-24 21:41:06,179 - INFO - Sequences created: X shape (933, 60, 15), y shape (933,)
-2025-12-24 21:41:06,596 - INFO - Train: (596, 60, 15), Val: (150, 60, 15), Test: (187, 60, 15)
-2025-12-24 21:43:07,029 - INFO - Evaluation - MAE: 142.26, RMSE: 174.52, R2: 0.5716
-2025-12-24 21:43:07,231 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:44:07,231 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:45:07,233 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:46:07,234 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:47:07,235 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:48:07,236 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:49:07,237 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:50:07,238 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:51:07,238 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:52:07,239 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:53:07,241 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:54:07,241 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:55:07,242 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:56:07,243 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:57:07,244 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:58:07,245 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 21:59:07,246 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:00:07,247 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:04:16,910 - INFO - No existing dataset - fetching new
-2025-12-24 22:04:19,665 - INFO - Fetched 1000 new candles
-2025-12-24 22:04:19,670 - INFO - Updated dataset: 1000 candles (added 1000 new)
-2025-12-24 22:04:47,670 - INFO - No existing dataset - fetching new
-2025-12-24 22:04:55,163 - INFO - Fetched 1000 new candles
-2025-12-24 22:04:55,168 - INFO - Updated dataset: 1000 candles (added 1000 new)
-2025-12-24 22:04:55,229 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 22:05:23,990 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766581200001
-2025-12-24 22:05:25,145 - INFO - Fetched 1 new candles
-2025-12-24 22:05:25,149 - INFO - Updated dataset: 1001 candles (added 1 new)
-2025-12-24 22:05:25,212 - INFO - Sequences created: X shape (892, 60, 15), y shape (892,)
-2025-12-24 22:05:25,598 - INFO - Train: (570, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 22:09:03,462 - INFO - Evaluation - MAE: 126.55, RMSE: 154.16, R2: 0.5860
-2025-12-24 22:09:03,684 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:10:03,684 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:12:47,677 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:13:47,682 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:14:47,683 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:15:47,685 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:16:47,686 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:17:47,688 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:18:47,689 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:19:47,690 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:20:47,690 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:21:47,691 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:22:47,693 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:23:47,694 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:24:47,695 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:25:47,696 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:28:09,833 - ERROR - Live loop error: fetch_and_update_data() got an unexpected keyword argument 'total_limit'
-2025-12-24 22:34:56,608 - INFO - Existing dataset loaded: 1001 candles, fetching from since 1766581500001
-2025-12-24 22:34:58,682 - INFO - Fetched 5 new candles
-2025-12-24 22:34:58,685 - INFO - Updated dataset: 1006 candles (added 5 new)
-2025-12-24 22:34:58,736 - INFO - Sequences created: X shape (897, 60, 15), y shape (897,)
-2025-12-24 22:34:59,139 - INFO - Train: (573, 60, 15), Val: (144, 60, 15), Test: (180, 60, 15)
-2025-12-24 22:37:21,719 - INFO - Evaluation - MAE: 119.01, RMSE: 142.12, R2: 0.6362
-2025-12-24 22:37:21,948 - INFO - Existing dataset loaded: 1006 candles, fetching from since 1766583000001
-2025-12-24 22:37:24,469 - INFO - Fetched 1 new candles
-2025-12-24 22:37:24,472 - INFO - Updated dataset: 1007 candles (added 1 new)
-2025-12-24 22:42:24,594 - INFO - Existing dataset loaded: 1007 candles, fetching from since 1766583300001
-2025-12-24 22:42:27,442 - INFO - Fetched 1 new candles
-2025-12-24 22:42:27,445 - INFO - Updated dataset: 1008 candles (added 1 new)
-2025-12-24 22:47:27,570 - INFO - Existing dataset loaded: 1008 candles, fetching from since 1766583600001
-2025-12-24 22:47:29,270 - INFO - Fetched 1 new candles
-2025-12-24 22:47:29,273 - INFO - Updated dataset: 1009 candles (added 1 new)
-2025-12-24 23:04:47,613 - INFO - Existing dataset loaded: 1009 candles, fetching from since 1766583900001
-2025-12-24 23:04:49,086 - INFO - Fetched 1 new candles
-2025-12-24 23:04:49,092 - INFO - Updated dataset: 1010 candles (added 1 new)
-2025-12-24 23:04:49,155 - INFO - Sequences created: X shape (901, 60, 15), y shape (901,)
-2025-12-24 23:04:49,563 - INFO - Train: (576, 60, 15), Val: (144, 60, 15), Test: (181, 60, 15)
-2025-12-24 23:06:12,308 - INFO - No existing dataset - fetching new
-2025-12-24 23:06:14,361 - INFO - Fetched 1000 new candles
-2025-12-24 23:06:14,362 - INFO - Updated dataset: 1000 candles (added 1000 new)
-2025-12-24 23:06:14,402 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 23:06:14,802 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 23:11:01,258 - INFO - Evaluation - MAE: 488.49, RMSE: 659.85, R2: 0.5835
-2025-12-24 23:11:01,474 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766584800001
-2025-12-24 23:11:03,606 - INFO - Fetched 2 new candles
-2025-12-24 23:11:03,609 - INFO - Updated dataset: 1002 candles (added 2 new)
-2025-12-24 23:19:53,342 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766584800001
-2025-12-24 23:19:55,086 - INFO - No new data available
-2025-12-24 23:19:55,086 - INFO - No new data - returning existing
-2025-12-24 23:19:55,126 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 23:19:55,594 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 23:21:18,099 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766584800001
-2025-12-24 23:21:19,838 - INFO - No new data available
-2025-12-24 23:21:19,839 - INFO - No new data - returning existing
-2025-12-24 23:22:24,016 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766584800001
-2025-12-24 23:22:25,061 - INFO - No new data available
-2025-12-24 23:22:25,061 - INFO - No new data - returning existing
-2025-12-24 23:22:25,117 - INFO - Sequences created: X shape (891, 60, 15), y shape (891,)
-2025-12-24 23:22:25,517 - INFO - Train: (569, 60, 15), Val: (143, 60, 15), Test: (179, 60, 15)
-2025-12-24 23:26:35,973 - INFO - Evaluation - MAE: 410.22, RMSE: 599.18, R2: 0.6566
-2025-12-24 23:26:36,196 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766584800001
-2025-12-24 23:26:38,018 - INFO - No new data available
-2025-12-24 23:26:38,018 - INFO - No new data - returning existing
-2025-12-25 09:51:11,657 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766584800001
-2025-12-25 09:51:12,972 - INFO - Fetched 10 new candles
-2025-12-25 09:51:12,979 - INFO - Updated dataset: 1010 candles (added 10 new)
-2025-12-25 09:51:13,025 - INFO - Sequences created: X shape (901, 60, 15), y shape (901,)
-2025-12-25 09:51:13,464 - INFO - Train: (576, 60, 15), Val: (144, 60, 15), Test: (181, 60, 15)
-2025-12-25 09:52:39,358 - INFO - Evaluation - MAE: 483.77, RMSE: 734.67, R2: 0.4542
-2025-12-25 09:52:39,589 - INFO - Existing dataset loaded: 1010 candles, fetching from since 1766620800001
-2025-12-25 09:52:40,822 - INFO - No new data available
-2025-12-25 09:52:40,822 - INFO - No new data - returning existing
-2025-12-25 09:57:40,916 - INFO - Existing dataset loaded: 1010 candles, fetching from since 1766620800001
-2025-12-25 09:57:42,439 - INFO - No new data available
-2025-12-25 09:57:42,439 - INFO - No new data - returning existing
-2025-12-25 10:02:42,532 - INFO - Existing dataset loaded: 1010 candles, fetching from since 1766620800001
-2025-12-25 10:02:45,074 - INFO - Fetched 1 new candles
-2025-12-25 10:02:45,076 - INFO - Updated dataset: 1011 candles (added 1 new)
-2025-12-25 10:07:45,162 - INFO - Existing dataset loaded: 1011 candles, fetching from since 1766624400001
-2025-12-25 10:07:46,733 - INFO - No new data available
-2025-12-25 10:07:46,733 - INFO - No new data - returning existing
-2025-12-25 10:48:54,471 - INFO - Existing dataset loaded: 1011 candles, fetching from since 1766624400001
-2025-12-25 10:48:56,759 - INFO - No new data available
-2025-12-25 10:48:56,760 - INFO - No new data - returning existing
-2025-12-25 10:48:56,811 - INFO - Sequences created: X shape (902, 60, 15), y shape (902,)
-2025-12-25 10:48:57,201 - INFO - Train: (576, 60, 15), Val: (145, 60, 15), Test: (181, 60, 15)
-2025-12-25 10:53:10,562 - INFO - Evaluation - MAE: 449.19, RMSE: 618.97, R2: 0.6114
-2025-12-25 10:53:10,845 - INFO - Existing dataset loaded: 1011 candles, fetching from since 1766624400001
-2025-12-25 10:53:11,937 - INFO - No new data available
-2025-12-25 10:53:11,937 - INFO - No new data - returning existing
-2025-12-25 11:21:47,087 - INFO - No existing dataset - fetching new
-2025-12-25 11:21:48,692 - INFO - Fetched 1000 new candles
-2025-12-25 11:21:48,703 - INFO - Updated dataset: 1000 candles (added 1000 new)
-2025-12-25 11:23:30,004 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766629200001
-2025-12-25 11:23:31,780 - INFO - No new data available
-2025-12-25 11:23:31,780 - INFO - No new data - returning existing
-2025-12-25 11:23:31,821 - INFO - Sequences created: X shape (891, 60, 9), y shape (891,)
-2025-12-25 11:24:06,639 - INFO - Existing dataset loaded: 1000 candles, fetching from since 1766629200001
-2025-12-25 11:24:08,015 - INFO - No new data available
-2025-12-25 11:24:08,016 - INFO - No new data - returning existing
-2025-12-25 11:24:08,061 - INFO - Sequences created: X shape (891, 60, 9), y shape (891,)
-2025-12-25 11:24:08,396 - INFO - Train: (569, 60, 9), Val: (143, 60, 9), Test: (179, 60, 9)
-2025-12-25 11:24:51,169 - INFO - Evaluation - MAE: 184.91, RMSE: 197.20, R2: 0.3086
-2025-12-25 11:24:51,983 - ERROR - Live loop error: name 'symbol' is not defined
-2025-12-25 11:25:51,981 - ERROR - Live loop error: name 'symbol' is not defined
+
 2025-12-25 11:32:42,183 - INFO - No existing dataset - fetching new
 2025-12-25 11:32:43,634 - INFO - Fetched 1000 new candles
 2025-12-25 11:32:43,650 - INFO - Updated dataset: 1000 candles (added 1000 new)
@@ -414,3 +72,44 @@
 2025-12-25 14:50:10,060 - INFO - Existing dataset loaded: 1034 candles, fetching from since 1766640300001
 2025-12-25 14:50:11,957 - INFO - Fetched 5 new candles
 2025-12-25 14:50:11,970 - INFO - Updated dataset: 1039 candles (added 5 new)
+2025-12-29 13:05:17,350 - INFO - Existing dataset loaded: 1039 candles, fetching from since 1766641800001
+2025-12-29 13:05:19,413 - INFO - Fetched 1000 new candles
+2025-12-29 13:05:19,439 - INFO - Updated dataset: 2039 candles (added 1000 new)
+2025-12-29 13:05:19,490 - INFO - Sequences created: X shape (1930, 60, 9), y shape (1930,)
+2025-12-29 13:05:19,857 - INFO - Train: (1235, 60, 9), Val: (309, 60, 9), Test: (386, 60, 9)
+2025-12-29 13:07:50,421 - INFO - Sequences created: X shape (1930, 60, 9), y shape (1930,)
+2025-12-29 13:07:54,742 - INFO - Evaluation - MAE: 35.61, RMSE: 52.04, R2: 0.9745
+2025-12-29 13:07:54,948 - INFO - Existing dataset loaded: 2039 candles, fetching from since 1766981100001
+2025-12-29 13:07:56,356 - INFO - No new data available
+2025-12-29 13:07:56,356 - INFO - No new data - returning existing
+2025-12-29 13:12:56,442 - INFO - Existing dataset loaded: 2039 candles, fetching from since 1766981100001
+2025-12-29 13:13:08,350 - INFO - Fetched 1 new candles
+2025-12-29 13:13:08,373 - INFO - Updated dataset: 2040 candles (added 1 new)
+2025-12-29 13:18:08,456 - INFO - Existing dataset loaded: 2040 candles, fetching from since 1766981400001
+2025-12-29 13:18:53,410 - INFO - Fetched 1 new candles
+2025-12-29 13:18:53,434 - INFO - Updated dataset: 2041 candles (added 1 new)
+2025-12-29 13:23:53,538 - INFO - Existing dataset loaded: 2041 candles, fetching from since 1766981700001
+2025-12-29 13:23:56,071 - INFO - Fetched 1 new candles
+2025-12-29 13:23:56,096 - INFO - Updated dataset: 2042 candles (added 1 new)
+2025-12-29 18:11:56,427 - INFO - Existing dataset loaded: 2059 candles, fetching from since 1766987100001
+2025-12-29 18:11:57,883 - INFO - Fetched 41 new candles
+2025-12-29 18:11:57,909 - INFO - Updated dataset: 2100 candles (added 41 new)
+2025-12-29 18:11:57,977 - INFO - Sequences created: X shape (1991, 60, 9), y shape (1991,)
+2025-12-29 18:11:58,369 - INFO - Train: (1273, 60, 9), Val: (319, 60, 9), Test: (399, 60, 9)
+2025-12-29 18:14:57,104 - INFO - Sequences created: X shape (1991, 60, 9), y shape (1991,)
+2025-12-29 18:15:01,274 - INFO - Evaluation - MAE: 53.16, RMSE: 69.05, R2: 0.9921
+2025-12-29 18:15:01,474 - INFO - Existing dataset loaded: 2100 candles, fetching from since 1766999400001
+2025-12-29 18:15:03,234 - INFO - Fetched 1 new candles
+2025-12-29 18:15:03,251 - INFO - Updated dataset: 2101 candles (added 1 new)
+2025-12-29 18:20:03,337 - INFO - Existing dataset loaded: 2101 candles, fetching from since 1766999700001
+2025-12-29 18:20:04,823 - INFO - Fetched 1 new candles
+2025-12-29 18:20:04,839 - INFO - Updated dataset: 2102 candles (added 1 new)
+2025-12-29 18:25:04,921 - INFO - Existing dataset loaded: 2102 candles, fetching from since 1767000000001
+2025-12-29 18:25:06,140 - INFO - Fetched 1 new candles
+2025-12-29 18:25:06,156 - INFO - Updated dataset: 2103 candles (added 1 new)
+2025-12-29 18:30:06,233 - INFO - Existing dataset loaded: 2103 candles, fetching from since 1767000300001
+2025-12-29 18:30:07,916 - INFO - Fetched 1 new candles
+2025-12-29 18:30:07,939 - INFO - Updated dataset: 2104 candles (added 1 new)
+2025-12-29 18:35:54,305 - INFO - Existing dataset loaded: 2104 candles, fetching from since 1767000600001
+2025-12-29 18:35:58,890 - INFO - Fetched 1 new candles
+2025-12-29 18:35:58,912 - INFO - Updated dataset: 2105 candles (added 1 new)
