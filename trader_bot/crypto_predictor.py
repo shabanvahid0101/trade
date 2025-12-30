@@ -16,7 +16,7 @@ from tensorflow.keras.callbacks import EarlyStopping  # To stop early (توقف 
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.mixed_precision import set_global_policy
 import requests  # برای ارسال درخواست HTTP به تلگرام
-set_global_policy('mixed_float16')  # Speed up on M1 (سرعت روی M1)
+# set_global_policy('mixed_float16')  # Speed up on M1 (سرعت روی M1)
 
 # Import for rotation (وارد کردن برای چرخش)
 from logging.handlers import RotatingFileHandler  
