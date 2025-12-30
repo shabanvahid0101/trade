@@ -15,6 +15,7 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout, Bidirectional, Input  
 from tensorflow.keras.callbacks import EarlyStopping  # To stop early (توقف زودهنگام)
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.mixed_precision import set_global_policy
+import requests  # برای ارسال درخواست HTTP به تلگرام
 set_global_policy('mixed_float16')  # Speed up on M1 (سرعت روی M1)
 
 # Import for rotation (وارد کردن برای چرخش)
@@ -32,7 +33,32 @@ logger.addHandler(handler)
 load_dotenv()
 ACCESS_ID = os.getenv('Access_ID')
 SECRET_KEY = os.getenv('Secret_Key')
-
+def send_telegram_message(message):
+    """
+    Send a message to your Telegram bot (ارسال پیام به ربات تلگرام)
+    """
+    token = os.getenv('ٖTELEGRAM_TOKEN')
+    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    
+    if not token or not chat_id:
+        logging.warning("Telegram TOKEN or CHAT_ID not set in .env - message not sent")
+        return
+    
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': message,
+        'parse_mode': 'HTML'  # برای فرمت بهتر (بولد، ایموجی و ...)
+    }
+    
+    try:
+        response = requests.post(url, data=payload, timeout=10)
+        if response.status_code == 200:
+            logging.info(f"Telegram message sent: {message}")
+        else:
+            logging.error(f"Failed to send Telegram message: {response.text}")
+    except Exception as e:
+        logging.error(f"Error sending Telegram message: {e}")
 def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, file='dataset/5m_btc_history.csv', retries=3):
     exchange = ccxt.coinex({'apiKey': ACCESS_ID, 'secret': SECRET_KEY, 'enableRateLimit': True})
 
@@ -99,7 +125,6 @@ def preprocess_data(df):
     df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), columns=features, index=df.index)
     df_scaled['timestamp'] = df['timestamp'].values
     return df_scaled, scaler, df
-
 def eda(df_original, df_processed):
     plt.figure(figsize=(14, 6))
     plt.plot(df_original['timestamp'], df_original['close'], label='Close Price')
@@ -124,7 +149,6 @@ def eda(df_original, df_processed):
     plt.title('Feature Correlation')
     plt.savefig('pic/new/feature_correlation.png')
     plt.close()
-
 def create_sequences(df_scaled, sequence_length=60):
     X, y = [], []
     data_values = df_scaled.drop(columns=['timestamp']).values
@@ -135,7 +159,6 @@ def create_sequences(df_scaled, sequence_length=60):
     y = np.array(y)
     logging.info(f"Sequences created: X shape {X.shape}, y shape {y.shape}")
     return X, y
-
 def build_and_train_model(X, y, sequence_length=60):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=False)
@@ -161,7 +184,6 @@ def build_and_train_model(X, y, sequence_length=60):
     history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=150, batch_size=32, callbacks=[early_stop], verbose=1)
     
     return model, X_test, y_test, history, scaler
-
 def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     y_pred_scaled = model.predict(X_test)
     
@@ -203,7 +225,6 @@ def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     plt.close()
     
     return mae, rmse, r2
-
 def predict_next_price(model, df_processed, scaler, sequence_length=60):
     last_sequence = df_processed.drop(columns=['timestamp']).values[-sequence_length:]
     last_sequence = last_sequence.reshape((1, sequence_length, last_sequence.shape[1]))
@@ -222,31 +243,54 @@ def predict_next_price(model, df_processed, scaler, sequence_length=60):
     print(f"Expected Change: {pred_price - current_price:.2f} USD ({((pred_price/current_price)-1)*100:.2f}%)")
     
     return pred_price
-
-def live_trading_loop(model, scaler, sequence_length=60):
-
+def live_trading_loop(model, scaler, symbol='BTC/USDT', timeframe='5m', sequence_length=60, sleeptime=300):
     print("Live bot started! Press Ctrl+C to stop.")
     while True:
         try:
-            new_data = fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=200, file='dataset/5m_btc_history.csv', retries=3)
-            if new_data is not None:
-                df_processed, scaler_new, df_original = preprocess_data(new_data)
+            new_data = fetch_and_update_data(symbol, timeframe, batch_limit=sequence_length + 200)
+            if new_data is not None and len(new_data) > sequence_length:
+                df_processed, _, df_original = preprocess_data(new_data)
                 predicted = predict_next_price(model, df_processed, scaler, sequence_length)
                 current = df_original['close'].iloc[-1]
                 
-                change_pct = ((predicted / current) - 1) * 100
-                if change_pct > 0.3:
-                    print(f"BUY SIGNAL! Expected +{change_pct:.2f}%")
-                elif change_pct < -0.3:
-                    print(f"SELL SIGNAL! Expected {change_pct:.2f}%")
-                else:
-                    print(f"HOLD - Change: {change_pct:.2f}%")
+                change_pct = ((predicted - current) / current) * 100  # درست: مثبت اگر پیش‌بینی بالاتر
                 
-            time.sleep(300)
+                timestamp = df_original['timestamp'].iloc[-1].strftime('%Y-%m-%d %H:%M')
+                
+                if change_pct > 0.3:
+                    signal = "🟢 BUY SIGNAL 🟢"
+                    msg = f"<b>{signal}</b>\n" \
+                          f"Symbol: {symbol}\n" \
+                          f"Time: {timestamp}\n" \
+                          f"Current: ${current:.2f}\n" \
+                          f"Predicted: ${predicted:.2f}\n" \
+                          f"Expected: +{change_pct:.2f}%"
+                    print(msg)
+                    send_telegram_message(msg)
+                elif change_pct < -0.3:
+                    signal = "🔴 SELL SIGNAL 🔴"
+                    msg = f"<b>{signal}</b>\n" \
+                          f"Symbol: {symbol}\n" \
+                          f"Time: {timestamp}\n" \
+                          f"Current: ${current:.2f}\n" \
+                          f"Predicted: ${predicted:.2f}\n" \
+                          f"Expected: {change_pct:.2f}%"
+                    print(msg)
+                    send_telegram_message(msg)
+                else:
+                    signal = "⚪ HOLD SIGNAL ⚪"
+                    msg = f"<b>{signal}</b>\n" \
+                          f"Symbol: {symbol}\n" \
+                          f"Time: {timestamp}\n" \
+                          f"Current: ${current:.2f}\n" \
+                          f"Predicted: ${predicted:.2f}\n" \
+                          f"Expected: {change_pct:.2f}%"
+                    print(msg)
+                    send_telegram_message(msg)
+            time.sleep(sleeptime)
         except Exception as e:
             logging.error(f"Live loop error: {e}")
             time.sleep(60)
-
 def backtest(data, model, scaler, sequence_length=60, initial_capital=10000, threshold=0.3):
     df_processed, _, _ = preprocess_data(data.copy())
     X, _ = create_sequences(df_processed, sequence_length)
