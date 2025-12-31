@@ -98,6 +98,24 @@ def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, f
     else:
         logging.info("No new data - returning existing")
         return old_df
+def calculate_fibonacci_levels(df):
+    # Find swing high/low (نوسان بالا/پایین - simple method: rolling max/min)
+    df['swing_high'] = df['high'].rolling(window=20).max().shift(1)  # Recent high (بالای اخیر)
+    df['swing_low'] = df['low'].rolling(window=20).min().shift(1)  # Recent low (پایین اخیر)
+    
+    fib_ratios = [-0.13, 0, 0.13, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.13]  # Standard + custom (استاندارد + سفارشی)
+    
+    for ratio in fib_ratios:
+        df[f'fib_{ratio}'] = df['swing_low'] + (df['swing_high'] - df['swing_low']) * ratio
+    
+    # Measure reaction (سنجش واکنش): proximity to nearest fib level (نزدیکی به نزدیک‌ترین سطح)
+    fib_cols = [col for col in df.columns if col.startswith('fib_')]
+    df['nearest_fib'] = df.apply(lambda row: min(fib_cols, key=lambda col: abs(row['close'] - row[col])), axis=1)
+    df['fib_reaction'] = df.apply(lambda row: abs(row['close'] - row[row['nearest_fib']]) / row['close'], axis=1)  # Relative proximity (نزدیکی نسبی - 0 = on level, small = strong reaction)
+    
+    # Drop NaN and add to features (حذف NaN و اضافه به ویژگی‌ها)
+    df = df.dropna()
+    return df
 def preprocess_data(df):
     df['sma_50'] = df['close'].rolling(window=50).mean()
     df['ema_20'] = df['close'].ewm(span=20, adjust=False).mean()
@@ -118,10 +136,10 @@ def preprocess_data(df):
     df['volatility'] = df['high'] - df['low']
     
     df = df.dropna().reset_index(drop=True)
-    
+    df = calculate_fibonacci_levels(df)
     scaler = MinMaxScaler()
     # Dropped high/low/open/lag_3/5/10 for multicollinearity (برای چندخطی)
-    features = ['close', 'volume', 'sma_50', 'ema_20', 'rsi_14', 'macd', 'macd_signal', 'close_lag_1', 'volatility']  
+    features = ['close', 'volume', 'sma_50', 'ema_20', 'rsi_14', 'macd', 'macd_signal', 'close_lag_1', 'volatility','fib_reaction']  
     df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), columns=features, index=df.index)
     df_scaled['timestamp'] = df['timestamp'].values
     return df_scaled, scaler, df
@@ -132,7 +150,7 @@ def eda(df_original, df_processed):
     plt.plot(df_original['timestamp'], df_original['ema_20'], label='EMA 20', alpha=0.7)
     plt.title('BTC Price with Moving Averages')
     plt.legend()
-    plt.savefig('pic/new/btc_price_ma.png')
+    plt.savefig('pic/new/5m_btc_price_ma.png')
     plt.close()
     
     plt.figure(figsize=(14, 4))
@@ -140,14 +158,14 @@ def eda(df_original, df_processed):
     plt.axhline(70, color='r', linestyle='--', alpha=0.5)
     plt.axhline(30, color='g', linestyle='--', alpha=0.5)
     plt.title('RSI Indicator')
-    plt.savefig('pic/new/rsi_indicator.png')
+    plt.savefig('pic/new/5m_rsi_indicator.png')
     plt.close()
     
     plt.figure(figsize=(12, 10))
     corr = df_processed.drop(columns=['timestamp']).corr()
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
     plt.title('Feature Correlation')
-    plt.savefig('pic/new/feature_correlation.png')
+    plt.savefig('pic/new/5m_feature_correlation.png')
     plt.close()
 def create_sequences(df_scaled, sequence_length=60):
     X, y = [], []
@@ -212,7 +230,7 @@ def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     plt.xlabel('Time Steps')
     plt.ylabel('Price (USD)')
     plt.legend()
-    plt.savefig('pic/new/actual_vs_predicted.png')
+    plt.savefig('pic/new/5m_actual_vs_predicted.png')
     plt.close()
     
     errors = y_test_actual - y_pred
@@ -221,7 +239,7 @@ def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     plt.title('Prediction Errors')
     plt.axhline(0, color='red', linestyle='--')
     plt.ylabel('Error (USD)')
-    plt.savefig('pic/new/prediction_errors.png')
+    plt.savefig('pic/new/5m_prediction_errors.png')
     plt.close()
     
     return mae, rmse, r2
@@ -252,14 +270,17 @@ def live_trading_loop(model, scaler, symbol='BTC/USDT', timeframe='5m', sequence
                 df_processed, _, df_original = preprocess_data(new_data)
                 predicted = predict_next_price(model, df_processed, scaler, sequence_length)
                 current = df_original['close'].iloc[-1]
-                
+                df_original = calculate_fibonacci_levels(df_original)  # Add Fib (اضافه فیبوناچی)
+                fib_reaction = df_original['fib_reaction'].iloc[-1]
+                nearest_fib = df_original['nearest_fib'].iloc[-1]
                 change_pct = ((predicted - current) / current) * 100  # درست: مثبت اگر پیش‌بینی بالاتر
                 
                 timestamp = df_original['timestamp'].iloc[-1].strftime('%Y-%m-%d %H:%M')
+                strength = "STRONG" if fib_reaction < 0.002 else "MODERATE" if fib_reaction < 0.005 else ""
                 
                 if change_pct > 0.3:
                     signal = "🟢 BUY SIGNAL 🟢"
-                    msg = f"<b>{signal}</b>\n" \
+                    msg = f"<b>{strength}{signal} near {nearest_fib}!</b>\n" \
                           f"Symbol: {symbol}\n" \
                           f"Time: {timestamp}\n" \
                           f"Current: ${current:.2f}\n" \
@@ -269,7 +290,7 @@ def live_trading_loop(model, scaler, symbol='BTC/USDT', timeframe='5m', sequence
                     send_telegram_message(msg)
                 elif change_pct < -0.3:
                     signal = "🔴 SELL SIGNAL 🔴"
-                    msg = f"<b>{signal}</b>\n" \
+                    msg = f"<b>{strength}{signal} near {nearest_fib}!</b>\n" \
                           f"Symbol: {symbol}\n" \
                           f"Time: {timestamp}\n" \
                           f"Current: ${current:.2f}\n" \

@@ -258,3 +258,69 @@ Time: 2025-12-30 06:20
 Current: $87352.00
 Predicted: $87447.85
 Expected: 0.11%
+2025-12-31 13:22:30,880 - INFO - Existing dataset loaded: 1315 candles, fetching from since 1767075600001
+2025-12-31 13:22:32,226 - INFO - Fetched 264 new candles
+2025-12-31 13:22:32,247 - INFO - Updated dataset: 1579 candles (added 264 new)
+2025-12-31 13:22:32,295 - INFO - Sequences created: X shape (1470, 60, 9), y shape (1470,)
+2025-12-31 13:22:32,647 - INFO - Train: (940, 60, 9), Val: (236, 60, 9), Test: (294, 60, 9)
+2025-12-31 13:24:04,915 - INFO - Sequences created: X shape (1470, 60, 9), y shape (1470,)
+2025-12-31 13:24:07,654 - INFO - Evaluation - MAE: 44.30, RMSE: 57.02, R2: 0.9836
+2025-12-31 13:24:07,868 - INFO - Existing dataset loaded: 1579 candles, fetching from since 1767154800001
+2025-12-31 13:24:09,350 - INFO - No new data available
+2025-12-31 13:24:09,350 - INFO - No new data - returning existing
+2025-12-31 13:24:10,980 - INFO - Telegram message sent: <b>⚪ HOLD SIGNAL ⚪</b>
+Symbol: BTC/USDT
+Time: 2025-12-31 04:20
+Current: $88438.00
+Predicted: $88547.20
+Expected: 0.12%
+2025-12-31 19:42:33,497 - INFO - Existing dataset loaded: 1579 candles, fetching from since 1767154800001
+2025-12-31 19:42:34,840 - INFO - Fetched 76 new candles
+2025-12-31 19:42:34,862 - INFO - Updated dataset: 1655 candles (added 76 new)
+2025-12-31 19:42:34,963 - INFO - Sequences created: X shape (1526, 60, 10), y shape (1526,)
+2025-12-31 19:42:35,339 - INFO - Train: (976, 60, 10), Val: (244, 60, 10), Test: (306, 60, 10)
+2025-12-31 19:44:20,805 - INFO - Sequences created: X shape (1526, 60, 10), y shape (1526,)
+2025-12-31 19:45:24,338 - INFO - Existing dataset loaded: 1655 candles, fetching from since 1767177600001
+2025-12-31 19:45:25,743 - INFO - Fetched 1 new candles
+2025-12-31 19:45:25,762 - INFO - Updated dataset: 1656 candles (added 1 new)
+2025-12-31 19:45:25,861 - INFO - Sequences created: X shape (1527, 60, 10), y shape (1527,)
+2025-12-31 19:45:26,218 - INFO - Train: (976, 60, 10), Val: (245, 60, 10), Test: (306, 60, 10)
+2025-12-31 19:47:24,988 - INFO - Sequences created: X shape (1527, 60, 10), y shape (1527,)
+2025-12-31 19:47:27,771 - INFO - Evaluation - MAE: 33.15, RMSE: 39.24, R2: 0.9777
+2025-12-31 19:47:27,979 - INFO - Existing dataset loaded: 1656 candles, fetching from since 1767177900001
+2025-12-31 19:47:30,170 - INFO - No new data available
+2025-12-31 19:47:30,171 - INFO - No new data - returning existing
+2025-12-31 19:52:30,347 - INFO - Existing dataset loaded: 1656 candles, fetching from since 1767177900001
+2025-12-31 19:52:32,158 - INFO - Fetched 1 new candles
+2025-12-31 19:52:32,171 - INFO - Updated dataset: 1657 candles (added 1 new)
+2025-12-31 19:57:32,341 - INFO - Existing dataset loaded: 1657 candles, fetching from since 1767178200001
+2025-12-31 19:57:34,025 - INFO - Fetched 1 new candles
+2025-12-31 19:57:34,038 - INFO - Updated dataset: 1658 candles (added 1 new)
+2025-12-31 20:02:34,203 - INFO - Existing dataset loaded: 1658 candles, fetching from since 1767178500001
+2025-12-31 20:02:36,103 - INFO - Fetched 1 new candles
+2025-12-31 20:02:36,116 - INFO - Updated dataset: 1659 candles (added 1 new)
+2025-12-31 20:05:05,459 - INFO - Existing dataset loaded: 1659 candles, fetching from since 1767178800001
+2025-12-31 20:05:07,110 - INFO - Fetched 1 new candles
+2025-12-31 20:05:07,130 - INFO - Updated dataset: 1660 candles (added 1 new)
+2025-12-31 20:05:07,228 - INFO - Sequences created: X shape (1531, 60, 10), y shape (1531,)
+2025-12-31 20:05:07,592 - INFO - Train: (979, 60, 10), Val: (245, 60, 10), Test: (307, 60, 10)
+2025-12-31 20:06:35,061 - INFO - Sequences created: X shape (1531, 60, 10), y shape (1531,)
+2025-12-31 20:06:37,824 - INFO - Evaluation - MAE: 49.97, RMSE: 62.59, R2: 0.9416
+2025-12-31 20:06:38,035 - INFO - Existing dataset loaded: 1660 candles, fetching from since 1767179100001
+2025-12-31 20:06:39,322 - INFO - No new data available
+2025-12-31 20:06:39,322 - INFO - No new data - returning existing
+2025-12-31 20:06:40,574 - INFO - Telegram message sent: <b>⚪ HOLD SIGNAL ⚪</b>
+Symbol: BTC/USDT
+Time: 2025-12-31 11:05
+Current: $88836.00
+Predicted: $88729.27
+Expected: -0.12%
+2025-12-31 20:11:40,579 - INFO - Existing dataset loaded: 1660 candles, fetching from since 1767179100001
+2025-12-31 20:11:42,091 - INFO - Fetched 1 new candles
+2025-12-31 20:11:42,104 - INFO - Updated dataset: 1661 candles (added 1 new)
+2025-12-31 20:11:43,356 - INFO - Telegram message sent: <b>⚪ HOLD SIGNAL ⚪</b>
+Symbol: BTC/USDT
+Time: 2025-12-31 11:10
+Current: $88911.00
+Predicted: $88746.40
+Expected: -0.19%
