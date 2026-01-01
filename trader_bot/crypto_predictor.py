@@ -16,6 +16,7 @@ from tensorflow.keras.callbacks import EarlyStopping  # To stop early (توقف 
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.mixed_precision import set_global_policy
 import requests  # برای ارسال درخواست HTTP به تلگرام
+import joblib  # For saving/loading scaler (برای ذخیره/بارگذاری اسکیلر)
 set_global_policy('mixed_float16')  # Speed up on M1 (سرعت روی M1)
 
 # Import for rotation (وارد کردن برای چرخش)
@@ -386,8 +387,9 @@ if __name__ == "__main__":
         
         model, X_test, y_test, history, scaler = build_and_train_model(X, y)
         model.save('btc_lstm_model.keras')  # Use Keras format (فرمت جدید)
-
+        joblib.dump(scaler, 'scaler.pkl')  # ذخیره اسکیلر   
         print("\nModel trained and saved as btc_lstm_model.keras")
+
         capital, return_pct = backtest(data, model, scaler)
         
         mae, rmse, r2 = evaluate_model(model, X_test, y_test, scaler, df_original)

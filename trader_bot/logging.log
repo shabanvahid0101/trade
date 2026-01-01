@@ -324,3 +324,31 @@ Time: 2025-12-31 11:10
 Current: $88911.00
 Predicted: $88746.40
 Expected: -0.19%
+2026-01-01 09:30:23,721 - INFO - Existing dataset loaded: 1661 candles, fetching from since 1767179400001
+2026-01-01 09:30:25,408 - INFO - Fetched 160 new candles
+2026-01-01 09:30:25,432 - INFO - Updated dataset: 1821 candles (added 160 new)
+2026-01-01 09:30:25,539 - INFO - Sequences created: X shape (1692, 60, 10), y shape (1692,)
+2026-01-01 09:30:25,910 - INFO - Train: (1082, 60, 10), Val: (271, 60, 10), Test: (339, 60, 10)
+2026-01-01 09:32:55,287 - INFO - Sequences created: X shape (1692, 60, 10), y shape (1692,)
+2026-01-01 09:32:58,295 - INFO - Evaluation - MAE: 29.45, RMSE: 36.72, R2: 0.9918
+2026-01-01 09:32:58,499 - INFO - Existing dataset loaded: 1821 candles, fetching from since 1767227400001
+2026-01-01 09:32:59,923 - INFO - No new data available
+2026-01-01 09:32:59,923 - INFO - No new data - returning existing
+2026-01-01 09:33:01,081 - INFO - Telegram message sent: <b>⚪ HOLD SIGNAL ⚪</b>
+Symbol: BTC/USDT
+Time: 2026-01-01 00:30
+Current: $87773.00
+Predicted: $87695.78
+Expected: -0.09%
+2026-01-01 09:38:11,070 - INFO - Existing dataset loaded: 1821 candles, fetching from since 1767227400001
+2026-01-01 09:38:12,620 - INFO - Fetched 1 new candles
+2026-01-01 09:38:12,635 - INFO - Updated dataset: 1822 candles (added 1 new)
+2026-01-01 09:43:13,188 - INFO - Existing dataset loaded: 1822 candles, fetching from since 1767227700001
+2026-01-01 09:43:14,618 - INFO - Fetched 1 new candles
+2026-01-01 09:43:14,633 - INFO - Updated dataset: 1823 candles (added 1 new)
+2026-01-01 09:48:14,780 - INFO - Existing dataset loaded: 1823 candles, fetching from since 1767228000001
+2026-01-01 09:48:16,254 - INFO - Fetched 1 new candles
+2026-01-01 09:48:16,268 - INFO - Updated dataset: 1824 candles (added 1 new)
+2026-01-01 09:53:16,370 - INFO - Existing dataset loaded: 1824 candles, fetching from since 1767228300001
+2026-01-01 09:53:17,507 - INFO - Fetched 1 new candles
+2026-01-01 09:53:17,516 - INFO - Updated dataset: 1825 candles (added 1 new)
