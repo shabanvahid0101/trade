@@ -93,67 +93,62 @@ def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, f
     else:
         logging.info("No new data - returning existing")
         return old_df
-def add_ichimoku_features(df, tenkan_period=9, kijun_period=26, senkou_period=52):
+def add_ichimoku_features(df, tenkan_period=9, kijun_period=26, senkou_period=52, variance_threshold=0.0005, reaction_window=10):
     """
-    Manual Ichimoku Cloud calculation + flat level detection + reaction assessment
-    (محاسبه دستی ابر ایچیموکو + تشخیص سطح صاف + سنجش واکنش قیمت)
+    محاسبه دستی ایچیموکو + تشخیص سطح صاف + واکنش قیمت - بدون حلقه سنگین
     """
     high = df['high']
     low = df['low']
     close = df['close']
     
-    # 1. Conversion Line (Tenkan-sen) - خط تبدیل
-    tenkan_high = high.rolling(window=tenkan_period).max()
-    tenkan_low = low.rolling(window=tenkan_period).min()
+    # Conversion Line (Tenkan-sen)
+    tenkan_high = high.rolling(window=tenkan_period, min_periods=1).max()
+    tenkan_low = low.rolling(window=tenkan_period, min_periods=1).min()
     df['tenkan_sen'] = (tenkan_high + tenkan_low) / 2
     
-    # 2. Base Line (Kijun-sen) - خط پایه
-    kijun_high = high.rolling(window=kijun_period).max()
-    kijun_low = low.rolling(window=kijun_period).min()
+    # Base Line (Kijun-sen)
+    kijun_high = high.rolling(window=kijun_period, min_periods=1).max()
+    kijun_low = low.rolling(window=kijun_period, min_periods=1).min()
     df['kijun_sen'] = (kijun_high + kijun_low) / 2
     
-    # 3. Leading Span A (Senkou Span A)
+    # Leading Span A
     df['senkou_span_a'] = ((df['tenkan_sen'] + df['kijun_sen']) / 2).shift(kijun_period)
     
-    # 4. Leading Span B (Senkou Span B) - سنکو اسپن B
-    span_b_high = high.rolling(window=senkou_period).max()
-    span_b_low = low.rolling(window=senkou_period).min()
+    # Leading Span B
+    span_b_high = high.rolling(window=senkou_period, min_periods=1).max()
+    span_b_low = low.rolling(window=senkou_period, min_periods=1).min()
     df['senkou_span_b'] = ((span_b_high + span_b_low) / 2).shift(kijun_period)
     
-    # 5. Lagging Span (Chikou Span) - اختیاری، برای تأیید
-    df['chikou_span'] = close.shift(-kijun_period)
-    
-    # تشخیص سطح صاف (Flat level detection between Tenkan and Senkou Span B)
-    window = 5  # پنجره برای چک صاف بودن
-    df['tenkan_variance'] = df['tenkan_sen'].rolling(window=window).var()
-    df['span_b_variance'] = df['senkou_span_b'].rolling(window=window).var()
+    # تشخیص سطح صاف (vectorized - بدون حلقه)
+    window_var = 5
+    df['tenkan_variance'] = df['tenkan_sen'].rolling(window=window_var, min_periods=1).var()
+    df['span_b_variance'] = df['senkou_span_b'].rolling(window=window_var, min_periods=1).var()
     df['tenkan_span_b_diff'] = abs(df['tenkan_sen'] - df['senkou_span_b'])
     
-    variance_threshold = df['close'].mean() * 0.0005  # آستانه پویا بر اساس قیمت (0.05%)
-    diff_threshold = df['close'].mean() * 0.005       # تفاوت کمتر از 0.5%
-    
+    # آستانه پویا بر اساس قیمت متوسط
+    avg_price = df['close'].mean()
     df['is_flat_ichimoku_level'] = (
-        (df['tenkan_variance'] < variance_threshold) &
-        (df['span_b_variance'] < variance_threshold) &
-        (df['tenkan_span_b_diff'] < diff_threshold)
+        (df['tenkan_variance'] < variance_threshold * avg_price) &
+        (df['span_b_variance'] < variance_threshold * avg_price) &
+        (df['tenkan_span_b_diff'] < 0.005 * avg_price)
     )
     
-    # سنجش واکنش قیمت به سطح صاف (Reaction assessment)
-    reaction_window = 10
+    # واکنش قیمت به صورت vectorized (بدون حلقه سنگین)
     df['ichimoku_reaction'] = 0.0
-    # بعد از محاسبه is_flat_level
-    df['ichimoku_reaction'] = 0.0
-
-    # Find indices where flat level exists in last reaction_window
-    flat_mask = df['is_flat_ichimoku_level'].rolling(window=reaction_window).sum() > 0
-    indices = flat_mask[flat_mask].index
-
-    for i in indices:
+    
+    # فقط روی ردیف‌هایی که سطح صاف داشته‌اند، محاسبه واکنش
+    flat_indices = df[df['is_flat_ichimoku_level']].index
+    
+    for i in flat_indices:
+        if i < reaction_window:
+            continue
         level_slice = df['senkou_span_b'].iloc[i - reaction_window:i]
         level = level_slice.mean()
         price_change = (df['close'].iloc[i] - df['close'].iloc[i - reaction_window]) / df['close'].iloc[i - reaction_window]
-        volume_factor = df['volume'].iloc[i] / df['volume'].iloc[i - reaction_window:i].mean()
+        volume_mean = df['volume'].iloc[i - reaction_window:i].mean()
+        volume_factor = df['volume'].iloc[i] / volume_mean if volume_mean > 0 else 1
         df.loc[i, 'ichimoku_reaction'] = price_change * volume_factor
+    
     return df
 def calculate_fibonacci_levels(df):
     # Find swing high/low (نوسان بالا/پایین - simple method: rolling max/min)
@@ -215,6 +210,9 @@ def preprocess_data(df):
     
     return df_scaled, scaler, df
 def predict_next_price(model, df_processed, scaler, sequence_length=60):
+    if len(df_processed) < sequence_length:
+        logging.warning("Not enough data for prediction")
+        return None  # یا مقدار پیش‌فرض
     last_sequence = df_processed.drop(columns=['timestamp']).values[-sequence_length:]
     last_sequence = last_sequence.reshape((1, sequence_length, last_sequence.shape[1]))
     
@@ -232,6 +230,71 @@ def predict_next_price(model, df_processed, scaler, sequence_length=60):
     print(f"Expected Change: {pred_price - current_price:.2f} USD ({((pred_price/current_price)-1)*100:.2f}%)")
     
     return pred_price
+def get_balance(exchange, asset='USDT'):
+    """
+    Fetch free balance (گرفتن موجودی آزاد)
+    """
+    try:
+        balance = exchange.fetch_balance()
+        return balance['free'].get(asset, 0)
+    except Exception as e:
+        logging.error(f"Balance fetch error: {e}")
+        send_telegram_message(f"Balance Error: {e}")
+        return 0
+
+def real_trade(exchange, symbol='BTC/USDT', signal='BUY', risk_pct=0.01, leverage=10, is_futures=False, min_size=0.0001):
+    """
+    Execute real trade with dynamic sizing based on balance (اجرای ترید واقعی با اندازه پویا بر اساس موجودی)
+    - risk_pct: Risk percentage of balance (درصد ریسک از موجودی)
+    - min_size: Coinex minimum order size (حداقل اندازه سفارش کوینکس)
+    """
+    try:
+        asset = 'USDT' if is_futures else 'BTC'
+        balance = get_balance(exchange, asset)
+        if balance <= 0:
+            msg = "No balance available!"
+            send_telegram_message(msg)
+            return
+        
+        current_price = exchange.fetch_ticker(symbol)['last']
+        
+        # Dynamic size (اندازه پویا)
+        risk_amount = balance * risk_pct
+        position_size = risk_amount / current_price
+        
+        if is_futures:
+            position_size *= leverage  # Adjust for leverage (تنظیم با لوریج)
+        
+        # Check minimum (چک حداقل)
+        if position_size < min_size:
+            msg = f"Position size {position_size:.6f} < min {min_size} - skipping trade!"
+            send_telegram_message(msg)
+            return
+        
+        # Round to precision (گرد کردن به دقت)
+        position_size = round(position_size, 4)  # e.g., 0.0001 precision
+        
+        if signal == 'BUY':
+            order = exchange.create_market_buy_order(symbol, position_size)
+            msg = f"✅ REAL BUY! Size: {position_size:.6f} BTC, Price: ${current_price:.2f}, Risk: ${risk_amount:.2f}"
+        elif signal == 'SELL':
+            order = exchange.create_market_sell_order(symbol, position_size)
+            msg = f"❌ REAL SELL! Size: {position_size:.6f} BTC, Price: ${current_price:.2f}, Risk: ${risk_amount:.2f}"
+        
+        print(msg)
+        send_telegram_message(msg)
+        
+        # Add stop-loss for BUY (استاپ لاس برای BUY - 2x risk)
+        if signal == 'BUY':
+            stop_price = current_price * (1 - risk_pct * 2)
+            exchange.create_stop_market_order(symbol, 'sell', position_size, stop_price)
+            msg += f"\nStop-Loss set at ${stop_price:.2f}"
+            send_telegram_message(msg)
+    
+    except Exception as e:
+        error_msg = f"Real Trade Error: {e}"
+        logging.error(error_msg)
+        send_telegram_message(error_msg)
 
 def paper_trading_loop(symbol='BTC/USDT', timeframe='5m', sequence_length=60, sleeptime=300, initial_capital=100, risk_per_trade=0.1):
     """
@@ -251,13 +314,29 @@ def paper_trading_loop(symbol='BTC/USDT', timeframe='5m', sequence_length=60, sl
         try:
             new_data = fetch_and_update_data(symbol, timeframe, batch_limit=sequence_length + 50)
             if new_data is not None and len(new_data) >= sequence_length:
+                print(f"\nbefore preprocess :{len(new_data)} candles for analysis.")
                 df_processed, _, df_original = preprocess_data(new_data)
+                print(f"after Preprocess :{len(df_original)} rows.")
+                # چک مهم بعد از preprocess
+                if len(df_original) < sequence_length:
+                    logging.warning(f"After preprocessing, only {len(df_original)} rows left – skipping")
+                    time.sleep(sleeptime)
+                    continue
+                
                 predicted = predict_next_price(model, df_processed, scaler, sequence_length)
+                if predicted is None:
+                    continue
+            
                 current = df_original['close'].iloc[-1]
                 
                 change_pct = ((predicted - current) / current) * 100
                 timestamp = df_original['timestamp'].iloc[-1].strftime('%Y-%m-%d %H:%M')
                 
+                # exchange = ccxt.coinex({'apiKey': ACCESS_ID, 'secret': SECRET_KEY})
+                # if change_pct > 0.3:
+                #     real_trade(exchange, symbol, 'BUY', risk_pct=0.01, is_futures=True)
+                # elif change_pct < -0.3:
+                #     real_trade(exchange, symbol, 'SELL', risk_pct=0.01, is_futures=True)
                 if change_pct > 0.3 and position == 0:
                     # BUY
                     position_size = capital * risk_per_trade / (current * 0.01)  # Approx position (تقریبی)
@@ -267,7 +346,7 @@ def paper_trading_loop(symbol='BTC/USDT', timeframe='5m', sequence_length=60, sl
                     msg = f"🟢 PAPER BUY 🟢\nTime: {timestamp}\nPrice: ${current:.2f}\nCapital: ${capital:.2f}"
                     print(msg)
                     send_telegram_message(msg)
-                
+                    # In live_predict_only, after signal:
                 elif change_pct < -0.3 and position == 1:
                     # SELL
                     profit_pct = (current - buy_price) / buy_price * 100

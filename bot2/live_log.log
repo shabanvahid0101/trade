@@ -36,3 +36,223 @@ HOLD
 Time: 2026-01-14 07:35
 Predicted Change: -0.15%
 Capital: $100.00
+2026-01-14 16:43:20,108 - INFO - Existing dataset loaded: 5592 candles, fetching from since 1768376100001
+2026-01-14 16:43:21,959 - INFO - Fetched 1 new candles
+2026-01-14 16:43:22,005 - INFO - Updated dataset: 5593 candles (added 1 new)
+2026-01-14 16:43:23,869 - INFO - Telegram message sent: current price is $94996.00
+predict price is $94819.87
+HOLD
+Time: 2026-01-14 07:40
+Predicted Change: -0.19%
+Capital: $100.00
+2026-01-14 16:48:23,890 - INFO - Existing dataset loaded: 5593 candles, fetching from since 1768376400001
+2026-01-14 16:48:25,794 - INFO - Fetched 1 new candles
+2026-01-14 16:48:25,828 - INFO - Updated dataset: 5594 candles (added 1 new)
+2026-01-14 16:48:27,528 - INFO - Telegram message sent: current price is $95214.00
+predict price is $94828.65
+HOLD
+Time: 2026-01-14 07:45
+Predicted Change: -0.40%
+Capital: $100.00
+2026-01-14 16:53:27,549 - INFO - Existing dataset loaded: 5594 candles, fetching from since 1768376700001
+2026-01-14 16:53:28,997 - INFO - Fetched 1 new candles
+2026-01-14 16:53:29,024 - INFO - Updated dataset: 5595 candles (added 1 new)
+2026-01-14 16:53:30,809 - INFO - Telegram message sent: current price is $95173.00
+predict price is $94833.04
+HOLD
+Time: 2026-01-14 07:50
+Predicted Change: -0.36%
+Capital: $100.00
+2026-01-14 16:58:30,826 - INFO - Existing dataset loaded: 5595 candles, fetching from since 1768377000001
+2026-01-14 16:58:32,376 - INFO - Fetched 1 new candles
+2026-01-14 16:58:32,407 - INFO - Updated dataset: 5596 candles (added 1 new)
+2026-01-14 16:58:34,249 - INFO - Telegram message sent: current price is $95182.00
+predict price is $94841.83
+HOLD
+Time: 2026-01-14 07:55
+Predicted Change: -0.36%
+Capital: $100.00
+2026-01-14 17:03:34,271 - INFO - Existing dataset loaded: 5596 candles, fetching from since 1768377300001
+2026-01-14 17:03:35,699 - INFO - Fetched 1 new candles
+2026-01-14 17:03:35,745 - INFO - Updated dataset: 5597 candles (added 1 new)
+2026-01-14 17:03:37,318 - INFO - Telegram message sent: current price is $95249.00
+predict price is $94841.83
+HOLD
+Time: 2026-01-14 08:00
+Predicted Change: -0.43%
+Capital: $100.00
+2026-01-14 17:23:38,302 - INFO - Existing dataset loaded: 5597 candles, fetching from since 1768377600001
+2026-01-14 17:23:39,569 - INFO - Fetched 4 new candles
+2026-01-14 17:23:39,598 - INFO - Updated dataset: 5601 candles (added 4 new)
+2026-01-14 17:23:42,509 - INFO - Telegram message sent: current price is $95213.00
+predict price is $94824.26
+HOLD
+Time: 2026-01-14 08:20
+Predicted Change: -0.41%
+Capital: $100.00
+2026-01-14 17:39:36,081 - INFO - Existing dataset loaded: 5601 candles, fetching from since 1768378800001
+2026-01-14 17:39:37,535 - INFO - Fetched 3 new candles
+2026-01-14 17:39:37,567 - INFO - Updated dataset: 5604 candles (added 3 new)
+2026-01-14 17:39:39,335 - INFO - Telegram message sent: current price is $94990.00
+predict price is $94802.31
+HOLD
+Time: 2026-01-14 08:35
+Predicted Change: -0.20%
+Capital: $100.00
+2026-01-14 17:44:39,344 - INFO - Existing dataset loaded: 5604 candles, fetching from since 1768379700001
+2026-01-14 17:44:41,120 - INFO - Fetched 1 new candles
+2026-01-14 17:44:41,140 - INFO - Updated dataset: 5605 candles (added 1 new)
+2026-01-14 17:44:42,708 - INFO - Telegram message sent: current price is $94944.00
+predict price is $94789.13
+HOLD
+Time: 2026-01-14 08:40
+Predicted Change: -0.16%
+Capital: $100.00
+2026-01-14 17:49:42,724 - INFO - Existing dataset loaded: 5605 candles, fetching from since 1768380000001
+2026-01-14 17:49:44,444 - INFO - Fetched 1 new candles
+2026-01-14 17:49:44,469 - INFO - Updated dataset: 5606 candles (added 1 new)
+2026-01-14 17:49:46,056 - INFO - Telegram message sent: current price is $94921.00
+predict price is $94771.57
+HOLD
+Time: 2026-01-14 08:45
+Predicted Change: -0.16%
+Capital: $100.00
+2026-01-14 17:54:46,069 - INFO - Existing dataset loaded: 5606 candles, fetching from since 1768380300001
+2026-01-14 17:54:47,695 - INFO - Fetched 1 new candles
+2026-01-14 17:54:47,717 - INFO - Updated dataset: 5607 candles (added 1 new)
+2026-01-14 17:54:49,401 - INFO - Telegram message sent: current price is $94898.00
+predict price is $94762.79
+HOLD
+Time: 2026-01-14 08:50
+Predicted Change: -0.14%
+Capital: $100.00
+2026-01-14 17:57:32,378 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-14 17:57:32,413 - INFO - Existing dataset loaded: 5607 candles, fetching from since 1768380600001
+2026-01-14 17:57:33,731 - INFO - Fetched 1 new candles
+2026-01-14 17:57:33,764 - INFO - Updated dataset: 5608 candles (added 1 new)
+2026-01-14 17:57:35,883 - INFO - Telegram message sent: current price is $94912.00
+predict price is $94740.83
+HOLD
+Time: 2026-01-14 08:55
+Predicted Change: -0.18%
+Capital: $100.00
+2026-01-14 18:02:35,917 - INFO - Existing dataset loaded: 5608 candles, fetching from since 1768380900001
+2026-01-14 18:02:37,477 - INFO - Fetched 1 new candles
+2026-01-14 18:02:37,507 - INFO - Updated dataset: 5609 candles (added 1 new)
+2026-01-14 18:02:39,093 - INFO - Telegram message sent: current price is $94899.00
+predict price is $94718.87
+HOLD
+Time: 2026-01-14 09:00
+Predicted Change: -0.19%
+Capital: $100.00
+2026-01-14 18:07:39,115 - INFO - Existing dataset loaded: 5609 candles, fetching from since 1768381200001
+2026-01-14 18:07:40,748 - INFO - Fetched 1 new candles
+2026-01-14 18:07:40,784 - INFO - Updated dataset: 5610 candles (added 1 new)
+2026-01-14 18:07:42,717 - INFO - Telegram message sent: current price is $94980.00
+predict price is $94705.70
+HOLD
+Time: 2026-01-14 09:05
+Predicted Change: -0.29%
+Capital: $100.00
+2026-01-14 18:12:42,740 - INFO - Existing dataset loaded: 5610 candles, fetching from since 1768381500001
+2026-01-14 18:12:44,570 - INFO - Fetched 1 new candles
+2026-01-14 18:12:44,601 - INFO - Updated dataset: 5611 candles (added 1 new)
+2026-01-14 18:12:46,350 - ERROR - Balance fetch error: coinex requires "apiKey" credential
+2026-01-14 18:12:47,360 - INFO - Telegram message sent: Balance Error: coinex requires "apiKey" credential
+2026-01-14 18:12:48,569 - INFO - Telegram message sent: No balance available!
+2026-01-14 18:12:49,595 - INFO - Telegram message sent: current price is $95049.00
+predict price is $94692.53
+HOLD
+Time: 2026-01-14 09:10
+Predicted Change: -0.38%
+Capital: $100.00
+2026-01-14 18:17:49,620 - INFO - Existing dataset loaded: 5611 candles, fetching from since 1768381800001
+2026-01-14 18:17:51,283 - INFO - Fetched 1 new candles
+2026-01-14 18:17:51,314 - INFO - Updated dataset: 5612 candles (added 1 new)
+2026-01-14 18:17:53,056 - ERROR - Balance fetch error: coinex requires "apiKey" credential
+2026-01-14 18:17:54,439 - INFO - Telegram message sent: Balance Error: coinex requires "apiKey" credential
+2026-01-14 18:17:55,560 - INFO - Telegram message sent: No balance available!
+2026-01-14 18:17:56,595 - INFO - Telegram message sent: current price is $95090.00
+predict price is $94688.14
+HOLD
+Time: 2026-01-14 09:15
+Predicted Change: -0.42%
+Capital: $100.00
+2026-01-14 22:43:44,843 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-14 22:43:44,889 - INFO - Existing dataset loaded: 5612 candles, fetching from since 1768382100001
+2026-01-14 22:43:46,246 - INFO - Fetched 53 new candles
+2026-01-14 22:43:46,283 - INFO - Updated dataset: 5665 candles (added 53 new)
+2026-01-14 22:43:46,798 - ERROR - Paper Trading Error: single positional indexer is out-of-bounds
+2026-01-14 22:43:47,846 - INFO - Telegram message sent: Paper Trading Error: single positional indexer is out-of-bounds
+2026-01-14 22:49:47,871 - INFO - Existing dataset loaded: 5665 candles, fetching from since 1768398000001
+2026-01-14 22:49:49,700 - INFO - Fetched 1 new candles
+2026-01-14 22:49:49,732 - INFO - Updated dataset: 5666 candles (added 1 new)
+2026-01-14 22:49:50,247 - ERROR - Paper Trading Error: single positional indexer is out-of-bounds
+2026-01-14 22:49:51,330 - INFO - Telegram message sent: Paper Trading Error: single positional indexer is out-of-bounds
+2026-01-14 22:51:52,526 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-14 22:51:52,564 - INFO - Existing dataset loaded: 5666 candles, fetching from since 1768398300001
+2026-01-14 22:51:54,495 - INFO - Fetched 1 new candles
+2026-01-14 22:51:54,531 - INFO - Updated dataset: 5667 candles (added 1 new)
+2026-01-14 22:51:54,798 - ERROR - Paper Trading Error: single positional indexer is out-of-bounds
+2026-01-14 22:51:55,906 - INFO - Telegram message sent: Paper Trading Error: single positional indexer is out-of-bounds
+2026-01-14 23:03:49,888 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-14 23:03:49,919 - INFO - Existing dataset loaded: 5667 candles, fetching from since 1768398600001
+2026-01-14 23:03:51,585 - INFO - Fetched 2 new candles
+2026-01-14 23:03:51,621 - INFO - Updated dataset: 5669 candles (added 2 new)
+2026-01-14 23:03:51,783 - ERROR - Paper Trading Error: name 'add_ichimoku_features' is not defined
+2026-01-14 23:03:52,750 - INFO - Telegram message sent: Paper Trading Error: name 'add_ichimoku_features' is not defined
+2026-01-15 07:09:43,878 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-15 07:09:43,914 - INFO - Existing dataset loaded: 5669 candles, fetching from since 1768399200001
+2026-01-15 07:09:45,359 - INFO - Fetched 97 new candles
+2026-01-15 07:09:45,401 - INFO - Updated dataset: 5766 candles (added 97 new)
+2026-01-15 07:09:45,570 - ERROR - Paper Trading Error: name 'add_ichimoku_features' is not defined
+2026-01-15 07:09:46,629 - INFO - Telegram message sent: Paper Trading Error: name 'add_ichimoku_features' is not defined
+2026-01-15 07:12:21,868 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-15 07:12:21,906 - INFO - Existing dataset loaded: 5766 candles, fetching from since 1768428300001
+2026-01-15 07:12:23,459 - INFO - Fetched 1 new candles
+2026-01-15 07:12:23,493 - INFO - Updated dataset: 5767 candles (added 1 new)
+2026-01-15 07:12:25,553 - INFO - Telegram message sent: current price is $97380.00
+predict price is $94464.19
+HOLD
+Time: 2026-01-14 22:10
+Predicted Change: -2.99%
+Capital: $100.00
+2026-01-15 07:18:21,225 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-15 07:18:21,261 - INFO - Existing dataset loaded: 5767 candles, fetching from since 1768428600001
+2026-01-15 07:18:23,167 - INFO - Fetched 1 new candles
+2026-01-15 07:18:23,199 - INFO - Updated dataset: 5768 candles (added 1 new)
+2026-01-15 07:18:24,919 - INFO - Telegram message sent: current price is $97379.00
+predict price is $93526.46
+HOLD
+Time: 2026-01-14 22:15
+Predicted Change: -3.96%
+Capital: $100.00
+2026-01-15 07:27:20,297 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-15 07:27:20,353 - INFO - Existing dataset loaded: 5769 candles, fetching from since 1768429200001
+2026-01-15 07:27:22,117 - INFO - Fetched 1 new candles
+2026-01-15 07:27:22,139 - INFO - Updated dataset: 5770 candles (added 1 new)
+2026-01-15 07:27:23,919 - INFO - Telegram message sent: current price is $97343.00
+predict price is $95678.12
+HOLD
+Time: 2026-01-14 22:25
+Predicted Change: -1.71%
+Capital: $100.00
+2026-01-15 07:45:00,262 - INFO - Telegram message sent: Paper Trading Started!
+Virtual Capital: $100.00
+2026-01-15 07:45:00,298 - INFO - Existing dataset loaded: 5772 candles, fetching from since 1768430100001
+2026-01-15 07:45:01,584 - INFO - Fetched 2 new candles
+2026-01-15 07:45:01,618 - INFO - Updated dataset: 5774 candles (added 2 new)
+2026-01-15 07:45:03,444 - INFO - Telegram message sent: current price is $97035.00
+predict price is $94213.25
+HOLD
+Time: 2026-01-14 22:45
+Predicted Change: -2.91%
+Capital: $100.00

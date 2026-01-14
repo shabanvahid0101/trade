@@ -124,67 +124,62 @@ def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, f
     else:
         logging.info("No new data - returning existing")
         return old_df
-def add_ichimoku_features(df, tenkan_period=9, kijun_period=26, senkou_period=52):
+def add_ichimoku_features(df, tenkan_period=9, kijun_period=26, senkou_period=52, variance_threshold=0.0005, reaction_window=10):
     """
-    Manual Ichimoku Cloud calculation + flat level detection + reaction assessment
-    (محاسبه دستی ابر ایچیموکو + تشخیص سطح صاف + سنجش واکنش قیمت)
+    محاسبه دستی ایچیموکو + تشخیص سطح صاف + واکنش قیمت - بدون حلقه سنگین
     """
     high = df['high']
     low = df['low']
     close = df['close']
     
-    # 1. Conversion Line (Tenkan-sen) - خط تبدیل
-    tenkan_high = high.rolling(window=tenkan_period).max()
-    tenkan_low = low.rolling(window=tenkan_period).min()
+    # Conversion Line (Tenkan-sen)
+    tenkan_high = high.rolling(window=tenkan_period, min_periods=1).max()
+    tenkan_low = low.rolling(window=tenkan_period, min_periods=1).min()
     df['tenkan_sen'] = (tenkan_high + tenkan_low) / 2
     
-    # 2. Base Line (Kijun-sen) - خط پایه
-    kijun_high = high.rolling(window=kijun_period).max()
-    kijun_low = low.rolling(window=kijun_period).min()
+    # Base Line (Kijun-sen)
+    kijun_high = high.rolling(window=kijun_period, min_periods=1).max()
+    kijun_low = low.rolling(window=kijun_period, min_periods=1).min()
     df['kijun_sen'] = (kijun_high + kijun_low) / 2
     
-    # 3. Leading Span A (Senkou Span A)
+    # Leading Span A
     df['senkou_span_a'] = ((df['tenkan_sen'] + df['kijun_sen']) / 2).shift(kijun_period)
     
-    # 4. Leading Span B (Senkou Span B) - سنکو اسپن B
-    span_b_high = high.rolling(window=senkou_period).max()
-    span_b_low = low.rolling(window=senkou_period).min()
+    # Leading Span B
+    span_b_high = high.rolling(window=senkou_period, min_periods=1).max()
+    span_b_low = low.rolling(window=senkou_period, min_periods=1).min()
     df['senkou_span_b'] = ((span_b_high + span_b_low) / 2).shift(kijun_period)
     
-    # 5. Lagging Span (Chikou Span) - اختیاری، برای تأیید
-    df['chikou_span'] = close.shift(-kijun_period)
-    
-    # تشخیص سطح صاف (Flat level detection between Tenkan and Senkou Span B)
-    window = 5  # پنجره برای چک صاف بودن
-    df['tenkan_variance'] = df['tenkan_sen'].rolling(window=window).var()
-    df['span_b_variance'] = df['senkou_span_b'].rolling(window=window).var()
+    # تشخیص سطح صاف (vectorized - بدون حلقه)
+    window_var = 5
+    df['tenkan_variance'] = df['tenkan_sen'].rolling(window=window_var, min_periods=1).var()
+    df['span_b_variance'] = df['senkou_span_b'].rolling(window=window_var, min_periods=1).var()
     df['tenkan_span_b_diff'] = abs(df['tenkan_sen'] - df['senkou_span_b'])
     
-    variance_threshold = df['close'].mean() * 0.0005  # آستانه پویا بر اساس قیمت (0.05%)
-    diff_threshold = df['close'].mean() * 0.005       # تفاوت کمتر از 0.5%
-    
+    # آستانه پویا بر اساس قیمت متوسط
+    avg_price = df['close'].mean()
     df['is_flat_ichimoku_level'] = (
-        (df['tenkan_variance'] < variance_threshold) &
-        (df['span_b_variance'] < variance_threshold) &
-        (df['tenkan_span_b_diff'] < diff_threshold)
+        (df['tenkan_variance'] < variance_threshold * avg_price) &
+        (df['span_b_variance'] < variance_threshold * avg_price) &
+        (df['tenkan_span_b_diff'] < 0.005 * avg_price)
     )
     
-    # سنجش واکنش قیمت به سطح صاف (Reaction assessment)
-    reaction_window = 10
+    # واکنش قیمت به صورت vectorized (بدون حلقه سنگین)
     df['ichimoku_reaction'] = 0.0
-    # بعد از محاسبه is_flat_level
-    df['ichimoku_reaction'] = 0.0
-
-    # Find indices where flat level exists in last reaction_window
-    flat_mask = df['is_flat_ichimoku_level'].rolling(window=reaction_window).sum() > 0
-    indices = flat_mask[flat_mask].index
-
-    for i in indices:
+    
+    # فقط روی ردیف‌هایی که سطح صاف داشته‌اند، محاسبه واکنش
+    flat_indices = df[df['is_flat_ichimoku_level']].index
+    
+    for i in flat_indices:
+        if i < reaction_window:
+            continue
         level_slice = df['senkou_span_b'].iloc[i - reaction_window:i]
         level = level_slice.mean()
         price_change = (df['close'].iloc[i] - df['close'].iloc[i - reaction_window]) / df['close'].iloc[i - reaction_window]
-        volume_factor = df['volume'].iloc[i] / df['volume'].iloc[i - reaction_window:i].mean()
+        volume_mean = df['volume'].iloc[i - reaction_window:i].mean()
+        volume_factor = df['volume'].iloc[i] / volume_mean if volume_mean > 0 else 1
         df.loc[i, 'ichimoku_reaction'] = price_change * volume_factor
+    
     return df
 def calculate_fibonacci_levels(df):
     # Find swing high/low (نوسان بالا/پایین - simple method: rolling max/min)
@@ -286,7 +281,6 @@ def create_sequences(df_scaled, sequence_length=60):
     y = np.array(y)
     logging.info(f"Sequences created: X shape {X.shape}, y shape {y.shape}")
     return X, y
-
 def build_and_train_model(X, y, sequence_length=60):    
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=False)
@@ -312,7 +306,6 @@ def build_and_train_model(X, y, sequence_length=60):
     history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=150, batch_size=64, callbacks=[early_stop], verbose=1)
     
     return model, X_test, y_test, history
-
 def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     y_pred_scaled = model.predict(X_test)
     
@@ -359,7 +352,6 @@ def evaluate_model(model, X_test, y_test, scaler, df_original=None):
     plt.close()
     
     return mae, rmse, r2
-
 def backtest(data, model, scaler, sequence_length=60, initial_capital=10000, threshold=0.3):
     df_processed, _, _ = preprocess_data(data.copy())
     X, _ = create_sequences(df_processed, sequence_length)
@@ -411,10 +403,11 @@ def backtest(data, model, scaler, sequence_length=60, initial_capital=10000, thr
     print(f"Number of Trades: {len(trades)//2 if position == 0 else len(trades)//2 + 1}")
     
     return capital, total_return
-
 def train_and_backtest(symbol='BTC/USDT', timeframe='5m'):
     data = fetch_and_update_data(symbol=symbol, timeframe=timeframe, batch_limit=1000)
+    data = data.tail(5000).reset_index(drop=True)  # استفاده از آخرین 5000 کندل برای سرعت بیشتر
     if data is not None and len(data) > 60:
+        logging.info(f"Limited data to last {len(data)} candles for training efficiency")
         df_processed, scaler, df_original = preprocess_data(data)
         X, y = create_sequences(df_processed)
         eda(df_original, df_processed)
