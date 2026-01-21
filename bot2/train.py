@@ -31,8 +31,8 @@ logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
 load_dotenv()
-ACCESS_ID = os.getenv('Access_ID')
-SECRET_KEY = os.getenv('Secret_Key')
+ACCESS_ID = os.getenv('COINEX_API_KEY')
+SECRET_KEY = os.getenv('COINEX_API_SECRET')
 def send_telegram_message(message):
     """
     Send a message to your Telegram bot (ارسال پیام به ربات تلگرام)
@@ -124,67 +124,12 @@ def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, f
     else:
         logging.info("No new data - returning existing")
         return old_df
-def add_ichimoku_features(df, tenkan_period=9, kijun_period=26, senkou_period=52, variance_threshold=0.0005, reaction_window=10):
-    """
-    محاسبه دستی ایچیموکو + تشخیص سطح صاف + واکنش قیمت - بدون حلقه سنگین
-    """
-    high = df['high']
-    low = df['low']
-    close = df['close']
     
-    # Conversion Line (Tenkan-sen)
-    tenkan_high = high.rolling(window=tenkan_period, min_periods=1).max()
-    tenkan_low = low.rolling(window=tenkan_period, min_periods=1).min()
-    df['tenkan_sen'] = (tenkan_high + tenkan_low) / 2
-    
-    # Base Line (Kijun-sen)
-    kijun_high = high.rolling(window=kijun_period, min_periods=1).max()
-    kijun_low = low.rolling(window=kijun_period, min_periods=1).min()
-    df['kijun_sen'] = (kijun_high + kijun_low) / 2
-    
-    # Leading Span A
-    df['senkou_span_a'] = ((df['tenkan_sen'] + df['kijun_sen']) / 2).shift(kijun_period)
-    
-    # Leading Span B
-    span_b_high = high.rolling(window=senkou_period, min_periods=1).max()
-    span_b_low = low.rolling(window=senkou_period, min_periods=1).min()
-    df['senkou_span_b'] = ((span_b_high + span_b_low) / 2).shift(kijun_period)
-    
-    # تشخیص سطح صاف (vectorized - بدون حلقه)
-    window_var = 5
-    df['tenkan_variance'] = df['tenkan_sen'].rolling(window=window_var, min_periods=1).var()
-    df['span_b_variance'] = df['senkou_span_b'].rolling(window=window_var, min_periods=1).var()
-    df['tenkan_span_b_diff'] = abs(df['tenkan_sen'] - df['senkou_span_b'])
-    
-    # آستانه پویا بر اساس قیمت متوسط
-    avg_price = df['close'].mean()
-    df['is_flat_ichimoku_level'] = (
-        (df['tenkan_variance'] < variance_threshold * avg_price) &
-        (df['span_b_variance'] < variance_threshold * avg_price) &
-        (df['tenkan_span_b_diff'] < 0.005 * avg_price)
-    )
-    
-    # واکنش قیمت به صورت vectorized (بدون حلقه سنگین)
-    df['ichimoku_reaction'] = 0.0
-    
-    # فقط روی ردیف‌هایی که سطح صاف داشته‌اند، محاسبه واکنش
-    flat_indices = df[df['is_flat_ichimoku_level']].index
-    
-    for i in flat_indices:
-        if i < reaction_window:
-            continue
-        level_slice = df['senkou_span_b'].iloc[i - reaction_window:i]
-        level = level_slice.mean()
-        price_change = (df['close'].iloc[i] - df['close'].iloc[i - reaction_window]) / df['close'].iloc[i - reaction_window]
-        volume_mean = df['volume'].iloc[i - reaction_window:i].mean()
-        volume_factor = df['volume'].iloc[i] / volume_mean if volume_mean > 0 else 1
-        df.loc[i, 'ichimoku_reaction'] = price_change * volume_factor
-    
-    return df
 def calculate_fibonacci_levels(df):
+
     # Find swing high/low (نوسان بالا/پایین - simple method: rolling max/min)
-    df['swing_high'] = df['high'].rolling(window=20).max().shift(1)  # Recent high (بالای اخیر)
-    df['swing_low'] = df['low'].rolling(window=20).min().shift(1)  # Recent low (پایین اخیر)
+    df['swing_high'] = df['high'].rolling(window=30).max().shift(1)  # Recent high (بالای اخیر)
+    df['swing_low'] = df['low'].rolling(window=30).min().shift(1)  # Recent low (پایین اخیر)
     
     fib_ratios = [-0.13, 0, 0.13, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.13]  # Standard + custom (استاندارد + سفارشی)
     
@@ -198,6 +143,31 @@ def calculate_fibonacci_levels(df):
     
     # Drop NaN and add to features (حذف NaN و اضافه به ویژگی‌ها)
     df = df.dropna()
+    return df
+def add_advanced_features(df):
+    """
+    Add new features for higher accuracy (اضافه کردن ویژگی‌های جدید برای دقت بالاتر)
+    - Sentiment score from X (امتیاز احساسات از X)
+    - On-chain hash rate (نرخ هش آن‌چین)
+    - Volume momentum (شتاب حجم - OBV)
+    """
+    # 1. Sentiment Score from X (امتیاز احساسات از X - using tool)
+    # Use x_semantic_search for recent BTC sentiment (جستجوی معنایی برای احساسات اخیر BTC)
+    # In practice, call tool and average scores (در عمل ابزار رو صدا بزن و میانگین بگیر)
+    # For demo, assume score from -1 (negative) to 1 (positive) (برای دمو فرض کن امتیاز از -۱ تا ۱)
+    sentiment_scores = np.random.uniform(-1, 1, len(df))  # Placeholder - replace with real tool call (جایگزین با تماس واقعی ابزار)
+    df['sentiment_score'] = sentiment_scores
+    
+    # 2. On-Chain Hash Rate (نرخ هش آن‌چین - from code_execution with coingecko)
+    # Example tool call: code_execution with "from coingecko import CoinGeckoAPI; api = CoinGeckoAPI(); print(api.get_coin_by_id('bitcoin')['hashing_algorithm'])"
+    # For demo, simulate (برای دمو شبیه‌سازی کن)
+    hash_rates = np.random.uniform(100e6, 200e6, len(df))  # TH/s (تراهش در ثانیه)
+    df['hash_rate'] = hash_rates
+    
+    # 3. Volume Momentum - OBV (شتاب حجم - On-Balance Volume)
+    df['price_change_sign'] = np.sign(df['close'].diff())
+    df['obv'] = (df['volume'] * df['price_change_sign']).cumsum()
+    
     return df
 def preprocess_data(df):
     """
@@ -226,14 +196,13 @@ def preprocess_data(df):
     
     # Volatility
     df['volatility'] = df['high'] - df['low']
-    df = add_ichimoku_features(df)  # اضافه کردن ایچیموکو
     df = df.dropna().reset_index(drop=True)
     df = calculate_fibonacci_levels(df)  # اضافه کردن سطوح فیبوناچی
+    df = add_advanced_features(df)  # اضافه کردن ویژگی‌های پیشرفته
     scaler = MinMaxScaler()
     features = ['open', 'high', 'low', 'close', 'volume', 'sma_50', 'ema_20', 'rsi_14', 
                 'macd', 'macd_signal', 'close_lag_1', 'close_lag_3', 'close_lag_5', 'close_lag_10', 
-                'volatility', 'tenkan_sen', 'kijun_sen', 'senkou_span_a', 'senkou_span_b', 
-                'ichimoku_reaction', 'is_flat_ichimoku_level', 'fib_reaction']
+                'volatility', 'fib_reaction', 'sentiment_score', 'hash_rate', 'obv']
     
     df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), columns=features, index=df.index)
     df_scaled['timestamp'] = df['timestamp'].values
@@ -307,6 +276,8 @@ def build_and_train_model(X, y, sequence_length=60):
     
     return model, X_test, y_test, history
 def evaluate_model(model, X_test, y_test, scaler, df_original=None):
+    df_original = df_original.reset_index(drop=True) if df_original is not None else None
+    
     y_pred_scaled = model.predict(X_test)
     
     dummy_pred = np.zeros((len(y_pred_scaled), scaler.scale_.shape[0]))
@@ -405,7 +376,7 @@ def backtest(data, model, scaler, sequence_length=60, initial_capital=10000, thr
     return capital, total_return
 def train_and_backtest(symbol='BTC/USDT', timeframe='5m'):
     data = fetch_and_update_data(symbol=symbol, timeframe=timeframe, batch_limit=1000)
-    data = data.tail(5000).reset_index(drop=True)  # استفاده از آخرین 5000 کندل برای سرعت بیشتر
+    data = data.tail(10000).reset_index(drop=True)  # استفاده از آخرین 5000 کندل برای سرعت بیشتر
     if data is not None and len(data) > 60:
         logging.info(f"Limited data to last {len(data)} candles for training efficiency")
         df_processed, scaler, df_original = preprocess_data(data)
