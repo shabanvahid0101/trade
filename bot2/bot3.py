@@ -111,6 +111,31 @@ def calculate_fibonacci_levels(df):
     # Drop NaN and add to features (حذف NaN و اضافه به ویژگی‌ها)
     df = df.dropna()
     return df
+def add_advanced_features(df):
+    """
+    Add new features for higher accuracy (اضافه کردن ویژگی‌های جدید برای دقت بالاتر)
+    - Sentiment score from X (امتیاز احساسات از X)
+    - On-chain hash rate (نرخ هش آن‌چین)
+    - Volume momentum (شتاب حجم - OBV)
+    """
+    # 1. Sentiment Score from X (امتیاز احساسات از X - using tool)
+    # Use x_semantic_search for recent BTC sentiment (جستجوی معنایی برای احساسات اخیر BTC)
+    # In practice, call tool and average scores (در عمل ابزار رو صدا بزن و میانگین بگیر)
+    # For demo, assume score from -1 (negative) to 1 (positive) (برای دمو فرض کن امتیاز از -۱ تا ۱)
+    sentiment_scores = np.random.uniform(-1, 1, len(df))  # Placeholder - replace with real tool call (جایگزین با تماس واقعی ابزار)
+    df['sentiment_score'] = sentiment_scores
+    
+    # 2. On-Chain Hash Rate (نرخ هش آن‌چین - from code_execution with coingecko)
+    # Example tool call: code_execution with "from coingecko import CoinGeckoAPI; api = CoinGeckoAPI(); print(api.get_coin_by_id('bitcoin')['hashing_algorithm'])"
+    # For demo, simulate (برای دمو شبیه‌سازی کن)
+    hash_rates = np.random.uniform(100e6, 200e6, len(df))  # TH/s (تراهش در ثانیه)
+    df['hash_rate'] = hash_rates
+    
+    # 3. Volume Momentum - OBV (شتاب حجم - On-Balance Volume)
+    df['price_change_sign'] = np.sign(df['close'].diff())
+    df['obv'] = (df['volume'] * df['price_change_sign']).cumsum()
+    
+    return df
 def preprocess_data(df):
     """
     Preprocess data: add indicators, lags, volatility, and Fibonacci levels.
@@ -141,10 +166,11 @@ def preprocess_data(df):
     
     df = df.dropna().reset_index(drop=True)
     df = calculate_fibonacci_levels(df)  # اضافه کردن سطوح فیبوناچی
+    df = add_advanced_features(df)  # اضافه کردن ویژگی‌های پیشرفته
     scaler = MinMaxScaler()
     features = ['open', 'high', 'low', 'close', 'volume', 'sma_50', 'ema_20', 'rsi_14', 
                 'macd', 'macd_signal', 'close_lag_1', 'close_lag_3', 'close_lag_5', 'close_lag_10', 
-                'volatility', 'fib_reaction']
+                'volatility', 'fib_reaction', 'obv']
 
     df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), columns=features, index=df.index)
     df_scaled['timestamp'] = df['timestamp'].values

@@ -124,7 +124,6 @@ def fetch_and_update_data(symbol='BTC/USDT', timeframe='5m', batch_limit=1000, f
     else:
         logging.info("No new data - returning existing")
         return old_df
-    
 def calculate_fibonacci_levels(df):
 
     # Find swing high/low (نوسان بالا/پایین - simple method: rolling max/min)
@@ -202,7 +201,7 @@ def preprocess_data(df):
     scaler = MinMaxScaler()
     features = ['open', 'high', 'low', 'close', 'volume', 'sma_50', 'ema_20', 'rsi_14', 
                 'macd', 'macd_signal', 'close_lag_1', 'close_lag_3', 'close_lag_5', 'close_lag_10', 
-                'volatility', 'fib_reaction', 'sentiment_score', 'hash_rate', 'obv']
+                'volatility', 'fib_reaction', 'obv']
     
     df_scaled = pd.DataFrame(scaler.fit_transform(df[features]), columns=features, index=df.index)
     df_scaled['timestamp'] = df['timestamp'].values

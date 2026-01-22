@@ -946,3 +946,313 @@ Price: $89607.00
 2026-01-21 19:45:47,656 - INFO - Predicted next close: $89619.08 (uncertainty std: 0.00)
 2026-01-21 19:45:48,693 - INFO - Telegram message sent: Predicted next close: $89619.08 (uncertainty std: 0.00)
 2026-01-21 19:45:49,821 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89290.00, Predicted: $89619.08
+2026-01-21 19:50:49,837 - INFO - Existing dataset loaded: 7646 candles, fetching from since 1768992300001
+2026-01-21 19:50:52,162 - INFO - Fetched 1 new candles
+2026-01-21 19:50:52,197 - INFO - Updated dataset: 7647 candles (added 1 new)
+2026-01-21 19:50:52,200 - INFO - before preprocess :7647 candles for analysis.
+2026-01-21 19:50:52,413 - INFO - after Preprocess :7568 rows.
+2026-01-21 19:50:52,991 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 19:50:52,992 - INFO - Predicted next close: $89597.82 (uncertainty std: 0.00)
+2026-01-21 19:50:54,052 - INFO - Telegram message sent: Predicted next close: $89597.82 (uncertainty std: 0.00)
+2026-01-21 19:50:54,978 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89283.00, Predicted: $89597.82
+2026-01-21 19:55:55,002 - INFO - Existing dataset loaded: 7647 candles, fetching from since 1768992600001
+2026-01-21 19:55:56,577 - INFO - Fetched 1 new candles
+2026-01-21 19:55:56,621 - INFO - Updated dataset: 7648 candles (added 1 new)
+2026-01-21 19:55:56,625 - INFO - before preprocess :7648 candles for analysis.
+2026-01-21 19:55:56,837 - INFO - after Preprocess :7569 rows.
+2026-01-21 19:55:57,325 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 19:55:57,325 - INFO - Predicted next close: $89587.19 (uncertainty std: 0.00)
+2026-01-21 19:55:58,388 - INFO - Telegram message sent: Predicted next close: $89587.19 (uncertainty std: 0.00)
+2026-01-21 19:55:59,537 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89275.00, Predicted: $89587.19
+2026-01-21 20:00:59,561 - INFO - Existing dataset loaded: 7648 candles, fetching from since 1768992900001
+2026-01-21 20:01:01,261 - INFO - Fetched 1 new candles
+2026-01-21 20:01:01,314 - INFO - Updated dataset: 7649 candles (added 1 new)
+2026-01-21 20:01:01,318 - INFO - before preprocess :7649 candles for analysis.
+2026-01-21 20:01:01,532 - INFO - after Preprocess :7570 rows.
+2026-01-21 20:01:02,008 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:01:02,008 - INFO - Predicted next close: $89573.91 (uncertainty std: 0.00)
+2026-01-21 20:01:03,054 - INFO - Telegram message sent: Predicted next close: $89573.91 (uncertainty std: 0.00)
+2026-01-21 20:01:04,070 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89220.00, Predicted: $89573.91
+2026-01-21 20:06:04,077 - INFO - Existing dataset loaded: 7649 candles, fetching from since 1768993200001
+2026-01-21 20:06:05,697 - INFO - Fetched 1 new candles
+2026-01-21 20:06:05,735 - INFO - Updated dataset: 7650 candles (added 1 new)
+2026-01-21 20:06:05,739 - INFO - before preprocess :7650 candles for analysis.
+2026-01-21 20:06:05,948 - INFO - after Preprocess :7571 rows.
+2026-01-21 20:06:06,426 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:06:06,426 - INFO - Predicted next close: $89565.94 (uncertainty std: 0.00)
+2026-01-21 20:06:07,565 - INFO - Telegram message sent: Predicted next close: $89565.94 (uncertainty std: 0.00)
+2026-01-21 20:06:08,633 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89152.00, Predicted: $89565.94
+2026-01-21 20:11:08,658 - INFO - Existing dataset loaded: 7650 candles, fetching from since 1768993500001
+2026-01-21 20:11:10,564 - INFO - Fetched 1 new candles
+2026-01-21 20:11:10,610 - INFO - Updated dataset: 7651 candles (added 1 new)
+2026-01-21 20:11:10,614 - INFO - before preprocess :7651 candles for analysis.
+2026-01-21 20:11:10,825 - INFO - after Preprocess :7572 rows.
+2026-01-21 20:11:11,309 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:11:11,309 - INFO - Predicted next close: $89568.59 (uncertainty std: 0.00)
+2026-01-21 20:11:12,425 - INFO - Telegram message sent: Predicted next close: $89568.59 (uncertainty std: 0.00)
+2026-01-21 20:11:13,630 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89254.00, Predicted: $89568.59
+2026-01-21 20:16:13,661 - INFO - Existing dataset loaded: 7651 candles, fetching from since 1768993800001
+2026-01-21 20:16:14,856 - INFO - Fetched 1 new candles
+2026-01-21 20:16:14,899 - INFO - Updated dataset: 7652 candles (added 1 new)
+2026-01-21 20:16:14,903 - INFO - before preprocess :7652 candles for analysis.
+2026-01-21 20:16:15,113 - INFO - after Preprocess :7573 rows.
+2026-01-21 20:16:15,587 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:16:15,588 - INFO - Predicted next close: $89555.31 (uncertainty std: 0.00)
+2026-01-21 20:16:16,557 - INFO - Telegram message sent: Predicted next close: $89555.31 (uncertainty std: 0.00)
+2026-01-21 20:16:17,774 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89289.00, Predicted: $89555.31
+2026-01-21 20:21:17,797 - INFO - Existing dataset loaded: 7652 candles, fetching from since 1768994100001
+2026-01-21 20:21:19,599 - INFO - Fetched 1 new candles
+2026-01-21 20:21:19,655 - INFO - Updated dataset: 7653 candles (added 1 new)
+2026-01-21 20:21:19,659 - INFO - before preprocess :7653 candles for analysis.
+2026-01-21 20:21:19,872 - INFO - after Preprocess :7574 rows.
+2026-01-21 20:21:20,340 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:21:20,340 - INFO - Predicted next close: $89557.96 (uncertainty std: 0.00)
+2026-01-21 20:21:21,309 - INFO - Telegram message sent: Predicted next close: $89557.96 (uncertainty std: 0.00)
+2026-01-21 20:21:22,314 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89363.00, Predicted: $89557.96
+2026-01-21 20:29:53,683 - INFO - Existing dataset loaded: 7653 candles, fetching from since 1768994400001
+2026-01-21 20:29:55,147 - INFO - Fetched 1 new candles
+2026-01-21 20:29:55,189 - INFO - Updated dataset: 7654 candles (added 1 new)
+2026-01-21 20:29:55,192 - INFO - before preprocess :7654 candles for analysis.
+2026-01-21 20:29:55,402 - INFO - after Preprocess :7575 rows.
+2026-01-21 20:29:55,872 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:29:55,872 - INFO - Predicted next close: $89563.28 (uncertainty std: 0.00)
+2026-01-21 20:29:56,878 - INFO - Telegram message sent: Predicted next close: $89563.28 (uncertainty std: 0.00)
+2026-01-21 20:29:57,899 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89316.00, Predicted: $89563.28
+2026-01-21 20:34:57,922 - INFO - Existing dataset loaded: 7654 candles, fetching from since 1768994700001
+2026-01-21 20:34:59,427 - INFO - Fetched 1 new candles
+2026-01-21 20:34:59,483 - INFO - Updated dataset: 7655 candles (added 1 new)
+2026-01-21 20:34:59,487 - INFO - before preprocess :7655 candles for analysis.
+2026-01-21 20:34:59,699 - INFO - after Preprocess :7576 rows.
+2026-01-21 20:35:00,180 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:35:00,180 - INFO - Predicted next close: $89560.62 (uncertainty std: 0.00)
+2026-01-21 20:35:01,213 - INFO - Telegram message sent: Predicted next close: $89560.62 (uncertainty std: 0.00)
+2026-01-21 20:35:02,361 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89319.00, Predicted: $89560.62
+2026-01-21 20:40:02,391 - INFO - Existing dataset loaded: 7655 candles, fetching from since 1768995000001
+2026-01-21 20:40:04,400 - INFO - Fetched 2 new candles
+2026-01-21 20:40:04,456 - INFO - Updated dataset: 7657 candles (added 2 new)
+2026-01-21 20:40:04,460 - INFO - before preprocess :7657 candles for analysis.
+2026-01-21 20:40:04,702 - INFO - after Preprocess :7578 rows.
+2026-01-21 20:40:05,192 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:40:05,192 - INFO - Predicted next close: $89544.68 (uncertainty std: 0.00)
+2026-01-21 20:40:06,601 - INFO - Telegram message sent: Predicted next close: $89544.68 (uncertainty std: 0.00)
+2026-01-21 20:40:07,818 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89268.00, Predicted: $89544.68
+2026-01-21 20:45:07,887 - INFO - Existing dataset loaded: 7657 candles, fetching from since 1768995600001
+2026-01-21 20:45:09,457 - INFO - Fetched 1 new candles
+2026-01-21 20:45:09,508 - INFO - Updated dataset: 7658 candles (added 1 new)
+2026-01-21 20:45:09,512 - INFO - before preprocess :7658 candles for analysis.
+2026-01-21 20:45:09,729 - INFO - after Preprocess :7579 rows.
+2026-01-21 20:45:10,459 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:45:10,460 - INFO - Predicted next close: $89538.03 (uncertainty std: 0.00)
+2026-01-21 20:45:11,431 - INFO - Telegram message sent: Predicted next close: $89538.03 (uncertainty std: 0.00)
+2026-01-21 20:45:12,441 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89259.00, Predicted: $89538.03
+2026-01-21 20:50:12,482 - INFO - Existing dataset loaded: 7658 candles, fetching from since 1768995900001
+2026-01-21 20:50:14,123 - INFO - Fetched 1 new candles
+2026-01-21 20:50:14,166 - INFO - Updated dataset: 7659 candles (added 1 new)
+2026-01-21 20:50:14,170 - INFO - before preprocess :7659 candles for analysis.
+2026-01-21 20:50:14,383 - INFO - after Preprocess :7580 rows.
+2026-01-21 20:50:14,890 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:50:14,890 - INFO - Predicted next close: $89519.43 (uncertainty std: 0.00)
+2026-01-21 20:50:15,945 - INFO - Telegram message sent: Predicted next close: $89519.43 (uncertainty std: 0.00)
+2026-01-21 20:50:16,877 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89141.00, Predicted: $89519.43
+2026-01-21 20:55:16,904 - INFO - Existing dataset loaded: 7659 candles, fetching from since 1768996200001
+2026-01-21 20:55:18,989 - INFO - Fetched 1 new candles
+2026-01-21 20:55:19,043 - INFO - Updated dataset: 7660 candles (added 1 new)
+2026-01-21 20:55:19,047 - INFO - before preprocess :7660 candles for analysis.
+2026-01-21 20:55:19,261 - INFO - after Preprocess :7581 rows.
+2026-01-21 20:55:19,743 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 20:55:19,744 - INFO - Predicted next close: $89487.54 (uncertainty std: 0.00)
+2026-01-21 20:55:20,804 - INFO - Telegram message sent: Predicted next close: $89487.54 (uncertainty std: 0.00)
+2026-01-21 20:55:21,725 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88976.00, Predicted: $89487.54
+2026-01-21 21:00:21,750 - INFO - Existing dataset loaded: 7660 candles, fetching from since 1768996500001
+2026-01-21 21:00:23,476 - INFO - Fetched 1 new candles
+2026-01-21 21:00:23,516 - INFO - Updated dataset: 7661 candles (added 1 new)
+2026-01-21 21:00:23,520 - INFO - before preprocess :7661 candles for analysis.
+2026-01-21 21:00:23,730 - INFO - after Preprocess :7582 rows.
+2026-01-21 21:00:24,222 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:00:24,222 - INFO - Predicted next close: $89442.36 (uncertainty std: 0.00)
+2026-01-21 21:00:25,238 - INFO - Telegram message sent: Predicted next close: $89442.36 (uncertainty std: 0.00)
+2026-01-21 21:00:26,154 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88803.00, Predicted: $89442.36
+2026-01-21 21:05:26,183 - INFO - Existing dataset loaded: 7661 candles, fetching from since 1768996800001
+2026-01-21 21:05:28,148 - INFO - Fetched 1 new candles
+2026-01-21 21:05:28,190 - INFO - Updated dataset: 7662 candles (added 1 new)
+2026-01-21 21:05:28,194 - INFO - before preprocess :7662 candles for analysis.
+2026-01-21 21:05:28,405 - INFO - after Preprocess :7583 rows.
+2026-01-21 21:05:28,903 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:05:28,903 - INFO - Predicted next close: $89389.21 (uncertainty std: 0.00)
+2026-01-21 21:05:29,876 - INFO - Telegram message sent: Predicted next close: $89389.21 (uncertainty std: 0.00)
+2026-01-21 21:05:30,912 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88813.00, Predicted: $89389.21
+2026-01-21 21:10:30,916 - INFO - Existing dataset loaded: 7662 candles, fetching from since 1768997100001
+2026-01-21 21:10:32,624 - INFO - Fetched 1 new candles
+2026-01-21 21:10:32,677 - INFO - Updated dataset: 7663 candles (added 1 new)
+2026-01-21 21:10:32,681 - INFO - before preprocess :7663 candles for analysis.
+2026-01-21 21:10:32,896 - INFO - after Preprocess :7584 rows.
+2026-01-21 21:10:33,379 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:10:33,379 - INFO - Predicted next close: $89338.72 (uncertainty std: 0.00)
+2026-01-21 21:10:34,342 - INFO - Telegram message sent: Predicted next close: $89338.72 (uncertainty std: 0.00)
+2026-01-21 21:10:35,388 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88546.00, Predicted: $89338.72
+2026-01-21 21:15:35,414 - INFO - Existing dataset loaded: 7663 candles, fetching from since 1768997400001
+2026-01-21 21:15:37,144 - INFO - Fetched 1 new candles
+2026-01-21 21:15:37,194 - INFO - Updated dataset: 7664 candles (added 1 new)
+2026-01-21 21:15:37,198 - INFO - before preprocess :7664 candles for analysis.
+2026-01-21 21:15:37,412 - INFO - after Preprocess :7585 rows.
+2026-01-21 21:15:37,911 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:15:37,911 - INFO - Predicted next close: $89270.96 (uncertainty std: 0.00)
+2026-01-21 21:15:38,860 - INFO - Telegram message sent: Predicted next close: $89270.96 (uncertainty std: 0.00)
+2026-01-21 21:15:39,892 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88319.00, Predicted: $89270.96
+2026-01-21 21:20:39,914 - INFO - Existing dataset loaded: 7664 candles, fetching from since 1768997700001
+2026-01-21 21:20:41,650 - INFO - Fetched 1 new candles
+2026-01-21 21:20:41,689 - INFO - Updated dataset: 7665 candles (added 1 new)
+2026-01-21 21:20:41,692 - INFO - before preprocess :7665 candles for analysis.
+2026-01-21 21:20:41,902 - INFO - after Preprocess :7586 rows.
+2026-01-21 21:20:42,375 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:20:42,375 - INFO - Predicted next close: $89196.55 (uncertainty std: 0.00)
+2026-01-21 21:20:43,725 - INFO - Telegram message sent: Predicted next close: $89196.55 (uncertainty std: 0.00)
+2026-01-21 21:20:44,767 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88427.00, Predicted: $89196.55
+2026-01-21 21:25:44,792 - INFO - Existing dataset loaded: 7665 candles, fetching from since 1768998000001
+2026-01-21 21:25:46,454 - INFO - Fetched 1 new candles
+2026-01-21 21:25:46,488 - INFO - Updated dataset: 7666 candles (added 1 new)
+2026-01-21 21:25:46,491 - INFO - before preprocess :7666 candles for analysis.
+2026-01-21 21:25:46,697 - INFO - after Preprocess :7587 rows.
+2026-01-21 21:25:47,179 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:25:47,179 - INFO - Predicted next close: $89138.08 (uncertainty std: 0.00)
+2026-01-21 21:25:48,158 - INFO - Telegram message sent: Predicted next close: $89138.08 (uncertainty std: 0.00)
+2026-01-21 21:25:49,179 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88390.00, Predicted: $89138.08
+2026-01-21 21:35:46,215 - INFO - Existing dataset loaded: 7666 candles, fetching from since 1768998300001
+2026-01-21 21:35:48,120 - INFO - Fetched 2 new candles
+2026-01-21 21:35:48,171 - INFO - Updated dataset: 7668 candles (added 2 new)
+2026-01-21 21:35:48,176 - INFO - before preprocess :7668 candles for analysis.
+2026-01-21 21:35:48,390 - INFO - after Preprocess :7589 rows.
+2026-01-21 21:35:48,915 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:35:48,915 - INFO - Predicted next close: $89006.54 (uncertainty std: 0.00)
+2026-01-21 21:35:49,971 - INFO - Telegram message sent: Predicted next close: $89006.54 (uncertainty std: 0.00)
+2026-01-21 21:35:50,975 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88567.00, Predicted: $89006.54
+2026-01-21 21:46:21,559 - INFO - Existing dataset loaded: 7668 candles, fetching from since 1768998900001
+2026-01-21 21:46:23,093 - INFO - Fetched 2 new candles
+2026-01-21 21:46:23,134 - INFO - Updated dataset: 7670 candles (added 2 new)
+2026-01-21 21:46:23,137 - INFO - before preprocess :7670 candles for analysis.
+2026-01-21 21:46:23,347 - INFO - after Preprocess :7591 rows.
+2026-01-21 21:46:23,847 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:46:23,847 - INFO - Predicted next close: $88926.81 (uncertainty std: 0.00)
+2026-01-21 21:46:24,834 - INFO - Telegram message sent: Predicted next close: $88926.81 (uncertainty std: 0.00)
+2026-01-21 21:47:23,294 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88558.00, Predicted: $88926.81
+2026-01-21 21:56:58,899 - INFO - Existing dataset loaded: 7670 candles, fetching from since 1768999500001
+2026-01-21 21:57:00,249 - INFO - Fetched 2 new candles
+2026-01-21 21:57:00,285 - INFO - Updated dataset: 7672 candles (added 2 new)
+2026-01-21 21:57:00,289 - INFO - before preprocess :7672 candles for analysis.
+2026-01-21 21:57:00,503 - INFO - after Preprocess :7593 rows.
+2026-01-21 21:57:00,982 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 21:57:00,983 - INFO - Predicted next close: $88881.64 (uncertainty std: 0.00)
+2026-01-21 21:57:01,972 - INFO - Telegram message sent: Predicted next close: $88881.64 (uncertainty std: 0.00)
+2026-01-21 21:57:03,032 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88747.00, Predicted: $88881.64
+2026-01-21 22:08:06,980 - INFO - Existing dataset loaded: 7672 candles, fetching from since 1769000100001
+2026-01-21 22:08:08,594 - INFO - Fetched 2 new candles
+2026-01-21 22:08:08,648 - INFO - Updated dataset: 7674 candles (added 2 new)
+2026-01-21 22:08:08,652 - INFO - before preprocess :7674 candles for analysis.
+2026-01-21 22:08:08,866 - INFO - after Preprocess :7595 rows.
+2026-01-21 22:08:09,343 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:08:09,343 - INFO - Predicted next close: $88886.95 (uncertainty std: 0.00)
+2026-01-21 22:08:10,480 - INFO - Telegram message sent: Predicted next close: $88886.95 (uncertainty std: 0.00)
+2026-01-21 22:08:11,613 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88947.00, Predicted: $88886.95
+2026-01-21 22:19:06,155 - INFO - Existing dataset loaded: 7674 candles, fetching from since 1769000700001
+2026-01-21 22:19:08,052 - INFO - Fetched 2 new candles
+2026-01-21 22:19:08,105 - INFO - Updated dataset: 7676 candles (added 2 new)
+2026-01-21 22:19:08,109 - INFO - before preprocess :7676 candles for analysis.
+2026-01-21 22:19:08,322 - INFO - after Preprocess :7597 rows.
+2026-01-21 22:19:08,799 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:19:08,799 - INFO - Predicted next close: $88922.83 (uncertainty std: 0.00)
+2026-01-21 22:19:09,823 - INFO - Telegram message sent: Predicted next close: $88922.83 (uncertainty std: 0.00)
+2026-01-21 22:19:10,821 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88882.00, Predicted: $88922.83
+2026-01-21 22:26:12,669 - INFO - Existing dataset loaded: 7676 candles, fetching from since 1769001300001
+2026-01-21 22:26:13,924 - INFO - Fetched 2 new candles
+2026-01-21 22:26:13,964 - INFO - Updated dataset: 7678 candles (added 2 new)
+2026-01-21 22:26:13,968 - INFO - before preprocess :7678 candles for analysis.
+2026-01-21 22:26:14,178 - INFO - after Preprocess :7599 rows.
+2026-01-21 22:26:14,676 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:26:14,677 - INFO - Predicted next close: $88981.29 (uncertainty std: 0.00)
+2026-01-21 22:26:15,886 - INFO - Telegram message sent: Predicted next close: $88981.29 (uncertainty std: 0.00)
+2026-01-21 22:26:17,177 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88823.00, Predicted: $88981.29
+2026-01-21 22:31:17,227 - INFO - Existing dataset loaded: 7678 candles, fetching from since 1769001900001
+2026-01-21 22:31:19,115 - INFO - Fetched 1 new candles
+2026-01-21 22:31:19,156 - INFO - Updated dataset: 7679 candles (added 1 new)
+2026-01-21 22:31:19,160 - INFO - before preprocess :7679 candles for analysis.
+2026-01-21 22:31:19,381 - INFO - after Preprocess :7600 rows.
+2026-01-21 22:31:19,980 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:31:19,980 - INFO - Predicted next close: $89003.88 (uncertainty std: 0.00)
+2026-01-21 22:31:20,956 - INFO - Telegram message sent: Predicted next close: $89003.88 (uncertainty std: 0.00)
+2026-01-21 22:31:22,061 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88821.00, Predicted: $89003.88
+2026-01-21 22:36:22,080 - INFO - Existing dataset loaded: 7679 candles, fetching from since 1769002200001
+2026-01-21 22:36:24,001 - INFO - Fetched 1 new candles
+2026-01-21 22:36:24,043 - INFO - Updated dataset: 7680 candles (added 1 new)
+2026-01-21 22:36:24,047 - INFO - before preprocess :7680 candles for analysis.
+2026-01-21 22:36:24,264 - INFO - after Preprocess :7601 rows.
+2026-01-21 22:36:24,755 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:36:24,755 - INFO - Predicted next close: $89046.40 (uncertainty std: 0.00)
+2026-01-21 22:36:25,824 - INFO - Telegram message sent: Predicted next close: $89046.40 (uncertainty std: 0.00)
+2026-01-21 22:36:26,817 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88942.00, Predicted: $89046.40
+2026-01-21 22:41:26,847 - INFO - Existing dataset loaded: 7680 candles, fetching from since 1769002500001
+2026-01-21 22:41:28,235 - INFO - Fetched 1 new candles
+2026-01-21 22:41:28,282 - INFO - Updated dataset: 7681 candles (added 1 new)
+2026-01-21 22:41:28,286 - INFO - before preprocess :7681 candles for analysis.
+2026-01-21 22:41:28,499 - INFO - after Preprocess :7602 rows.
+2026-01-21 22:41:28,978 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:41:28,978 - INFO - Predicted next close: $89074.30 (uncertainty std: 0.00)
+2026-01-21 22:41:30,009 - INFO - Telegram message sent: Predicted next close: $89074.30 (uncertainty std: 0.00)
+2026-01-21 22:41:31,033 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88772.00, Predicted: $89074.30
+2026-01-21 22:46:31,063 - INFO - Existing dataset loaded: 7681 candles, fetching from since 1769002800001
+2026-01-21 22:46:32,450 - INFO - Fetched 1 new candles
+2026-01-21 22:46:32,492 - INFO - Updated dataset: 7682 candles (added 1 new)
+2026-01-21 22:46:32,495 - INFO - before preprocess :7682 candles for analysis.
+2026-01-21 22:46:32,709 - INFO - after Preprocess :7603 rows.
+2026-01-21 22:46:33,253 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:46:33,253 - INFO - Predicted next close: $89080.95 (uncertainty std: 0.00)
+2026-01-21 22:46:34,346 - INFO - Telegram message sent: Predicted next close: $89080.95 (uncertainty std: 0.00)
+2026-01-21 22:46:35,882 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88734.00, Predicted: $89080.95
+2026-01-21 22:51:35,917 - INFO - Existing dataset loaded: 7682 candles, fetching from since 1769003100001
+2026-01-21 22:51:37,562 - INFO - Fetched 1 new candles
+2026-01-21 22:51:37,596 - INFO - Updated dataset: 7683 candles (added 1 new)
+2026-01-21 22:51:37,600 - INFO - before preprocess :7683 candles for analysis.
+2026-01-21 22:51:37,812 - INFO - after Preprocess :7604 rows.
+2026-01-21 22:51:38,322 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-21 22:51:38,323 - INFO - Predicted next close: $89076.96 (uncertainty std: 0.00)
+2026-01-21 22:51:39,305 - INFO - Telegram message sent: Predicted next close: $89076.96 (uncertainty std: 0.00)
+2026-01-21 22:51:40,527 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $88580.00, Predicted: $89076.96
+2026-01-22 08:01:23,264 - INFO - Telegram message sent: Live Trading Bot Started!
+2026-01-22 08:01:23,297 - INFO - Existing dataset loaded: 7791 candles, fetching from since 1769035800001
+2026-01-22 08:01:24,684 - INFO - Fetched 2 new candles
+2026-01-22 08:01:24,745 - INFO - Updated dataset: 7793 candles (added 2 new)
+2026-01-22 08:01:24,750 - INFO - before preprocess :7793 candles for analysis.
+2026-01-22 08:01:24,969 - INFO - after Preprocess :7714 rows.
+2026-01-22 08:01:25,868 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-22 08:01:25,868 - INFO - Predicted next close: $86723.60 (uncertainty std: 0.00)
+2026-01-22 08:01:26,744 - INFO - Telegram message sent: Predicted next close: $86723.60 (uncertainty std: 0.00)
+2026-01-22 08:01:27,803 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89790.00, Predicted: $86723.60
+2026-01-22 08:10:05,612 - INFO - Telegram message sent: Live Trading Bot Started!
+2026-01-22 08:10:05,645 - INFO - Existing dataset loaded: 7793 candles, fetching from since 1769036400001
+2026-01-22 08:10:07,115 - INFO - Fetched 2 new candles
+2026-01-22 08:10:07,170 - INFO - Updated dataset: 7795 candles (added 2 new)
+2026-01-22 08:10:07,175 - INFO - before preprocess :7795 candles for analysis.
+2026-01-22 08:10:07,391 - INFO - after Preprocess :7716 rows.
+2026-01-22 08:10:08,285 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-22 08:10:08,285 - INFO - Predicted next close: $87546.36 (uncertainty std: 0.00)
+2026-01-22 08:10:09,315 - INFO - Telegram message sent: Predicted next close: $87546.36 (uncertainty std: 0.00)
+2026-01-22 08:10:10,346 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89929.00, Predicted: $87546.36
+2026-01-22 08:11:05,311 - INFO - Telegram message sent: Live Trading Bot Started!
+2026-01-22 08:11:05,337 - INFO - Existing dataset loaded: 1368 candles, fetching from since 1769036400001
+2026-01-22 08:11:06,373 - INFO - No new data available
+2026-01-22 08:11:06,374 - INFO - No new data - returning existing
+2026-01-22 08:11:06,379 - INFO - before preprocess :1368 candles for analysis.
+2026-01-22 08:11:06,439 - INFO - after Preprocess :1289 rows.
+2026-01-22 08:11:07,333 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-22 08:11:07,334 - INFO - Predicted next close: $89309.29 (uncertainty std: 0.00)
+2026-01-22 08:11:08,372 - INFO - Telegram message sent: Predicted next close: $89309.29 (uncertainty std: 0.00)
+2026-01-22 08:11:09,275 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $89897.00, Predicted: $89309.29
+2026-01-22 08:18:40,314 - INFO - Telegram message sent: Live Trading Bot Started!
+2026-01-22 08:18:40,348 - INFO - Existing dataset loaded: 7795 candles, fetching from since 1769037000001
+2026-01-22 08:18:41,785 - INFO - Fetched 1 new candles
+2026-01-22 08:18:41,827 - INFO - Updated dataset: 7796 candles (added 1 new)
+2026-01-22 08:18:41,831 - INFO - before preprocess :7796 candles for analysis.
+2026-01-22 08:18:42,046 - INFO - after Preprocess :7717 rows.
+2026-01-22 08:18:42,940 - INFO - Prediction uncertainty: std = 0.0000
+2026-01-22 08:18:42,940 - INFO - Predicted next close: $90038.96 (uncertainty std: 0.00)
+2026-01-22 08:18:43,855 - INFO - Telegram message sent: Predicted next close: $90038.96 (uncertainty std: 0.00)
+2026-01-22 08:18:44,820 - INFO - Telegram message sent: ⚪ HOLD - Current Price: $90078.00, Predicted: $90038.96

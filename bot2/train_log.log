@@ -1,168 +1,52 @@
-2026-01-19 21:56:38,861 - INFO - No existing dataset - fetching new
-2026-01-19 21:56:40,783 - INFO - Fetched 1000 new candles
-2026-01-19 21:56:40,798 - INFO - Updated dataset: 1000 candles (added 1000 new)
-2026-01-19 21:56:40,803 - INFO - Limited data to last 1000 candles for training efficiency
-2026-01-19 21:56:40,859 - INFO - Sequences created: X shape (871, 60, 22), y shape (871,)
-2026-01-19 21:56:43,505 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-19 21:56:45,814 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-19 21:56:49,641 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-19 21:56:49,655 - INFO - Train: (556, 60, 22), Val: (140, 60, 22), Test: (175, 60, 22)
-2026-01-19 21:57:24,328 - INFO - Evaluation - MAE: 1909.63, RMSE: 2007.92, R2: -6.3151
-2026-01-19 21:57:25,338 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 1909.63 USD
-RMSE: 2007.92 USD
-R² Score: -6.3151
-2026-01-19 21:57:27,284 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-19 21:57:28,942 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-19 21:57:29,034 - INFO - Sequences created: X shape (871, 60, 22), y shape (871,)
-2026-01-19 21:57:31,024 - INFO - Telegram message sent: Retraining Done!
-R²: -6.3151
-MAE: 1909.63 USD
-Backtest Return: -0.78%
-2026-01-19 22:09:48,408 - INFO - Existing dataset loaded: 7070 candles, fetching from since 1768819500001
-2026-01-19 22:09:50,179 - INFO - Fetched 28 new candles
-2026-01-19 22:09:50,224 - INFO - Updated dataset: 7098 candles (added 28 new)
-2026-01-19 22:09:50,229 - INFO - Limited data to last 5000 candles for training efficiency
-2026-01-19 22:09:50,428 - INFO - Sequences created: X shape (4871, 60, 22), y shape (4871,)
-2026-01-19 22:09:52,394 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-19 22:09:54,425 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-19 22:09:57,107 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-19 22:09:57,139 - INFO - Train: (3116, 60, 22), Val: (780, 60, 22), Test: (975, 60, 22)
-2026-01-19 22:11:44,742 - INFO - Evaluation - MAE: 198.14, RMSE: 315.72, R2: 0.8855
-2026-01-19 22:11:45,841 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 198.14 USD
-RMSE: 315.72 USD
-R² Score: 0.8855
-2026-01-19 22:11:47,635 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-19 22:11:49,470 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-19 22:11:49,675 - INFO - Sequences created: X shape (4871, 60, 22), y shape (4871,)
-2026-01-19 22:11:55,304 - INFO - Telegram message sent: Retraining Done!
-R²: 0.8855
-MAE: 198.14 USD
-Backtest Return: 30.86%
-2026-01-20 06:59:10,661 - INFO - Existing dataset loaded: 7111 candles, fetching from since 1768831800001
-2026-01-20 06:59:12,528 - INFO - Fetched 93 new candles
-2026-01-20 06:59:12,554 - INFO - Updated dataset: 7204 candles (added 93 new)
-2026-01-20 06:59:12,557 - INFO - Limited data to last 7204 candles for training efficiency
-2026-01-20 06:59:12,840 - INFO - Sequences created: X shape (7075, 60, 22), y shape (7075,)
-2026-01-20 06:59:15,225 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-20 06:59:17,694 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-20 06:59:20,966 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-20 06:59:20,996 - INFO - Train: (4528, 60, 22), Val: (1132, 60, 22), Test: (1415, 60, 22)
-2026-01-20 07:04:17,535 - INFO - Evaluation - MAE: 320.65, RMSE: 474.16, R2: 0.8261
-2026-01-20 07:04:18,497 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 320.65 USD
-RMSE: 474.16 USD
-R² Score: 0.8261
-2026-01-20 07:04:20,368 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-20 07:04:22,421 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-20 07:04:22,749 - INFO - Sequences created: X shape (7075, 60, 22), y shape (7075,)
-2026-01-20 07:04:31,079 - INFO - Telegram message sent: Retraining Done!
-R²: 0.8261
-MAE: 320.65 USD
-Backtest Return: 37.33%
-2026-01-20 07:15:52,938 - INFO - Existing dataset loaded: 7206 candles, fetching from since 1768860300001
-2026-01-20 07:15:55,714 - INFO - Fetched 2 new candles
-2026-01-20 07:15:55,765 - INFO - Updated dataset: 7208 candles (added 2 new)
-2026-01-20 07:15:55,769 - INFO - Limited data to last 7208 candles for training efficiency
-2026-01-20 07:15:55,985 - INFO - Sequences created: X shape (7079, 60, 16), y shape (7079,)
-2026-01-20 07:15:58,543 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-20 07:16:00,994 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-20 07:16:03,322 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-20 07:16:03,359 - INFO - Train: (4530, 60, 16), Val: (1133, 60, 16), Test: (1416, 60, 16)
-2026-01-20 07:22:56,830 - INFO - Evaluation - MAE: 406.43, RMSE: 552.86, R2: 0.7644
-2026-01-20 07:22:57,906 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 406.43 USD
-RMSE: 552.86 USD
-R² Score: 0.7644
-2026-01-20 07:22:59,703 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-20 07:23:01,653 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-20 07:23:01,912 - INFO - Sequences created: X shape (7079, 60, 16), y shape (7079,)
-2026-01-20 07:23:09,895 - INFO - Telegram message sent: Retraining Done!
-R²: 0.7644
-MAE: 406.43 USD
-Backtest Return: 38.28%
-2026-01-20 22:12:55,031 - INFO - Existing dataset loaded: 7338 candles, fetching from since 1768899900001
-2026-01-20 22:12:57,063 - INFO - Fetched 49 new candles
-2026-01-20 22:12:57,118 - INFO - Updated dataset: 7387 candles (added 49 new)
-2026-01-20 22:12:57,122 - INFO - Limited data to last 7387 candles for training efficiency
-2026-01-20 22:12:57,345 - INFO - Sequences created: X shape (7258, 60, 16), y shape (7258,)
-2026-01-20 22:12:59,461 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-20 22:13:01,686 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-20 22:13:04,300 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-20 22:13:04,341 - INFO - Train: (4644, 60, 16), Val: (1162, 60, 16), Test: (1452, 60, 16)
-2026-01-20 22:17:19,651 - INFO - Evaluation - MAE: 373.64, RMSE: 442.34, R2: 0.9067
-2026-01-20 22:17:20,589 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 373.64 USD
-RMSE: 442.34 USD
-R² Score: 0.9067
-2026-01-20 22:17:22,446 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-20 22:17:24,477 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-20 22:17:24,741 - INFO - Sequences created: X shape (7258, 60, 16), y shape (7258,)
-2026-01-20 22:17:32,917 - INFO - Telegram message sent: Retraining Done!
-R²: 0.9067
-MAE: 373.64 USD
-Backtest Return: 43.83%
-2026-01-21 07:29:43,121 - INFO - Existing dataset loaded: 7403 candles, fetching from since 1768919400001
-2026-01-21 07:29:44,733 - INFO - Fetched 95 new candles
-2026-01-21 07:29:44,790 - INFO - Updated dataset: 7498 candles (added 95 new)
-2026-01-21 07:29:44,796 - INFO - Limited data to last 7498 candles for training efficiency
-2026-01-21 07:29:45,020 - INFO - Sequences created: X shape (7369, 60, 16), y shape (7369,)
-2026-01-21 07:29:47,458 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-21 07:29:49,831 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-21 07:29:56,740 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-21 07:29:56,784 - INFO - Train: (4716, 60, 16), Val: (1179, 60, 16), Test: (1474, 60, 16)
-2026-01-21 07:32:27,134 - INFO - Evaluation - MAE: 459.15, RMSE: 662.78, R2: 0.8582
-2026-01-21 07:32:28,050 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 459.15 USD
-RMSE: 662.78 USD
-R² Score: 0.8582
-2026-01-21 07:32:29,804 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-21 07:32:31,461 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-21 07:32:31,721 - INFO - Sequences created: X shape (7369, 60, 16), y shape (7369,)
-2026-01-21 07:32:39,988 - INFO - Telegram message sent: Retraining Done!
-R²: 0.8582
-MAE: 459.15 USD
-Backtest Return: 20.80%
-2026-01-21 15:50:50,891 - INFO - Existing dataset loaded: 7508 candles, fetching from since 1768950900001
-2026-01-21 15:50:52,434 - INFO - Fetched 91 new candles
-2026-01-21 15:50:52,465 - INFO - Updated dataset: 7599 candles (added 91 new)
-2026-01-21 15:50:52,469 - INFO - Limited data to last 7599 candles for training efficiency
-2026-01-21 15:50:52,694 - INFO - Sequences created: X shape (7470, 60, 16), y shape (7470,)
-2026-01-21 15:50:54,697 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-21 15:50:56,776 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-21 15:50:59,425 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-21 15:50:59,463 - INFO - Train: (4780, 60, 16), Val: (1196, 60, 16), Test: (1494, 60, 16)
-2026-01-21 15:54:06,583 - INFO - Evaluation - MAE: 691.91, RMSE: 735.26, R2: 0.8775
-2026-01-21 15:54:07,673 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 691.91 USD
-RMSE: 735.26 USD
-R² Score: 0.8775
-2026-01-21 15:54:09,715 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-21 15:54:11,629 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-21 15:54:11,894 - INFO - Sequences created: X shape (7470, 60, 16), y shape (7470,)
-2026-01-21 15:54:20,240 - INFO - Telegram message sent: Retraining Done!
-R²: 0.8775
-MAE: 691.91 USD
-Backtest Return: 40.52%
-2026-01-21 19:23:26,088 - INFO - Existing dataset loaded: 7641 candles, fetching from since 1768990800001
-2026-01-21 19:23:27,613 - INFO - No new data available
-2026-01-21 19:23:27,613 - INFO - No new data - returning existing
-2026-01-21 19:23:27,623 - INFO - Limited data to last 7641 candles for training efficiency
-2026-01-21 19:23:27,873 - INFO - Sequences created: X shape (7502, 60, 19), y shape (7502,)
-2026-01-21 19:23:30,078 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
-2026-01-21 19:23:32,167 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
-2026-01-21 19:23:34,793 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
-2026-01-21 19:23:34,841 - INFO - Train: (4800, 60, 19), Val: (1201, 60, 19), Test: (1501, 60, 19)
-2026-01-21 19:29:28,553 - INFO - Evaluation - MAE: 472.76, RMSE: 539.78, R2: 0.9394
-2026-01-21 19:29:29,533 - INFO - Telegram message sent: Model Evaluation in 5m Results:
-MAE: 472.76 USD
-RMSE: 539.78 USD
-R² Score: 0.9394
-2026-01-21 19:29:31,890 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
-2026-01-21 19:29:33,612 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
-2026-01-21 19:29:33,885 - INFO - Sequences created: X shape (7502, 60, 19), y shape (7502,)
-2026-01-21 19:29:42,613 - INFO - Telegram message sent: Retraining Done!
-R²: 0.9394
-MAE: 472.76 USD
-Backtest Return: 37.03%
+2026-01-22 21:33:56,711 - INFO - Existing dataset loaded: 7925 candles, fetching from since 1769076000001
+2026-01-22 21:33:58,085 - ERROR - Retry 1/3: coinex invalid argument
+2026-01-22 21:34:03,167 - ERROR - Retry 2/3: coinex invalid argument
+2026-01-22 21:34:08,334 - ERROR - Retry 3/3: coinex invalid argument
+2026-01-22 21:34:13,337 - INFO - No new data - returning existing
+2026-01-22 21:34:13,342 - INFO - Limited data to last 7925 candles for training efficiency
+2026-01-22 21:34:13,576 - INFO - Sequences created: X shape (7786, 60, 17), y shape (7786,)
+2026-01-22 21:34:16,055 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
+2026-01-22 21:34:18,295 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
+2026-01-22 21:34:20,612 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
+2026-01-22 21:34:20,649 - INFO - Train: (4982, 60, 17), Val: (1246, 60, 17), Test: (1558, 60, 17)
+2026-01-22 21:36:26,450 - INFO - Existing dataset loaded: 7925 candles, fetching from since 1769076000001
+2026-01-22 21:36:28,016 - ERROR - Retry 1/3: coinex invalid argument
+2026-01-22 21:36:33,106 - ERROR - Retry 2/3: coinex invalid argument
+2026-01-22 21:36:38,187 - ERROR - Retry 3/3: coinex invalid argument
+2026-01-22 21:36:43,192 - INFO - No new data - returning existing
+2026-01-22 21:36:43,206 - INFO - Limited data to last 7925 candles for training efficiency
+2026-01-22 21:36:43,468 - INFO - Sequences created: X shape (7786, 60, 16), y shape (7786,)
+2026-01-22 21:36:45,706 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
+2026-01-22 21:36:47,850 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
+2026-01-22 21:36:50,167 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
+2026-01-22 21:36:50,194 - INFO - Train: (4982, 60, 16), Val: (1246, 60, 16), Test: (1558, 60, 16)
+2026-01-22 22:03:58,885 - INFO - Existing dataset loaded: 7925 candles, fetching from since 1769076000001
+2026-01-22 22:04:00,819 - INFO - Fetched 36 new candles
+2026-01-22 22:04:00,877 - INFO - Updated dataset: 7961 candles (added 36 new)
+2026-01-22 22:04:00,881 - INFO - Limited data to last 7961 candles for training efficiency
+2026-01-22 22:04:01,114 - INFO - Sequences created: X shape (7822, 60, 16), y shape (7822,)
+2026-01-22 22:04:03,033 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
+2026-01-22 22:04:05,164 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
+2026-01-22 22:04:07,554 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
+2026-01-22 22:04:07,577 - INFO - Train: (5005, 60, 16), Val: (1252, 60, 16), Test: (1565, 60, 16)
+2026-01-22 22:05:54,838 - INFO - Existing dataset loaded: 7961 candles, fetching from since 1769086800001
+2026-01-22 22:05:56,930 - INFO - Fetched 1 new candles
+2026-01-22 22:05:56,984 - INFO - Updated dataset: 7962 candles (added 1 new)
+2026-01-22 22:05:56,989 - INFO - Limited data to last 7962 candles for training efficiency
+2026-01-22 22:05:57,250 - INFO - Sequences created: X shape (7823, 60, 17), y shape (7823,)
+2026-01-22 22:05:59,406 - INFO - Plot sent to Telegram: pic/new/5m_btc_price_ma.png
+2026-01-22 22:06:01,586 - INFO - Plot sent to Telegram: pic/new/5m_rsi_indicator.png
+2026-01-22 22:06:04,146 - INFO - Plot sent to Telegram: pic/new/5m_feature_correlation.png
+2026-01-22 22:06:04,183 - INFO - Train: (5006, 60, 17), Val: (1252, 60, 17), Test: (1565, 60, 17)
+2026-01-22 22:13:03,068 - INFO - Evaluation - MAE: 554.34, RMSE: 634.57, R2: 0.9323
+2026-01-22 22:13:04,191 - INFO - Telegram message sent: Model Evaluation in 5m Results:
+MAE: 554.34 USD
+RMSE: 634.57 USD
+R² Score: 0.9323
+2026-01-22 22:13:06,184 - INFO - Plot sent to Telegram: pic/new/5m_actual_vs_predicted.png
+2026-01-22 22:13:08,076 - INFO - Plot sent to Telegram: pic/new/5m_prediction_errors.png
+2026-01-22 22:13:08,358 - INFO - Sequences created: X shape (7823, 60, 17), y shape (7823,)
+2026-01-22 22:13:17,026 - INFO - Telegram message sent: Retraining Done!
+R²: 0.9323
+MAE: 554.34 USD
+Backtest Return: 31.88%
