@@ -118,6 +118,8 @@ Run one live paper-trading step and save the virtual account state in `paper_sta
 python paper_trader.py --mode single --update --telegram --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100
 ```
 
+The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs every hour, updates `paper_state.json`, sends a Telegram status message, and commits the virtual account state back to the repository.
+
 ## Trading Notes
 
 No model can predict crypto prices perfectly. Before using real money, require a stable out-of-sample edge after fees, slippage, and drawdown limits. Use small position sizing, stop-loss rules, and paper trading first.
