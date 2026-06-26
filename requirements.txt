@@ -1,0 +1,8 @@
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.4
+tensorflow>=2.16
+ccxt>=4.4
+python-dotenv>=1.0
+requests>=2.31
+joblib>=1.3
