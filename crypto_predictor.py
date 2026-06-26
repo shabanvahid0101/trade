@@ -48,6 +48,7 @@ MODEL_PATH = BASE_DIR / "btc_lstm_model.keras"
 ARTIFACT_PATH = BASE_DIR / "model_artifacts.pkl"
 LEGACY_SCALER_PATH = BASE_DIR / "scaler.pkl"
 LOG_PATH = BASE_DIR / "logging.log"
+MODELS_DIR = BASE_DIR / "models"
 
 CORE_FEATURE_COLUMNS = [
     "log_return_1",
@@ -121,6 +122,22 @@ def timeframe_to_milliseconds(timeframe: str) -> int:
     if unit not in units:
         raise ValueError(f"Unsupported timeframe: {timeframe}")
     return int(timeframe[:-1]) * units[unit]
+
+
+def parse_horizons(value: str) -> list[int]:
+    horizons = sorted({int(part.strip()) for part in value.split(",") if part.strip()})
+    if not horizons or any(horizon <= 0 for horizon in horizons):
+        raise ValueError("Horizons must be a comma-separated list of positive integers.")
+    return horizons
+
+
+def safe_symbol_name(symbol: str) -> str:
+    return "".join(char for char in symbol.upper() if char.isalnum())
+
+
+def horizon_model_paths(symbol: str, timeframe: str, horizon: int) -> tuple[Path, Path]:
+    prefix = f"{safe_symbol_name(symbol)}_{timeframe}_h{horizon}"
+    return MODELS_DIR / f"{prefix}.keras", MODELS_DIR / f"{prefix}_artifact.pkl"
 
 
 @dataclass(frozen=True)
@@ -387,7 +404,7 @@ def latest_continuous_block(df: pd.DataFrame, timeframe: str = "5m") -> pd.DataF
     return df.iloc[last_gap_idx:].reset_index(drop=True)
 
 
-def add_features(df: pd.DataFrame, horizon: int = 1) -> pd.DataFrame:
+def add_features(df: pd.DataFrame, horizon: int = 1, require_target: bool = True) -> pd.DataFrame:
     df = df.copy().sort_values("timestamp").reset_index(drop=True)
     close = df["close"].replace(0, np.nan)
     high = df["high"]
@@ -516,7 +533,8 @@ def add_features(df: pd.DataFrame, horizon: int = 1) -> pd.DataFrame:
     df["future_close"] = close.shift(-horizon)
     df["target_return"] = df["future_close"] / close - 1
     df = df.replace([np.inf, -np.inf], np.nan)
-    return df.dropna(subset=FEATURE_COLUMNS + ["target_return", "future_close"]).reset_index(drop=True)
+    required_columns = FEATURE_COLUMNS + (["target_return", "future_close"] if require_target else [])
+    return df.dropna(subset=required_columns).reset_index(drop=True)
 
 
 def select_features_by_correlation(
@@ -627,7 +645,7 @@ def prepare_datasets(
     df = latest_continuous_block(df, timeframe=timeframe)
     if max_rows is not None and max_rows > 0 and len(df) > max_rows + 250:
         df = df.tail(max_rows + 250).reset_index(drop=True)
-    featured = add_features(df, horizon=horizon)
+    featured = add_features(df, horizon=horizon, require_target=True)
     if max_rows is not None and max_rows > 0 and len(featured) > max_rows:
         featured = featured.tail(max_rows).reset_index(drop=True)
     featured_gap_count = int((featured["timestamp"].diff() > pd.to_timedelta(timeframe_to_milliseconds(timeframe), unit="ms") * 1.5).sum())
@@ -754,11 +772,11 @@ def build_model(sequence_length: int, n_features: int, target_mode: str = "regre
     return model
 
 
-def train_model(split: SplitData, epochs: int = 80, batch_size: int = 32):
+def train_model(split: SplitData, epochs: int = 80, batch_size: int = 32, verbose: int = 1):
     model = build_model(split.sequence_length, split.X_train.shape[-1], split.target_mode)
     callbacks = [
-        EarlyStopping(monitor="val_loss", patience=12, restore_best_weights=True, verbose=1),
-        ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-5, verbose=1),
+        EarlyStopping(monitor="val_loss", patience=12, restore_best_weights=True, verbose=verbose),
+        ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-5, verbose=verbose),
     ]
     fit_kwargs = {}
     if split.target_mode == "classification":
@@ -776,7 +794,7 @@ def train_model(split: SplitData, epochs: int = 80, batch_size: int = 32):
         epochs=epochs,
         batch_size=batch_size,
         callbacks=callbacks,
-        verbose=1,
+        verbose=verbose,
         **fit_kwargs,
     )
     return model, history
@@ -1052,7 +1070,7 @@ def predict_next_price(model, data: pd.DataFrame, artifact: dict) -> dict:
     sequence_length = int(artifact["sequence_length"])
     horizon = int(artifact["horizon"])
     data = latest_continuous_block(data)
-    featured = add_features(data, horizon=horizon)
+    featured = add_features(data, horizon=horizon, require_target=False)
     if len(featured) < sequence_length:
         raise ValueError("Not enough processed rows for prediction.")
 
@@ -1107,22 +1125,17 @@ def predict_next_price(model, data: pd.DataFrame, artifact: dict) -> dict:
     }
 
 
-def train_command(args: argparse.Namespace) -> None:
-    data = (
-        fetch_and_update_data(
-            args.symbol,
-            args.timeframe,
-            file=args.data,
-            max_batches=args.max_fetch_batches,
-            exchange_name=args.exchange,
-        )
-        if args.update
-        else load_price_csv(args.data)
-    )
+def run_training_pipeline(
+    args: argparse.Namespace,
+    data: pd.DataFrame,
+    horizon: int,
+    model_path: str | Path,
+    artifact_path: str | Path,
+) -> dict:
     split = prepare_datasets(
         data,
         sequence_length=args.sequence_length,
-        horizon=args.horizon,
+        horizon=horizon,
         timeframe=args.timeframe,
         max_rows=args.max_train_rows,
         feature_columns=FEATURE_SETS[args.feature_set],
@@ -1135,7 +1148,7 @@ def train_command(args: argparse.Namespace) -> None:
         min_selected_features=args.min_selected_features,
         feature_correlation_method=args.feature_correlation_method,
     )
-    model, _ = train_model(split, epochs=args.epochs, batch_size=args.batch_size)
+    model, _ = train_model(split, epochs=args.epochs, batch_size=args.batch_size, verbose=args.training_verbose)
     metrics = evaluate_model(model, split)
     metrics["min_confidence"] = args.min_confidence
     metrics["selected_feature_count"] = len(split.feature_columns)
@@ -1159,13 +1172,53 @@ def train_command(args: argparse.Namespace) -> None:
         leverage=args.leverage,
     )
 
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    model.save(MODEL_PATH)
-    save_artifacts(split, {**metrics, "backtest": backtest})
+    model_path = Path(model_path)
+    artifact_path = Path(artifact_path)
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    artifact_path.parent.mkdir(parents=True, exist_ok=True)
+    model.save(model_path)
+    save_artifacts(split, {**metrics, "backtest": backtest}, path=artifact_path)
 
-    print(json.dumps({"metrics": metrics, "backtest": backtest}, indent=2))
+    return {
+        "horizon": horizon,
+        "model_path": str(model_path),
+        "artifact_path": str(artifact_path),
+        "metrics": metrics,
+        "backtest": backtest,
+    }
+
+
+def load_training_data(args: argparse.Namespace) -> pd.DataFrame:
+    return (
+        fetch_and_update_data(
+            args.symbol,
+            args.timeframe,
+            file=args.data,
+            max_batches=args.max_fetch_batches,
+            exchange_name=args.exchange,
+        )
+        if args.update
+        else load_price_csv(args.data)
+    )
+
+
+def train_command(args: argparse.Namespace) -> None:
+    data = load_training_data(args)
+    result = run_training_pipeline(args, data, args.horizon, MODEL_PATH, ARTIFACT_PATH)
+
+    print(json.dumps({"metrics": result["metrics"], "backtest": result["backtest"]}, indent=2))
     print(f"Saved model: {MODEL_PATH}")
     print(f"Saved artifacts: {ARTIFACT_PATH}")
+
+
+def train_multi_command(args: argparse.Namespace) -> None:
+    data = load_training_data(args)
+    results = []
+    for horizon in parse_horizons(args.horizons):
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        print(f"Training horizon {horizon} -> {model_path}")
+        results.append(run_training_pipeline(args, data, horizon, model_path, artifact_path))
+    print(json.dumps({"results": results}, indent=2))
 
 
 def predict_command(args: argparse.Namespace) -> None:
@@ -1195,6 +1248,75 @@ def predict_command(args: argparse.Namespace) -> None:
         )
 
 
+def combine_multi_horizon_predictions(results: list[dict], min_agree: int, min_confidence: float) -> dict:
+    if not results:
+        raise ValueError("No horizon predictions were provided.")
+    actionable = [result for result in results if result["signal"] in {"LONG", "SHORT"} and result["confidence"] >= min_confidence]
+    long_votes = [result for result in actionable if result["signal"] == "LONG"]
+    short_votes = [result for result in actionable if result["signal"] == "SHORT"]
+
+    if len(long_votes) >= min_agree and len(short_votes) == 0:
+        signal = "LONG"
+        voters = long_votes
+    elif len(short_votes) >= min_agree and len(long_votes) == 0:
+        signal = "SHORT"
+        voters = short_votes
+    else:
+        signal = "HOLD"
+        voters = actionable
+
+    current_price = float(results[0]["current_price"])
+    expected_return = float(np.mean([result["predicted_return_pct"] for result in voters]) / 100) if voters and signal != "HOLD" else 0.0
+    confidence = float(np.mean([result["confidence"] for result in voters])) if voters else float(np.mean([result["confidence"] for result in results]))
+    return {
+        "timestamp": results[0]["timestamp"],
+        "current_price": current_price,
+        "signal": signal,
+        "predicted_price": float(current_price * (1 + expected_return)),
+        "predicted_return_pct": float(expected_return * 100),
+        "confidence": confidence,
+        "min_agree": min_agree,
+        "min_confidence": min_confidence,
+        "long_votes": len(long_votes),
+        "short_votes": len(short_votes),
+        "hold_votes": int(sum(1 for result in results if result["signal"] == "HOLD")),
+    }
+
+
+def predict_multi_command(args: argparse.Namespace) -> None:
+    require_tensorflow()
+    data = (
+        fetch_and_update_data(
+            args.symbol,
+            args.timeframe,
+            file=args.data,
+            max_batches=args.max_fetch_batches,
+            exchange_name=args.exchange,
+        )
+        if args.update
+        else load_price_csv(args.data)
+    )
+    results = []
+    for horizon in parse_horizons(args.horizons):
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        if not model_path.exists() or not artifact_path.exists():
+            raise FileNotFoundError(f"Missing model/artifact for horizon {horizon}. Run train-multi first.")
+        model = load_model(model_path)
+        artifact = load_artifacts(artifact_path)
+        results.append(predict_next_price(model, data, artifact))
+
+    final_signal = combine_multi_horizon_predictions(results, args.min_agree, args.min_confidence)
+    output = {"final": final_signal, "horizons": results}
+    print(json.dumps(output, indent=2))
+    if args.telegram:
+        send_telegram_message(
+            f"<b>{final_signal['signal']}</b> {args.symbol} multi-horizon\n"
+            f"Current: ${final_signal['current_price']:.2f}\n"
+            f"Expected: {final_signal['predicted_return_pct']:.3f}%\n"
+            f"Confidence: {final_signal['confidence']:.2f}"
+        )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Crypto price forecasting pipeline.")
     parser.add_argument("--data", default=str(DATA_DIR / "5m_btc_history.csv"))
@@ -1204,32 +1326,41 @@ def build_parser() -> argparse.ArgumentParser:
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
+    def add_train_options(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--data", default=str(DATA_DIR / "5m_btc_history.csv"))
+        command_parser.add_argument("--symbol", default="BTC/USDT")
+        command_parser.add_argument("--timeframe", default="5m")
+        command_parser.add_argument("--exchange", default="binance")
+        command_parser.add_argument("--update", action="store_true", help="Fetch fresh candles before training.")
+        command_parser.add_argument("--sequence-length", type=int, default=96)
+        command_parser.add_argument("--epochs", type=int, default=80)
+        command_parser.add_argument("--batch-size", type=int, default=32)
+        command_parser.add_argument("--training-verbose", type=int, choices=[0, 1, 2], default=2)
+        command_parser.add_argument("--threshold", type=float, default=0.0015)
+        command_parser.add_argument("--fee-rate", type=float, default=0.001)
+        command_parser.add_argument("--market-mode", choices=["spot", "futures"], default="futures")
+        command_parser.add_argument("--leverage", type=float, default=1.0)
+        command_parser.add_argument("--max-fetch-batches", type=int, default=200)
+        command_parser.add_argument("--max-train-rows", type=int, default=5000)
+        command_parser.add_argument("--feature-set", choices=sorted(FEATURE_SETS), default="core")
+        command_parser.add_argument("--feature-selection", choices=["none", "correlation"], default="correlation")
+        command_parser.add_argument("--feature-correlation-method", choices=["spearman", "pearson"], default="spearman")
+        command_parser.add_argument("--max-selected-features", type=int, default=18)
+        command_parser.add_argument("--min-selected-features", type=int, default=8)
+        command_parser.add_argument("--min-feature-correlation", type=float, default=0.005)
+        command_parser.add_argument("--max-feature-pair-correlation", type=float, default=0.92)
+        command_parser.add_argument("--target-mode", choices=["regression", "classification"], default="classification")
+        command_parser.add_argument("--min-confidence", type=float, default=0.50)
+
     train = subparsers.add_parser("train")
-    train.add_argument("--data", default=str(DATA_DIR / "5m_btc_history.csv"))
-    train.add_argument("--symbol", default="BTC/USDT")
-    train.add_argument("--timeframe", default="5m")
-    train.add_argument("--exchange", default="binance")
-    train.add_argument("--update", action="store_true", help="Fetch fresh candles before training.")
-    train.add_argument("--sequence-length", type=int, default=96)
+    add_train_options(train)
     train.add_argument("--horizon", type=int, default=1)
-    train.add_argument("--epochs", type=int, default=80)
-    train.add_argument("--batch-size", type=int, default=32)
-    train.add_argument("--threshold", type=float, default=0.0015)
-    train.add_argument("--fee-rate", type=float, default=0.001)
-    train.add_argument("--market-mode", choices=["spot", "futures"], default="futures")
-    train.add_argument("--leverage", type=float, default=1.0)
-    train.add_argument("--max-fetch-batches", type=int, default=200)
-    train.add_argument("--max-train-rows", type=int, default=5000)
-    train.add_argument("--feature-set", choices=sorted(FEATURE_SETS), default="core")
-    train.add_argument("--feature-selection", choices=["none", "correlation"], default="correlation")
-    train.add_argument("--feature-correlation-method", choices=["spearman", "pearson"], default="spearman")
-    train.add_argument("--max-selected-features", type=int, default=18)
-    train.add_argument("--min-selected-features", type=int, default=8)
-    train.add_argument("--min-feature-correlation", type=float, default=0.005)
-    train.add_argument("--max-feature-pair-correlation", type=float, default=0.92)
-    train.add_argument("--target-mode", choices=["regression", "classification"], default="classification")
-    train.add_argument("--min-confidence", type=float, default=0.50)
     train.set_defaults(func=train_command)
+
+    train_multi = subparsers.add_parser("train-multi")
+    add_train_options(train_multi)
+    train_multi.add_argument("--horizons", default="1,3,6,12")
+    train_multi.set_defaults(func=train_multi_command)
 
     predict = subparsers.add_parser("predict")
     predict.add_argument("--data", default=str(DATA_DIR / "5m_btc_history.csv"))
@@ -1240,6 +1371,19 @@ def build_parser() -> argparse.ArgumentParser:
     predict.add_argument("--max-fetch-batches", type=int, default=200)
     predict.add_argument("--telegram", action="store_true")
     predict.set_defaults(func=predict_command)
+
+    predict_multi = subparsers.add_parser("predict-multi")
+    predict_multi.add_argument("--data", default=str(DATA_DIR / "5m_btc_history.csv"))
+    predict_multi.add_argument("--symbol", default="BTC/USDT")
+    predict_multi.add_argument("--timeframe", default="5m")
+    predict_multi.add_argument("--exchange", default="binance")
+    predict_multi.add_argument("--update", action="store_true", help="Fetch fresh candles before prediction.")
+    predict_multi.add_argument("--max-fetch-batches", type=int, default=200)
+    predict_multi.add_argument("--horizons", default="1,3,6,12")
+    predict_multi.add_argument("--min-agree", type=int, default=2)
+    predict_multi.add_argument("--min-confidence", type=float, default=0.50)
+    predict_multi.add_argument("--telegram", action="store_true")
+    predict_multi.set_defaults(func=predict_multi_command)
     return parser
 
 

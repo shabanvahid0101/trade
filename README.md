@@ -49,6 +49,20 @@ python crypto_predictor.py train --update --exchange binance --market-mode futur
 
 Use `--feature-selection correlation` to rank indicators on the training window only and keep the strongest non-redundant features. The chosen features are saved in `model_artifacts.pkl` and printed in the training metrics.
 
+## Multi-Horizon Training
+
+Train separate models for several future windows and only trade when they agree:
+
+```powershell
+python crypto_predictor.py train-multi --update --symbol BTC/USDT --timeframe 5m --data dataset/5m_btc_history.csv --horizons 1,3,6,12 --max-train-rows 5000 --feature-set advanced --feature-selection correlation --max-selected-features 18 --target-mode classification --threshold 0.0002 --min-confidence 0.50 --market-mode futures --leverage 1 --training-verbose 2
+```
+
+Multi-horizon prediction:
+
+```powershell
+python crypto_predictor.py predict-multi --data dataset/5m_btc_history.csv --horizons 1,3,6,12 --min-agree 2 --min-confidence 0.50
+```
+
 ## Predict Once
 
 ```powershell
