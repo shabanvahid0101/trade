@@ -156,6 +156,7 @@ class SplitData:
     feature_columns: list[str]
     sequence_length: int
     horizon: int
+    timeframe: str
     target_mode: str
     target_threshold: float
     feature_selection_report: dict
@@ -740,6 +741,7 @@ def prepare_datasets(
         feature_columns=feature_columns,
         sequence_length=sequence_length,
         horizon=horizon,
+        timeframe=timeframe,
         target_mode=target_mode,
         target_threshold=target_threshold,
         feature_selection_report=feature_selection_report,
@@ -1053,6 +1055,7 @@ def save_artifacts(split: SplitData, metrics: dict, path: str | Path = ARTIFACT_
         "feature_selection": split.feature_selection_report,
         "sequence_length": split.sequence_length,
         "horizon": split.horizon,
+        "timeframe": split.timeframe,
         "target_mode": split.target_mode,
         "target_threshold": split.target_threshold,
         "metrics": metrics,
@@ -1069,7 +1072,8 @@ def load_artifacts(path: str | Path = ARTIFACT_PATH) -> dict:
 def predict_next_price(model, data: pd.DataFrame, artifact: dict) -> dict:
     sequence_length = int(artifact["sequence_length"])
     horizon = int(artifact["horizon"])
-    data = latest_continuous_block(data)
+    timeframe = artifact.get("timeframe", "5m")
+    data = latest_continuous_block(data, timeframe=timeframe)
     featured = add_features(data, horizon=horizon, require_target=False)
     if len(featured) < sequence_length:
         raise ValueError("Not enough processed rows for prediction.")
@@ -1236,6 +1240,7 @@ def predict_command(args: argparse.Namespace) -> None:
     )
     model = load_model(MODEL_PATH)
     artifact = load_artifacts()
+    artifact.setdefault("timeframe", args.timeframe)
     result = predict_next_price(model, data, artifact)
     print(json.dumps(result, indent=2))
     if args.telegram:
@@ -1303,6 +1308,7 @@ def predict_multi_command(args: argparse.Namespace) -> None:
             raise FileNotFoundError(f"Missing model/artifact for horizon {horizon}. Run train-multi first.")
         model = load_model(model_path)
         artifact = load_artifacts(artifact_path)
+        artifact.setdefault("timeframe", args.timeframe)
         results.append(predict_next_price(model, data, artifact))
 
     final_signal = combine_multi_horizon_predictions(results, args.min_agree, args.min_confidence)
