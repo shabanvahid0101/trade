@@ -104,6 +104,20 @@ TELEGRAM_CHAT_ID=your_channel_or_chat_id
 
 Cloudflare Workers cannot run this Python/TensorFlow model directly. Use GitHub Actions for a free scheduled runner, or a small Python VPS/container for true always-on looping.
 
+## Paper Trading
+
+Backtest the current 1h multi-horizon setup with a virtual 100 USD futures account:
+
+```powershell
+python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --days 7
+```
+
+Run one live paper-trading step and save the virtual account state in `paper_state.json`:
+
+```powershell
+python paper_trader.py --mode single --update --telegram --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100
+```
+
 ## Trading Notes
 
 No model can predict crypto prices perfectly. Before using real money, require a stable out-of-sample edge after fees, slippage, and drawdown limits. Use small position sizing, stop-loss rules, and paper trading first.
