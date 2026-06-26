@@ -110,7 +110,7 @@ def run_once(args: argparse.Namespace) -> dict:
     changed_signal = final["signal"] != last_signal or final["timestamp"] != last_timestamp
 
     should_send = args.telegram and is_actionable and (changed_signal or cooldown_passed)
-    if args.send_hold and args.telegram and final["signal"] == "HOLD" and changed_signal:
+    if args.send_hold and args.telegram and final["signal"] == "HOLD":
         should_send = True
 
     if should_send:

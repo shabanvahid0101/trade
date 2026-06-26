@@ -86,16 +86,16 @@ python live_predict.py --symbol BTC/USDT --timeframe 5m --sleep-seconds 300 --te
 Run one alert check with the saved 1h multi-horizon models:
 
 ```powershell
-python alert_bot.py --update --telegram --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --min-agree 2 --min-confidence 0.50
+python alert_bot.py --update --telegram --send-hold --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --min-agree 2 --min-confidence 0.50
 ```
 
 Run continuously on a Python server:
 
 ```powershell
-python alert_bot.py --mode loop --update --telegram --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --sleep-seconds 300
+python alert_bot.py --mode loop --update --telegram --send-hold --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --sleep-seconds 300
 ```
 
-The included GitHub Actions workflow `.github/workflows/telegram-alert.yml` runs every 15 minutes. Add these repository secrets before enabling it:
+The included GitHub Actions workflow `.github/workflows/telegram-alert.yml` runs every 15 minutes and sends HOLD updates too. Add these repository secrets before enabling it:
 
 ```text
 TELEGRAM_TOKEN=your_bot_token
