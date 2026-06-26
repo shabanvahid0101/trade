@@ -81,6 +81,29 @@ python crypto_predictor.py predict --update --symbol BTC/USDT --timeframe 5m --d
 python live_predict.py --symbol BTC/USDT --timeframe 5m --sleep-seconds 300 --telegram
 ```
 
+## Telegram Alert Bot
+
+Run one alert check with the saved 1h multi-horizon models:
+
+```powershell
+python alert_bot.py --update --telegram --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --min-agree 2 --min-confidence 0.50
+```
+
+Run continuously on a Python server:
+
+```powershell
+python alert_bot.py --mode loop --update --telegram --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --sleep-seconds 300
+```
+
+The included GitHub Actions workflow `.github/workflows/telegram-alert.yml` runs every 15 minutes. Add these repository secrets before enabling it:
+
+```text
+TELEGRAM_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_channel_or_chat_id
+```
+
+Cloudflare Workers cannot run this Python/TensorFlow model directly. Use GitHub Actions for a free scheduled runner, or a small Python VPS/container for true always-on looping.
+
 ## Trading Notes
 
 No model can predict crypto prices perfectly. Before using real money, require a stable out-of-sample edge after fees, slippage, and drawdown limits. Use small position sizing, stop-loss rules, and paper trading first.
