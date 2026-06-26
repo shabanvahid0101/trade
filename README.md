@@ -32,13 +32,13 @@ TELEGRAM_CHAT_ID=telegram_chat_id
 ## Train
 
 ```powershell
-python crypto_predictor.py train --data dataset/5m_btc_history.csv --sequence-length 96 --horizon 1 --epochs 40 --max-train-rows 5000 --feature-set core --target-mode classification --threshold 0.0002 --min-confidence 0.50
+python crypto_predictor.py train --data dataset/5m_btc_history.csv --sequence-length 96 --horizon 1 --epochs 40 --max-train-rows 5000 --feature-set advanced --feature-selection correlation --max-selected-features 18 --target-mode classification --threshold 0.0002 --min-confidence 0.50
 ```
 
 To fetch new candles before training:
 
 ```powershell
-python crypto_predictor.py train --update --symbol BTC/USDT --timeframe 5m --data dataset/5m_btc_history.csv --max-train-rows 5000 --feature-set core --target-mode classification --threshold 0.0002 --min-confidence 0.50
+python crypto_predictor.py train --update --symbol BTC/USDT --timeframe 5m --data dataset/5m_btc_history.csv --max-train-rows 5000 --feature-set advanced --feature-selection correlation --max-selected-features 18 --target-mode classification --threshold 0.0002 --min-confidence 0.50
 ```
 
 Futures-style backtests can take both long and short signals:
@@ -47,7 +47,7 @@ Futures-style backtests can take both long and short signals:
 python crypto_predictor.py train --update --exchange binance --market-mode futures --leverage 1 --threshold 0.0015
 ```
 
-Use `--feature-set advanced` to include the larger experimental indicator set. Keep it only if its out-of-sample metrics beat `core`.
+Use `--feature-selection correlation` to rank indicators on the training window only and keep the strongest non-redundant features. The chosen features are saved in `model_artifacts.pkl` and printed in the training metrics.
 
 ## Predict Once
 

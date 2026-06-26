@@ -141,6 +141,7 @@ class SplitData:
     horizon: int
     target_mode: str
     target_threshold: float
+    feature_selection_report: dict
 
 
 def setup_logging() -> None:
@@ -518,6 +519,88 @@ def add_features(df: pd.DataFrame, horizon: int = 1) -> pd.DataFrame:
     return df.dropna(subset=FEATURE_COLUMNS + ["target_return", "future_close"]).reset_index(drop=True)
 
 
+def select_features_by_correlation(
+    featured: pd.DataFrame,
+    candidate_columns: list[str],
+    sequence_length: int,
+    train_end: int,
+    max_features: int = 18,
+    min_abs_corr: float = 0.005,
+    max_pair_corr: float = 0.92,
+    min_features: int = 8,
+    method: str = "spearman",
+) -> tuple[list[str], dict]:
+    if method not in {"spearman", "pearson"}:
+        raise ValueError("feature correlation method must be 'spearman' or 'pearson'.")
+    if max_features <= 0:
+        raise ValueError("max_features must be positive.")
+    if min_features <= 0:
+        raise ValueError("min_features must be positive.")
+
+    target_start = sequence_length - 1
+    target_stop = target_start + train_end
+    train_frame = featured.iloc[target_start:target_stop].copy()
+    if train_frame.empty:
+        return candidate_columns, {"enabled": False, "reason": "empty_train_window"}
+
+    target = train_frame["target_return"]
+    scores = []
+    for column in candidate_columns:
+        series = train_frame[column]
+        corr = series.corr(target, method=method)
+        if pd.isna(corr) or np.isinf(corr):
+            corr = 0.0
+        scores.append({"feature": column, "correlation": float(corr), "abs_correlation": float(abs(corr))})
+
+    ranked = sorted(scores, key=lambda item: item["abs_correlation"], reverse=True)
+    strong = [item for item in ranked if item["abs_correlation"] >= min_abs_corr]
+    if len(strong) < min_features:
+        strong = ranked[:min_features]
+
+    selected: list[str] = []
+    skipped_redundant: list[dict] = []
+    corr_frame = train_frame[candidate_columns].corr(method=method).abs()
+    for item in strong:
+        feature = item["feature"]
+        if len(selected) >= max_features:
+            break
+        if selected:
+            max_existing_corr = float(corr_frame.loc[feature, selected].max())
+            if max_existing_corr > max_pair_corr and len(selected) >= min_features:
+                skipped_redundant.append(
+                    {
+                        "feature": feature,
+                        "abs_correlation": item["abs_correlation"],
+                        "max_pair_correlation": max_existing_corr,
+                    }
+                )
+                continue
+        selected.append(feature)
+
+    if len(selected) < min_features:
+        for item in ranked:
+            feature = item["feature"]
+            if feature not in selected:
+                selected.append(feature)
+            if len(selected) >= min(min_features, len(candidate_columns)):
+                break
+
+    selected_set = set(selected)
+    report = {
+        "enabled": True,
+        "method": method,
+        "candidate_count": len(candidate_columns),
+        "selected_count": len(selected),
+        "max_features": max_features,
+        "min_abs_corr": min_abs_corr,
+        "max_pair_corr": max_pair_corr,
+        "top_ranked": ranked[:12],
+        "selected": [item for item in ranked if item["feature"] in selected_set],
+        "skipped_redundant": skipped_redundant[:12],
+    }
+    return selected, report
+
+
 def prepare_datasets(
     df: pd.DataFrame,
     sequence_length: int = 96,
@@ -529,9 +612,17 @@ def prepare_datasets(
     feature_columns: list[str] | None = None,
     target_mode: str = "regression",
     target_threshold: float = 0.0015,
+    feature_selection: str = "none",
+    max_selected_features: int = 18,
+    min_feature_correlation: float = 0.005,
+    max_feature_pair_correlation: float = 0.92,
+    min_selected_features: int = 8,
+    feature_correlation_method: str = "spearman",
 ) -> SplitData:
     if target_mode not in {"regression", "classification"}:
         raise ValueError("target_mode must be 'regression' or 'classification'.")
+    if feature_selection not in {"none", "correlation"}:
+        raise ValueError("feature_selection must be 'none' or 'correlation'.")
     feature_columns = feature_columns or FEATURE_COLUMNS
     df = latest_continuous_block(df, timeframe=timeframe)
     if max_rows is not None and max_rows > 0 and len(df) > max_rows + 250:
@@ -545,13 +636,41 @@ def prepare_datasets(
     if len(featured) < sequence_length + 100:
         raise ValueError("Not enough rows after feature engineering. Fetch more history before training.")
 
-    features = featured[feature_columns].to_numpy(dtype=np.float32)
     if target_mode == "classification":
         target_return = featured["target_return"].to_numpy(dtype=np.float32)
         targets = np.where(target_return > target_threshold, 2, np.where(target_return < -target_threshold, 0, 1)).astype(np.int32)
     else:
         targets = featured["target_return"].to_numpy(dtype=np.float32)
     meta = featured[["timestamp", "close", "future_close", "target_return"]].copy()
+
+    n_samples = len(featured) - sequence_length + 1
+    train_end = int(n_samples * train_ratio)
+    val_end = int(n_samples * (train_ratio + val_ratio))
+    if train_end <= 0 or val_end <= train_end or val_end >= n_samples:
+        raise ValueError("Invalid split sizes. Adjust train_ratio/val_ratio.")
+
+    if feature_selection == "correlation":
+        feature_columns, feature_selection_report = select_features_by_correlation(
+            featured=featured,
+            candidate_columns=feature_columns,
+            sequence_length=sequence_length,
+            train_end=train_end,
+            max_features=max_selected_features,
+            min_abs_corr=min_feature_correlation,
+            max_pair_corr=max_feature_pair_correlation,
+            min_features=min_selected_features,
+            method=feature_correlation_method,
+        )
+    else:
+        feature_selection_report = {
+            "enabled": False,
+            "method": "none",
+            "candidate_count": len(feature_columns),
+            "selected_count": len(feature_columns),
+            "selected": feature_columns,
+        }
+
+    features = featured[feature_columns].to_numpy(dtype=np.float32)
 
     X, y, rows = [], [], []
     for end_idx in range(sequence_length - 1, len(featured)):
@@ -562,12 +681,6 @@ def prepare_datasets(
     X = np.asarray(X, dtype=np.float32)
     y = np.asarray(y, dtype=np.float32)
     meta_all = pd.DataFrame(rows).reset_index(drop=True)
-
-    n_samples = len(X)
-    train_end = int(n_samples * train_ratio)
-    val_end = int(n_samples * (train_ratio + val_ratio))
-    if train_end <= 0 or val_end <= train_end or val_end >= n_samples:
-        raise ValueError("Invalid split sizes. Adjust train_ratio/val_ratio.")
 
     X_train_raw, X_val_raw, X_test_raw = X[:train_end], X[train_end:val_end], X[val_end:]
     y_train_raw, y_val_raw, y_test_raw = y[:train_end], y[train_end:val_end], y[val_end:]
@@ -611,6 +724,7 @@ def prepare_datasets(
         horizon=horizon,
         target_mode=target_mode,
         target_threshold=target_threshold,
+        feature_selection_report=feature_selection_report,
     )
 
 
@@ -907,12 +1021,18 @@ def backtest_futures_long_short(
 
 
 def save_artifacts(split: SplitData, metrics: dict, path: str | Path = ARTIFACT_PATH) -> None:
-    feature_set = "advanced" if split.feature_columns == ADVANCED_FEATURE_COLUMNS else "core"
+    if split.feature_columns == ADVANCED_FEATURE_COLUMNS:
+        feature_set = "advanced"
+    elif split.feature_columns == CORE_FEATURE_COLUMNS:
+        feature_set = "core"
+    else:
+        feature_set = "selected"
     artifact = {
         "feature_scaler": split.feature_scaler,
         "target_scaler": split.target_scaler,
         "feature_columns": split.feature_columns,
         "feature_set": feature_set,
+        "feature_selection": split.feature_selection_report,
         "sequence_length": split.sequence_length,
         "horizon": split.horizon,
         "target_mode": split.target_mode,
@@ -1008,10 +1128,19 @@ def train_command(args: argparse.Namespace) -> None:
         feature_columns=FEATURE_SETS[args.feature_set],
         target_mode=args.target_mode,
         target_threshold=args.threshold,
+        feature_selection=args.feature_selection,
+        max_selected_features=args.max_selected_features,
+        min_feature_correlation=args.min_feature_correlation,
+        max_feature_pair_correlation=args.max_feature_pair_correlation,
+        min_selected_features=args.min_selected_features,
+        feature_correlation_method=args.feature_correlation_method,
     )
     model, _ = train_model(split, epochs=args.epochs, batch_size=args.batch_size)
     metrics = evaluate_model(model, split)
     metrics["min_confidence"] = args.min_confidence
+    metrics["selected_feature_count"] = len(split.feature_columns)
+    metrics["selected_features"] = split.feature_columns
+    metrics["feature_selection"] = split.feature_selection_report
 
     if split.target_mode == "classification":
         probabilities = model.predict(split.X_test, verbose=0)
@@ -1092,6 +1221,12 @@ def build_parser() -> argparse.ArgumentParser:
     train.add_argument("--max-fetch-batches", type=int, default=200)
     train.add_argument("--max-train-rows", type=int, default=5000)
     train.add_argument("--feature-set", choices=sorted(FEATURE_SETS), default="core")
+    train.add_argument("--feature-selection", choices=["none", "correlation"], default="correlation")
+    train.add_argument("--feature-correlation-method", choices=["spearman", "pearson"], default="spearman")
+    train.add_argument("--max-selected-features", type=int, default=18)
+    train.add_argument("--min-selected-features", type=int, default=8)
+    train.add_argument("--min-feature-correlation", type=float, default=0.005)
+    train.add_argument("--max-feature-pair-correlation", type=float, default=0.92)
     train.add_argument("--target-mode", choices=["regression", "classification"], default="classification")
     train.add_argument("--min-confidence", type=float, default=0.50)
     train.set_defaults(func=train_command)
