@@ -176,20 +176,32 @@ setup_logging()
 load_dotenv(BASE_DIR / ".env")
 
 
-def send_telegram_message(message: str) -> None:
+def send_telegram_message(message: str) -> bool:
     token = os.getenv("TELEGRAM_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    strict = os.getenv("TELEGRAM_STRICT", "0") == "1"
     if not token or not chat_id:
-        logging.warning("Telegram TOKEN or CHAT_ID is not configured.")
-        return
+        error = "Telegram TOKEN or CHAT_ID is not configured."
+        logging.warning(error)
+        print(error)
+        if strict:
+            raise RuntimeError(error)
+        return False
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
     try:
         response = requests.post(url, data=payload, timeout=10)
         response.raise_for_status()
+        print("Telegram message sent.")
+        return True
     except Exception as exc:
-        logging.error("Telegram send failed: %s", exc)
+        error = f"Telegram send failed: {exc}"
+        logging.error(error)
+        print(error)
+        if strict:
+            raise RuntimeError(error) from exc
+        return False
 
 
 def create_exchange(exchange_name: str):
