@@ -280,6 +280,17 @@ def fetch_and_update_data(
         time.sleep(exchange.rateLimit / 1000 if getattr(exchange, "rateLimit", None) else 0.2)
 
     if not new_data:
+        try:
+            latest_candles = exchange.fetch_ohlcv(symbol, timeframe, limit=batch_limit)
+            if latest_candles:
+                new_data.extend(latest_candles)
+                print(f"Fetched latest fallback candles: {len(latest_candles)} for {symbol} {timeframe}")
+        except Exception as exc:
+            logging.error("Latest fallback fetch failed: %s", exc)
+            print(f"Latest fallback fetch failed: {exc}")
+    if not new_data:
+        last_timestamp = old_df["timestamp"].max() if not old_df.empty else None
+        print(f"No new candles fetched for {symbol} {timeframe}. Last local timestamp: {last_timestamp}")
         return old_df
 
     new_df = pd.DataFrame(new_data, columns=["timestamp", "open", "high", "low", "close", "volume"])
@@ -291,6 +302,10 @@ def fetch_and_update_data(
         .reset_index(drop=True)
     )
     combined.to_csv(file, index=False)
+    print(
+        f"Dataset updated: {file} rows={len(combined)} "
+        f"last={combined['timestamp'].max()} added_or_merged={len(new_df)}"
+    )
     logging.info("Dataset updated: %s rows saved to %s", len(combined), file)
     return combined
 

@@ -240,6 +240,8 @@ def run_single(args: argparse.Namespace) -> dict:
         if args.update
         else load_price_csv(args.data)
     )
+    dataset_last_timestamp = str(data["timestamp"].max()) if not data.empty else None
+    print(f"Paper data last timestamp: {dataset_last_timestamp}")
     horizon_results = []
     for horizon in parse_horizons(args.horizons):
         model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
@@ -260,7 +262,11 @@ def run_single(args: argparse.Namespace) -> dict:
         leverage=args.leverage,
     )
     save_state(state_path, state)
-    output = {"final": final, "paper": {"state": state, **trade_result}}
+    output = {
+        "data_last_timestamp": dataset_last_timestamp,
+        "final": final,
+        "paper": {"state": state, **trade_result},
+    }
     print(json.dumps(output, indent=2))
 
     if args.telegram:
