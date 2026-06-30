@@ -130,6 +130,12 @@ python strategy_optimizer.py --data dataset/1h-btc_history.csv --days 14 --initi
 
 The optimizer writes `strategy_optimization.json` locally and prints the top configurations. Review results out of sample before changing live paper-trading settings.
 
+Walk-forward validation chooses the best config on a rolling training window and tests it on the next unseen window:
+
+```powershell
+python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100
+```
+
 ## Trading Notes
 
 No model can predict crypto prices perfectly. Before using real money, require a stable out-of-sample edge after fees, slippage, and drawdown limits. Use small position sizing, stop-loss rules, and paper trading first.

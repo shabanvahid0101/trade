@@ -222,32 +222,23 @@ def simulate_futures(
     }
 
 
-def run_optimizer(args: argparse.Namespace) -> dict:
-    data = load_price_csv(args.data)
-    horizon_sets = parse_horizon_sets(args.horizon_sets)
-    all_horizons = sorted(set(itertools.chain.from_iterable(horizon_sets)))
-    prediction_frame = load_horizon_predictions(
-        data=data,
-        symbol=args.symbol,
-        timeframe=args.timeframe,
-        horizons=all_horizons,
-        max_rows=args.max_train_rows,
-    )
-    rows = args.days * (24 if args.timeframe.endswith("h") else 24 * 12)
-    test_frame = prediction_frame.tail(rows).reset_index(drop=True)
-
-    results = []
+def iter_grid(args: argparse.Namespace):
     for horizons, min_confidence, min_agree, stop_loss, take_profit in itertools.product(
-        horizon_sets,
+        parse_horizon_sets(args.horizon_sets),
         parse_float_grid(args.confidence_grid),
         parse_int_grid(args.min_agree_grid),
         parse_float_grid(args.stop_loss_grid),
         parse_float_grid(args.take_profit_grid),
     ):
-        if min_agree > len(horizons):
-            continue
+        if min_agree <= len(horizons):
+            yield horizons, min_confidence, min_agree, stop_loss, take_profit
+
+
+def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
+    results = []
+    for horizons, min_confidence, min_agree, stop_loss, take_profit in iter_grid(args):
         metrics = simulate_futures(
-            frame=test_frame,
+            frame=frame,
             horizons=horizons,
             min_confidence=min_confidence,
             min_agree=min_agree,
@@ -267,12 +258,46 @@ def run_optimizer(args: argparse.Namespace) -> dict:
                 **metrics,
             }
         )
+    return results
 
-    ranked = sorted(
+
+def rank_results(results: list[dict]) -> list[dict]:
+    return sorted(
         results,
-        key=lambda item: (item["final_capital"], item["max_drawdown_pct"], item["closed_trade_count"]),
+        key=lambda item: (
+            item["final_capital"],
+            item["max_drawdown_pct"],
+            item["closed_trade_count"],
+            item["win_rate_pct"],
+        ),
         reverse=True,
     )
+
+
+def prepare_prediction_frame(args: argparse.Namespace) -> pd.DataFrame:
+    data = load_price_csv(args.data)
+    horizon_sets = parse_horizon_sets(args.horizon_sets)
+    all_horizons = sorted(set(itertools.chain.from_iterable(horizon_sets)))
+    return load_horizon_predictions(
+        data=data,
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        horizons=all_horizons,
+        max_rows=args.max_train_rows,
+    )
+
+
+def bars_per_day(timeframe: str) -> int:
+    return 24 if timeframe.endswith("h") else 24 * 12
+
+
+def run_optimizer(args: argparse.Namespace) -> dict:
+    prediction_frame = prepare_prediction_frame(args)
+    rows = args.days * bars_per_day(args.timeframe)
+    test_frame = prediction_frame.tail(rows).reset_index(drop=True)
+
+    results = evaluate_grid(test_frame, args)
+    ranked = rank_results(results)
     output = {
         "start": str(test_frame["timestamp"].iloc[0]),
         "end": str(test_frame["timestamp"].iloc[-1]),
@@ -285,8 +310,97 @@ def run_optimizer(args: argparse.Namespace) -> dict:
     return output
 
 
+def config_key(config: dict) -> str:
+    return (
+        f"h={','.join(map(str, config['horizons']))}|"
+        f"conf={config['min_confidence']}|agree={config['min_agree']}|"
+        f"sl={config['stop_loss_pct']}|tp={config['take_profit_pct']}"
+    )
+
+
+def run_walk_forward(args: argparse.Namespace) -> dict:
+    prediction_frame = prepare_prediction_frame(args)
+    train_rows = args.train_days * bars_per_day(args.timeframe)
+    test_rows = args.test_days * bars_per_day(args.timeframe)
+    step_rows = args.step_days * bars_per_day(args.timeframe)
+    start_index = max(0, len(prediction_frame) - args.walkforward_days * bars_per_day(args.timeframe))
+
+    folds = []
+    cursor = start_index
+    while cursor + train_rows + test_rows <= len(prediction_frame):
+        train_frame = prediction_frame.iloc[cursor : cursor + train_rows].reset_index(drop=True)
+        test_frame = prediction_frame.iloc[cursor + train_rows : cursor + train_rows + test_rows].reset_index(drop=True)
+        train_ranked = rank_results(evaluate_grid(train_frame, args))
+        if not train_ranked:
+            break
+        best_config = train_ranked[0]
+        test_metrics = simulate_futures(
+            frame=test_frame,
+            horizons=best_config["horizons"],
+            min_confidence=best_config["min_confidence"],
+            min_agree=best_config["min_agree"],
+            initial_capital=args.initial_capital,
+            fee_rate=args.fee_rate,
+            leverage=args.leverage,
+            stop_loss_pct=best_config["stop_loss_pct"] / 100,
+            take_profit_pct=best_config["take_profit_pct"] / 100,
+        )
+        folds.append(
+            {
+                "fold": len(folds) + 1,
+                "train_start": str(train_frame["timestamp"].iloc[0]),
+                "train_end": str(train_frame["timestamp"].iloc[-1]),
+                "test_start": str(test_frame["timestamp"].iloc[0]),
+                "test_end": str(test_frame["timestamp"].iloc[-1]),
+                "selected_config": {
+                    "horizons": best_config["horizons"],
+                    "min_confidence": best_config["min_confidence"],
+                    "min_agree": best_config["min_agree"],
+                    "stop_loss_pct": best_config["stop_loss_pct"],
+                    "take_profit_pct": best_config["take_profit_pct"],
+                    "train_final_capital": best_config["final_capital"],
+                    "train_return_pct": best_config["total_return_pct"],
+                    "train_drawdown_pct": best_config["max_drawdown_pct"],
+                },
+                "test": test_metrics,
+            }
+        )
+        cursor += step_rows
+
+    if not folds:
+        raise ValueError("Not enough rows for walk-forward validation. Reduce train/test days.")
+
+    returns = [fold["test"]["total_return_pct"] for fold in folds]
+    final_capitals = [fold["test"]["final_capital"] for fold in folds]
+    drawdowns = [fold["test"]["max_drawdown_pct"] for fold in folds]
+    config_counts = {}
+    for fold in folds:
+        key = config_key(fold["selected_config"])
+        config_counts[key] = config_counts.get(key, 0) + 1
+
+    output = {
+        "mode": "walk-forward",
+        "fold_count": len(folds),
+        "train_days": args.train_days,
+        "test_days": args.test_days,
+        "step_days": args.step_days,
+        "walkforward_days": args.walkforward_days,
+        "average_test_return_pct": float(np.mean(returns)),
+        "median_test_return_pct": float(np.median(returns)),
+        "profitable_fold_pct": float(np.mean([value > 0 for value in returns]) * 100),
+        "average_final_capital": float(np.mean(final_capitals)),
+        "worst_drawdown_pct": float(min(drawdowns)),
+        "selected_config_counts": config_counts,
+        "folds": folds,
+    }
+    Path(args.output).write_text(json.dumps(output, indent=2), encoding="utf-8")
+    print(json.dumps(output, indent=2))
+    return output
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Optimize crypto paper-trading strategy parameters.")
+    parser.add_argument("--mode", choices=["optimize", "walk-forward"], default="optimize")
     parser.add_argument("--symbol", default="BTC/USDT")
     parser.add_argument("--timeframe", default="1h")
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
@@ -300,10 +414,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--max-train-rows", type=int, default=5000)
     parser.add_argument("--days", type=int, default=14)
+    parser.add_argument("--train-days", type=int, default=14)
+    parser.add_argument("--test-days", type=int, default=3)
+    parser.add_argument("--step-days", type=int, default=3)
+    parser.add_argument("--walkforward-days", type=int, default=45)
     parser.add_argument("--top", type=int, default=10)
     parser.add_argument("--output", default="strategy_optimization.json")
     return parser
 
 
 if __name__ == "__main__":
-    run_optimizer(build_parser().parse_args())
+    parsed_args = build_parser().parse_args()
+    if parsed_args.mode == "walk-forward":
+        run_walk_forward(parsed_args)
+    else:
+        run_optimizer(parsed_args)
