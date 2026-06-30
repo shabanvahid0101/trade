@@ -120,6 +120,16 @@ python paper_trader.py --mode single --update --telegram --data dataset/1h-btc_h
 
 The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs every hour, updates `paper_state.json`, sends a Telegram status message, and commits the virtual account state back to the repository.
 
+## Strategy Optimization
+
+Search for better 1h paper-trading settings across confidence, horizon agreement, stop loss, and take profit:
+
+```powershell
+python strategy_optimizer.py --data dataset/1h-btc_history.csv --days 14 --initial-capital 100 --top 10
+```
+
+The optimizer writes `strategy_optimization.json` locally and prints the top configurations. Review results out of sample before changing live paper-trading settings.
+
 ## Trading Notes
 
 No model can predict crypto prices perfectly. Before using real money, require a stable out-of-sample edge after fees, slippage, and drawdown limits. Use small position sizing, stop-loss rules, and paper trading first.
