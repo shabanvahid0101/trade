@@ -18,6 +18,7 @@ from crypto_predictor import (
     predict_next_price,
     send_telegram_message,
 )
+from strategy_rules import apply_hybrid_to_latest
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -62,6 +63,7 @@ def build_alert_message(symbol: str, timeframe: str, result: dict, horizon_resul
         f"Timeframe: {timeframe}\n"
         f"Time: {result['timestamp']}\n"
         f"Price: ${result['current_price']:.2f}\n"
+        f"Strategy: {result.get('strategy', 'model')} | Regime: {result.get('market_regime', 'model')}\n"
         f"Expected: {result['predicted_return_pct']:.3f}%\n"
         f"Confidence: {result['confidence']:.2f}\n"
         f"Votes: LONG {result['long_votes']} | SHORT {result['short_votes']} | HOLD {result['hold_votes']}\n\n"
@@ -113,6 +115,19 @@ def run_once(args: argparse.Namespace) -> dict:
         min_agree=args.min_agree,
         min_confidence=args.min_confidence,
     )
+    final = apply_hybrid_to_latest(
+        final=final,
+        data=data,
+        strategy=args.strategy,
+        threshold=args.threshold,
+        range_lower=args.range_lower,
+        range_upper=args.range_upper,
+        range_atr_max=args.range_atr_max,
+        range_trend_max=args.range_trend_max,
+        range_width_min=args.range_width_min,
+        range_width_max=args.range_width_max,
+        range_lookback=args.range_lookback,
+    )
     output = {"final": final, "horizons": horizon_results}
     print(json.dumps(output, indent=2))
 
@@ -137,6 +152,7 @@ def run_once(args: argparse.Namespace) -> dict:
                 f"Timeframe: {args.timeframe}\n"
                 f"Time: {final['timestamp']}\n"
                 f"Price: ${final['current_price']:.2f}\n"
+                f"Strategy: {final.get('strategy', 'model')} | Regime: {final.get('market_regime', 'model')}\n"
                 f"Confidence: {final['confidence']:.2f}"
             )
         else:
@@ -172,6 +188,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--horizons", default="1,3,6")
     parser.add_argument("--min-agree", type=int, default=2)
     parser.add_argument("--min-confidence", type=float, default=0.50)
+    parser.add_argument("--threshold", type=float, default=0.0015)
+    parser.add_argument("--strategy", choices=["model", "range", "hybrid"], default="hybrid")
+    parser.add_argument("--range-lower", type=float, default=0.15)
+    parser.add_argument("--range-upper", type=float, default=0.75)
+    parser.add_argument("--range-atr-max", type=float, default=0.006)
+    parser.add_argument("--range-trend-max", type=float, default=0.002)
+    parser.add_argument("--range-width-min", type=float, default=0.005)
+    parser.add_argument("--range-width-max", type=float, default=0.04)
+    parser.add_argument("--range-lookback", type=int, default=48)
     parser.add_argument("--max-fetch-batches", type=int, default=20)
     parser.add_argument("--max-data-age-hours", type=float, default=4.0)
     parser.add_argument("--mode", choices=["single", "loop"], default="single")

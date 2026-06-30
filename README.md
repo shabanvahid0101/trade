@@ -102,13 +102,13 @@ python live_predict.py --symbol BTC/USDT --timeframe 5m --sleep-seconds 300 --te
 Run one alert check with the saved 1h multi-horizon models:
 
 ```powershell
-python alert_bot.py --update --telegram --send-hold --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --min-agree 2 --min-confidence 0.50
+python alert_bot.py --update --update-fundamentals --telegram --send-hold --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --min-agree 1 --min-confidence 0.45 --strategy hybrid
 ```
 
 Run continuously on a Python server:
 
 ```powershell
-python alert_bot.py --mode loop --update --telegram --send-hold --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --horizons 1,3,6 --sleep-seconds 300
+python alert_bot.py --mode loop --update --update-fundamentals --telegram --send-hold --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --min-agree 1 --min-confidence 0.45 --strategy hybrid --sleep-seconds 300
 ```
 
 The included GitHub Actions workflow `.github/workflows/telegram-alert.yml` runs every 15 minutes and sends HOLD updates too. Add these repository secrets before enabling it:
@@ -131,10 +131,10 @@ python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timef
 Run one live paper-trading step and save the virtual account state in `paper_state.json`:
 
 ```powershell
-python paper_trader.py --mode single --update --telegram --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100
+python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid
 ```
 
-The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs every hour, updates `paper_state.json`, sends a Telegram status message, and commits the virtual account state back to the repository.
+The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs every hour, updates market/fundamental data, applies the hybrid trend/range strategy, sends a Telegram status message, and commits the virtual account state back to the repository.
 
 ## Strategy Optimization
 

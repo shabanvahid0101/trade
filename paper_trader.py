@@ -23,6 +23,7 @@ from crypto_predictor import (
     predict_next_price,
     send_telegram_message,
 )
+from strategy_rules import apply_hybrid_to_latest, apply_hybrid_to_returns
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -249,6 +250,20 @@ def run_backtest(args: argparse.Namespace) -> dict:
     rows = args.days * (24 if args.timeframe.endswith("h") else 24 * 12)
     meta_window = meta.tail(rows).reset_index(drop=True)
     predicted_window = predicted_return[-len(meta_window) :]
+    predicted_window = apply_hybrid_to_returns(
+        meta=meta_window,
+        predicted_return=predicted_window,
+        data=data,
+        strategy=args.strategy,
+        threshold=args.threshold,
+        range_lower=args.range_lower,
+        range_upper=args.range_upper,
+        range_atr_max=args.range_atr_max,
+        range_trend_max=args.range_trend_max,
+        range_width_min=args.range_width_min,
+        range_width_max=args.range_width_max,
+        range_lookback=args.range_lookback,
+    )
     result = backtest_predictions(
         meta_window,
         predicted_window,
@@ -263,6 +278,7 @@ def run_backtest(args: argparse.Namespace) -> dict:
         "end": str(meta_window["timestamp"].iloc[-1]),
         "days": args.days,
         "horizons": horizons,
+        "strategy": args.strategy,
         "backtest": result,
     }
     print(json.dumps(output, indent=2))
@@ -307,6 +323,19 @@ def run_single(args: argparse.Namespace) -> dict:
         horizon_results.append(predict_next_price(model, data, artifact))
 
     final = combine_multi_horizon_predictions(horizon_results, args.min_agree, args.min_confidence)
+    final = apply_hybrid_to_latest(
+        final=final,
+        data=data,
+        strategy=args.strategy,
+        threshold=args.threshold,
+        range_lower=args.range_lower,
+        range_upper=args.range_upper,
+        range_atr_max=args.range_atr_max,
+        range_trend_max=args.range_trend_max,
+        range_width_min=args.range_width_min,
+        range_width_max=args.range_width_max,
+        range_lookback=args.range_lookback,
+    )
     state_path = Path(args.state_file)
     state = load_state(state_path, args.initial_capital)
     trade_result = apply_signal(
@@ -331,6 +360,7 @@ def run_single(args: argparse.Namespace) -> dict:
         send_telegram_message(
             f"<b>Paper Trading {args.symbol}</b>\n"
             f"Signal: {final['signal']}\n"
+            f"Strategy: {final.get('strategy', 'model')} | Regime: {final.get('market_regime', 'model')}\n"
             f"Position: {position_name}\n"
             f"Price: ${final['current_price']:.2f}\n"
             f"Equity: ${trade_result['equity']:.2f}\n"
@@ -352,6 +382,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--horizons", default="1,3,6")
     parser.add_argument("--min-agree", type=int, default=2)
     parser.add_argument("--min-confidence", type=float, default=0.50)
+    parser.add_argument("--strategy", choices=["model", "range", "hybrid"], default="hybrid")
+    parser.add_argument("--range-lower", type=float, default=0.15)
+    parser.add_argument("--range-upper", type=float, default=0.75)
+    parser.add_argument("--range-atr-max", type=float, default=0.006)
+    parser.add_argument("--range-trend-max", type=float, default=0.002)
+    parser.add_argument("--range-width-min", type=float, default=0.005)
+    parser.add_argument("--range-width-max", type=float, default=0.04)
+    parser.add_argument("--range-lookback", type=int, default=48)
     parser.add_argument("--threshold", type=float, default=0.0015)
     parser.add_argument("--fee-rate", type=float, default=0.001)
     parser.add_argument("--leverage", type=float, default=1.0)
