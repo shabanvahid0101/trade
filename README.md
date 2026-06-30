@@ -160,6 +160,14 @@ Example walk-forward run with explicit regime filter grids:
 python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100 --horizon-sets "1,3,6;1,6;3,6;6" --confidence-grid "0.45,0.50" --min-agree-grid "1,2" --stop-loss-grid "0" --take-profit-grid "0,0.02" --atr-min-grid "0,0.003,0.006" --trend-min-grid "0,0.003,0.006" --trend-filter-grid "off,follow"
 ```
 
+The optimizer can also test a range-market mean-reversion layer:
+
+```powershell
+python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --train-days 7 --test-days 2 --step-days 2 --walkforward-days 16 --initial-capital 100 --horizon-sets "1,3,6;1,6;3,6;6" --confidence-grid "0.45,0.50" --min-agree-grid "1,2" --strategy-grid "model,hybrid,range" --range-lower-grid "0.15,0.20,0.25" --range-upper-grid "0.75,0.80,0.85" --range-atr-max-grid "0.006,0.008,0.012" --range-trend-max-grid "0.002,0.003,0.005"
+```
+
+`hybrid` uses the model in trending/unclear markets and switches to range mean-reversion when price is near rolling support/resistance inside a low-trend range.
+
 ## Trading Notes
 
 No model can predict crypto prices perfectly. Before using real money, require a stable out-of-sample edge after fees, slippage, and drawdown limits. Use small position sizing, stop-loss rules, and paper trading first.

@@ -110,10 +110,17 @@ def load_horizon_predictions(
     ).max(axis=1)
     sma_20 = ohlc["close"].rolling(20).mean()
     sma_50 = ohlc["close"].rolling(50).mean()
+    range_low = ohlc["low"].rolling(48).min().shift(1)
+    range_high = ohlc["high"].rolling(48).max().shift(1)
+    range_span = (range_high - range_low).replace(0, np.nan)
     ohlc["atr_14_pct"] = true_range.rolling(14).mean() / ohlc["close"]
     ohlc["trend_20_50"] = sma_20 / sma_50 - 1
     ohlc["trend_strength_pct"] = ohlc["trend_20_50"].abs()
     ohlc["volatility_20"] = np.log(ohlc["close"] / previous_close).rolling(20).std()
+    ohlc["range_low"] = range_low
+    ohlc["range_high"] = range_high
+    ohlc["range_position"] = (ohlc["close"] - range_low) / range_span
+    ohlc["range_width_pct"] = range_span / ohlc["close"]
     ohlc["next_open"] = ohlc["open"].shift(-1)
     ohlc["next_high"] = ohlc["high"].shift(-1)
     ohlc["next_low"] = ohlc["low"].shift(-1)
@@ -184,6 +191,90 @@ def build_ensemble_signal(
     return signal
 
 
+def is_range_regime(
+    row,
+    range_atr_max: float,
+    range_trend_max: float,
+    range_width_min: float,
+    range_width_max: float,
+) -> bool:
+    values = [
+        float(row.atr_14_pct),
+        float(row.trend_strength_pct),
+        float(row.range_width_pct),
+        float(row.range_position),
+    ]
+    if any(np.isnan(value) for value in values):
+        return False
+    return (
+        values[0] <= range_atr_max
+        and values[1] <= range_trend_max
+        and range_width_min <= values[2] <= range_width_max
+        and 0 <= values[3] <= 1
+    )
+
+
+def build_range_signal(
+    row,
+    range_lower: float,
+    range_upper: float,
+    range_atr_max: float,
+    range_trend_max: float,
+    range_width_min: float,
+    range_width_max: float,
+) -> int:
+    if not is_range_regime(row, range_atr_max, range_trend_max, range_width_min, range_width_max):
+        return 0
+    position = float(row.range_position)
+    if position <= range_lower:
+        return 1
+    if position >= range_upper:
+        return -1
+    return 0
+
+
+def build_strategy_signal(
+    row,
+    horizons: list[int],
+    min_confidence: float,
+    min_agree: int,
+    atr_min: float,
+    trend_min: float,
+    volatility_min: float,
+    trend_filter: str,
+    strategy: str,
+    range_lower: float,
+    range_upper: float,
+    range_atr_max: float,
+    range_trend_max: float,
+    range_width_min: float,
+    range_width_max: float,
+) -> int:
+    range_signal = build_range_signal(
+        row,
+        range_lower,
+        range_upper,
+        range_atr_max,
+        range_trend_max,
+        range_width_min,
+        range_width_max,
+    )
+    if strategy == "range":
+        return range_signal
+    if strategy == "hybrid" and is_range_regime(row, range_atr_max, range_trend_max, range_width_min, range_width_max):
+        return range_signal
+    return build_ensemble_signal(
+        row,
+        horizons,
+        min_confidence,
+        min_agree,
+        atr_min,
+        trend_min,
+        volatility_min,
+        trend_filter,
+    )
+
+
 def simulate_futures(
     frame: pd.DataFrame,
     horizons: list[int],
@@ -198,6 +289,13 @@ def simulate_futures(
     trend_min: float,
     volatility_min: float,
     trend_filter: str,
+    strategy: str,
+    range_lower: float,
+    range_upper: float,
+    range_atr_max: float,
+    range_trend_max: float,
+    range_width_min: float,
+    range_width_max: float,
 ) -> dict:
     capital = initial_capital
     position = 0
@@ -254,7 +352,7 @@ def simulate_futures(
     for row in frame.itertuples(index=False):
         timestamp = row.timestamp
         price = float(row.close)
-        signal = build_ensemble_signal(
+        signal = build_strategy_signal(
             row,
             horizons,
             min_confidence,
@@ -263,6 +361,13 @@ def simulate_futures(
             trend_min,
             volatility_min,
             trend_filter,
+            strategy,
+            range_lower,
+            range_upper,
+            range_atr_max,
+            range_trend_max,
+            range_width_min,
+            range_width_max,
         )
 
         if signal == 0 and position != 0:
@@ -318,7 +423,24 @@ def simulate_futures(
 
 
 def iter_grid(args: argparse.Namespace):
-    for horizons, min_confidence, min_agree, stop_loss, take_profit, atr_min, trend_min, volatility_min, trend_filter in itertools.product(
+    for (
+        horizons,
+        min_confidence,
+        min_agree,
+        stop_loss,
+        take_profit,
+        atr_min,
+        trend_min,
+        volatility_min,
+        trend_filter,
+        strategy,
+        range_lower,
+        range_upper,
+        range_atr_max,
+        range_trend_max,
+        range_width_min,
+        range_width_max,
+    ) in itertools.product(
         parse_horizon_sets(args.horizon_sets),
         parse_float_grid(args.confidence_grid),
         parse_int_grid(args.min_agree_grid),
@@ -328,14 +450,55 @@ def iter_grid(args: argparse.Namespace):
         parse_float_grid(args.trend_min_grid),
         parse_float_grid(args.volatility_min_grid),
         parse_string_grid(args.trend_filter_grid, {"off", "strength", "follow"}),
+        parse_string_grid(args.strategy_grid, {"model", "range", "hybrid"}),
+        parse_float_grid(args.range_lower_grid),
+        parse_float_grid(args.range_upper_grid),
+        parse_float_grid(args.range_atr_max_grid),
+        parse_float_grid(args.range_trend_max_grid),
+        parse_float_grid(args.range_width_min_grid),
+        parse_float_grid(args.range_width_max_grid),
     ):
-        if min_agree <= len(horizons):
-            yield horizons, min_confidence, min_agree, stop_loss, take_profit, atr_min, trend_min, volatility_min, trend_filter
+        if min_agree <= len(horizons) and range_lower < range_upper and range_width_min <= range_width_max:
+            yield (
+                horizons,
+                min_confidence,
+                min_agree,
+                stop_loss,
+                take_profit,
+                atr_min,
+                trend_min,
+                volatility_min,
+                trend_filter,
+                strategy,
+                range_lower,
+                range_upper,
+                range_atr_max,
+                range_trend_max,
+                range_width_min,
+                range_width_max,
+            )
 
 
 def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
     results = []
-    for horizons, min_confidence, min_agree, stop_loss, take_profit, atr_min, trend_min, volatility_min, trend_filter in iter_grid(args):
+    for (
+        horizons,
+        min_confidence,
+        min_agree,
+        stop_loss,
+        take_profit,
+        atr_min,
+        trend_min,
+        volatility_min,
+        trend_filter,
+        strategy,
+        range_lower,
+        range_upper,
+        range_atr_max,
+        range_trend_max,
+        range_width_min,
+        range_width_max,
+    ) in iter_grid(args):
         metrics = simulate_futures(
             frame=frame,
             horizons=horizons,
@@ -350,6 +513,13 @@ def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
             trend_min=trend_min,
             volatility_min=volatility_min,
             trend_filter=trend_filter,
+            strategy=strategy,
+            range_lower=range_lower,
+            range_upper=range_upper,
+            range_atr_max=range_atr_max,
+            range_trend_max=range_trend_max,
+            range_width_min=range_width_min,
+            range_width_max=range_width_max,
         )
         results.append(
             {
@@ -362,6 +532,13 @@ def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
                 "trend_min_pct": trend_min * 100,
                 "volatility_min_pct": volatility_min * 100,
                 "trend_filter": trend_filter,
+                "strategy": strategy,
+                "range_lower": range_lower,
+                "range_upper": range_upper,
+                "range_atr_max_pct": range_atr_max * 100,
+                "range_trend_max_pct": range_trend_max * 100,
+                "range_width_min_pct": range_width_min * 100,
+                "range_width_max_pct": range_width_max * 100,
                 **metrics,
             }
         )
@@ -437,7 +614,9 @@ def config_key(config: dict) -> str:
         f"conf={config['min_confidence']}|agree={config['min_agree']}|"
         f"sl={config['stop_loss_pct']}|tp={config['take_profit_pct']}|"
         f"atr={config.get('atr_min_pct', 0)}|trend={config.get('trend_min_pct', 0)}|"
-        f"vol={config.get('volatility_min_pct', 0)}|trend_filter={config.get('trend_filter', 'off')}"
+        f"vol={config.get('volatility_min_pct', 0)}|trend_filter={config.get('trend_filter', 'off')}|"
+        f"strategy={config.get('strategy', 'model')}|"
+        f"range={config.get('range_lower', 0)}-{config.get('range_upper', 1)}"
     )
 
 
@@ -471,6 +650,13 @@ def run_walk_forward(args: argparse.Namespace) -> dict:
             trend_min=best_config.get("trend_min_pct", 0) / 100,
             volatility_min=best_config.get("volatility_min_pct", 0) / 100,
             trend_filter=best_config.get("trend_filter", "off"),
+            strategy=best_config.get("strategy", "model"),
+            range_lower=best_config.get("range_lower", 0.2),
+            range_upper=best_config.get("range_upper", 0.8),
+            range_atr_max=best_config.get("range_atr_max_pct", 0.8) / 100,
+            range_trend_max=best_config.get("range_trend_max_pct", 0.3) / 100,
+            range_width_min=best_config.get("range_width_min_pct", 0.8) / 100,
+            range_width_max=best_config.get("range_width_max_pct", 6.0) / 100,
         )
         folds.append(
             {
@@ -489,6 +675,13 @@ def run_walk_forward(args: argparse.Namespace) -> dict:
                     "trend_min_pct": best_config.get("trend_min_pct", 0),
                     "volatility_min_pct": best_config.get("volatility_min_pct", 0),
                     "trend_filter": best_config.get("trend_filter", "off"),
+                    "strategy": best_config.get("strategy", "model"),
+                    "range_lower": best_config.get("range_lower", 0.2),
+                    "range_upper": best_config.get("range_upper", 0.8),
+                    "range_atr_max_pct": best_config.get("range_atr_max_pct", 0.8),
+                    "range_trend_max_pct": best_config.get("range_trend_max_pct", 0.3),
+                    "range_width_min_pct": best_config.get("range_width_min_pct", 0.8),
+                    "range_width_max_pct": best_config.get("range_width_max_pct", 6.0),
                     "train_final_capital": best_config["final_capital"],
                     "train_return_pct": best_config["total_return_pct"],
                     "train_drawdown_pct": best_config["max_drawdown_pct"],
@@ -546,6 +739,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--trend-min-grid", default="0,0.003,0.006")
     parser.add_argument("--volatility-min-grid", default="0")
     parser.add_argument("--trend-filter-grid", default="off,follow")
+    parser.add_argument("--strategy-grid", default="model,hybrid")
+    parser.add_argument("--range-lower-grid", default="0.20")
+    parser.add_argument("--range-upper-grid", default="0.80")
+    parser.add_argument("--range-atr-max-grid", default="0.008")
+    parser.add_argument("--range-trend-max-grid", default="0.003")
+    parser.add_argument("--range-width-min-grid", default="0.008")
+    parser.add_argument("--range-width-max-grid", default="0.06")
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--fee-rate", type=float, default=0.001)
     parser.add_argument("--leverage", type=float, default=1.0)
