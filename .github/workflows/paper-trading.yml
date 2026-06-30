@@ -52,5 +52,6 @@ jobs:
             echo "No paper trading state changes to commit."
           else
             git commit -m "Update paper trading state"
+            git pull --rebase origin main
             git push
           fi
