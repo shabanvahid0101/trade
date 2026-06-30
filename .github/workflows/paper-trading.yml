@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: paper-trading
+  group: trading-repo-writes
   cancel-in-progress: false
 
 jobs:

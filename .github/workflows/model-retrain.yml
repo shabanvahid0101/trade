@@ -1,0 +1,57 @@
+name: Nightly Model Retrain
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub cron is UTC. This runs every night at 02:00 UTC.
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: trading-repo-writes
+  cancel-in-progress: false
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Retrain one hour futures fundamentals models
+        run: |
+          python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 24 --min-selected-features 10 --target-mode classification --threshold 0.0015 --min-confidence 0.50 --market-mode futures --leverage 1 --training-verbose 2
+
+      - name: Validate refreshed models
+        run: |
+          python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --symbol BTC/USDT --timeframe 1h --train-days 7 --test-days 2 --step-days 2 --walkforward-days 16 --initial-capital 100 --horizon-sets "1,3,6;1,6;3,6;6" --confidence-grid "0.45,0.50" --min-agree-grid "1,2" --stop-loss-grid "0" --take-profit-grid "0,0.02" --atr-min-grid "0" --trend-min-grid "0" --volatility-min-grid "0" --trend-filter-grid "off" --strategy-grid "model,hybrid,range" --range-lower-grid "0.15,0.20,0.25" --range-upper-grid "0.75,0.80,0.85" --range-atr-max-grid "0.006,0.008,0.012" --range-trend-max-grid "0.002,0.003,0.005" --range-width-min-grid "0.005" --range-width-max-grid "0.04,0.06" --output strategy_walkforward_retrain.json
+
+      - name: Commit refreshed models
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dataset/1h-btc_history.csv dataset/1h-btc_fundamentals.csv models/BTCUSDT_1h_h1.keras models/BTCUSDT_1h_h1_artifact.pkl models/BTCUSDT_1h_h3.keras models/BTCUSDT_1h_h3_artifact.pkl models/BTCUSDT_1h_h6.keras models/BTCUSDT_1h_h6_artifact.pkl scaler.pkl
+          if git diff --cached --quiet; then
+            echo "No model or dataset changes to commit."
+          else
+            git commit -m "Nightly retrain one hour models"
+            git pull --rebase origin main
+            git push
+          fi
