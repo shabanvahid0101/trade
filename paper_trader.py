@@ -12,10 +12,11 @@ from crypto_predictor import (
     backtest_predictions,
     class_predictions_to_signal_returns,
     combine_multi_horizon_predictions,
-    fetch_and_update_data,
+    fetch_and_update_with_fallbacks,
     horizon_model_paths,
     load_artifacts,
     load_price_csv,
+    parse_exchange_names,
     prepare_datasets,
     predict_next_price,
     send_telegram_message,
@@ -230,12 +231,13 @@ def run_backtest(args: argparse.Namespace) -> dict:
 
 def run_single(args: argparse.Namespace) -> dict:
     data = (
-        fetch_and_update_data(
+        fetch_and_update_with_fallbacks(
             symbol=args.symbol,
             timeframe=args.timeframe,
             file=args.data,
+            exchange_names=parse_exchange_names(args.exchange_fallbacks),
             max_batches=args.max_fetch_batches,
-            exchange_name=args.exchange,
+            max_data_age_hours=args.max_data_age_hours,
         )
         if args.update
         else load_price_csv(args.data)
@@ -289,6 +291,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--symbol", default="BTC/USDT")
     parser.add_argument("--timeframe", default="1h")
     parser.add_argument("--exchange", default="binance")
+    parser.add_argument("--exchange-fallbacks", default="binance,okx,kucoin,bybit")
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
     parser.add_argument("--horizons", default="1,3,6")
     parser.add_argument("--min-agree", type=int, default=2)
@@ -299,6 +302,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--max-train-rows", type=int, default=5000)
     parser.add_argument("--max-fetch-batches", type=int, default=5)
+    parser.add_argument("--max-data-age-hours", type=float, default=4.0)
     parser.add_argument("--days", type=int, default=7)
     parser.add_argument("--state-file", default=str(DEFAULT_STATE_PATH))
     parser.add_argument("--mode", choices=["backtest", "single"], default="backtest")

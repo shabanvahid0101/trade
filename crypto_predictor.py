@@ -310,6 +310,60 @@ def fetch_and_update_data(
     return combined
 
 
+def parse_exchange_names(value: str) -> list[str]:
+    exchanges = [part.strip() for part in value.split(",") if part.strip()]
+    if not exchanges:
+        raise ValueError("At least one exchange name is required.")
+    return exchanges
+
+
+def assert_data_freshness(df: pd.DataFrame, timeframe: str, max_age_hours: float) -> None:
+    if max_age_hours <= 0:
+        return
+    if df.empty:
+        raise RuntimeError("Dataset is empty after update.")
+    last_timestamp = pd.Timestamp(df["timestamp"].max())
+    now = pd.Timestamp.utcnow().tz_localize(None)
+    age_hours = (now - last_timestamp).total_seconds() / 3600
+    timeframe_hours = timeframe_to_milliseconds(timeframe) / (60 * 60 * 1000)
+    allowed_age = max(max_age_hours, timeframe_hours * 2)
+    print(f"Data freshness: last={last_timestamp}, now_utc={now}, age_hours={age_hours:.2f}, allowed={allowed_age:.2f}")
+    if age_hours > allowed_age:
+        raise RuntimeError(
+            f"Stale market data: last candle is {last_timestamp} UTC "
+            f"({age_hours:.2f} hours old), max allowed is {allowed_age:.2f} hours."
+        )
+
+
+def fetch_and_update_with_fallbacks(
+    symbol: str,
+    timeframe: str,
+    file: str | Path,
+    exchange_names: list[str],
+    max_batches: int,
+    max_data_age_hours: float = 0,
+) -> pd.DataFrame:
+    errors = []
+    for exchange_name in exchange_names:
+        try:
+            print(f"Updating market data from exchange: {exchange_name}")
+            data = fetch_and_update_data(
+                symbol=symbol,
+                timeframe=timeframe,
+                file=file,
+                max_batches=max_batches,
+                exchange_name=exchange_name,
+            )
+            assert_data_freshness(data, timeframe=timeframe, max_age_hours=max_data_age_hours)
+            return data
+        except Exception as exc:
+            message = f"{exchange_name}: {exc}"
+            print(f"Market data update failed: {message}")
+            logging.error("Market data update failed: %s", message)
+            errors.append(message)
+    raise RuntimeError("All market data exchanges failed or returned stale data: " + " | ".join(errors))
+
+
 def fetch_ohlcv_batches(
     exchange,
     symbol: str,

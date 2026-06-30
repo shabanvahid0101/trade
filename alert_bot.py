@@ -8,10 +8,11 @@ from tensorflow.keras.models import load_model
 from crypto_predictor import (
     DATA_DIR,
     combine_multi_horizon_predictions,
-    fetch_and_update_data,
+    fetch_and_update_with_fallbacks,
     horizon_model_paths,
     load_artifacts,
     load_price_csv,
+    parse_exchange_names,
     predict_next_price,
     send_telegram_message,
 )
@@ -70,12 +71,13 @@ def build_alert_message(symbol: str, timeframe: str, result: dict, horizon_resul
 def run_once(args: argparse.Namespace) -> dict:
     data_path = Path(args.data)
     data = (
-        fetch_and_update_data(
+        fetch_and_update_with_fallbacks(
             symbol=args.symbol,
             timeframe=args.timeframe,
             file=data_path,
+            exchange_names=parse_exchange_names(args.exchange_fallbacks),
             max_batches=args.max_fetch_batches,
-            exchange_name=args.exchange,
+            max_data_age_hours=args.max_data_age_hours,
         )
         if args.update
         else load_price_csv(data_path)
@@ -148,11 +150,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--symbol", default="BTC/USDT")
     parser.add_argument("--timeframe", default="1h")
     parser.add_argument("--exchange", default="binance")
+    parser.add_argument("--exchange-fallbacks", default="binance,okx,kucoin,bybit")
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
     parser.add_argument("--horizons", default="1,3,6")
     parser.add_argument("--min-agree", type=int, default=2)
     parser.add_argument("--min-confidence", type=float, default=0.50)
     parser.add_argument("--max-fetch-batches", type=int, default=20)
+    parser.add_argument("--max-data-age-hours", type=float, default=4.0)
     parser.add_argument("--mode", choices=["single", "loop"], default="single")
     parser.add_argument("--sleep-seconds", type=int, default=300)
     parser.add_argument("--cooldown-seconds", type=int, default=3600)
