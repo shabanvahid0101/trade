@@ -122,11 +122,13 @@ The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs 
 
 ## Strategy Optimization
 
-Search for better 1h paper-trading settings across confidence, horizon agreement, stop loss, and take profit:
+Search for better 1h paper-trading settings across confidence, horizon agreement, stop loss, take profit, and market regime filters:
 
 ```powershell
 python strategy_optimizer.py --data dataset/1h-btc_history.csv --days 14 --initial-capital 100 --top 10
 ```
+
+Regime filter grids can skip low-quality candles. `--atr-min-grid` requires minimum ATR percent, `--trend-min-grid` requires minimum 20/50 SMA trend distance, `--volatility-min-grid` requires minimum rolling volatility, and `--trend-filter-grid off,follow` tests whether long trades should follow positive trend and short trades should follow negative trend.
 
 The optimizer writes `strategy_optimization.json` locally and prints the top configurations. Review results out of sample before changing live paper-trading settings.
 
@@ -134,6 +136,12 @@ Walk-forward validation chooses the best config on a rolling training window and
 
 ```powershell
 python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100
+```
+
+Example walk-forward run with explicit regime filter grids:
+
+```powershell
+python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100 --horizon-sets "1,3,6;1,6;3,6;6" --confidence-grid "0.45,0.50" --min-agree-grid "1,2" --stop-loss-grid "0" --take-profit-grid "0,0.02" --atr-min-grid "0,0.003,0.006" --trend-min-grid "0,0.003,0.006" --trend-filter-grid "off,follow"
 ```
 
 ## Trading Notes

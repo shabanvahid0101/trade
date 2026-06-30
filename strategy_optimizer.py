@@ -35,6 +35,16 @@ def parse_horizon_sets(value: str) -> list[list[int]]:
     return sets
 
 
+def parse_string_grid(value: str, allowed: set[str]) -> list[str]:
+    values = [part.strip().lower() for part in value.split(",") if part.strip()]
+    invalid = sorted(set(values) - allowed)
+    if invalid:
+        raise ValueError(f"Invalid grid values: {invalid}. Allowed values: {sorted(allowed)}")
+    if not values:
+        raise ValueError("Grid must contain at least one value.")
+    return values
+
+
 def load_horizon_predictions(
     data: pd.DataFrame,
     symbol: str,
@@ -78,6 +88,21 @@ def load_horizon_predictions(
         merged = merged.merge(frame, on="timestamp", how="inner")
 
     ohlc = data[["timestamp", "open", "high", "low", "close"]].copy().sort_values("timestamp")
+    previous_close = ohlc["close"].shift(1)
+    true_range = pd.concat(
+        [
+            ohlc["high"] - ohlc["low"],
+            (ohlc["high"] - previous_close).abs(),
+            (ohlc["low"] - previous_close).abs(),
+        ],
+        axis=1,
+    ).max(axis=1)
+    sma_20 = ohlc["close"].rolling(20).mean()
+    sma_50 = ohlc["close"].rolling(50).mean()
+    ohlc["atr_14_pct"] = true_range.rolling(14).mean() / ohlc["close"]
+    ohlc["trend_20_50"] = sma_20 / sma_50 - 1
+    ohlc["trend_strength_pct"] = ohlc["trend_20_50"].abs()
+    ohlc["volatility_20"] = np.log(ohlc["close"] / previous_close).rolling(20).std()
     ohlc["next_open"] = ohlc["open"].shift(-1)
     ohlc["next_high"] = ohlc["high"].shift(-1)
     ohlc["next_low"] = ohlc["low"].shift(-1)
@@ -86,7 +111,23 @@ def load_horizon_predictions(
     return merged.dropna(subset=["next_high", "next_low", "next_close"]).reset_index(drop=True)
 
 
-def build_ensemble_signal(row, horizons: list[int], min_confidence: float, min_agree: int) -> int:
+def build_ensemble_signal(
+    row,
+    horizons: list[int],
+    min_confidence: float,
+    min_agree: int,
+    atr_min: float,
+    trend_min: float,
+    volatility_min: float,
+    trend_filter: str,
+) -> int:
+    if float(row.atr_14_pct) < atr_min:
+        return 0
+    if trend_filter == "strength" and float(row.trend_strength_pct) < trend_min:
+        return 0
+    if float(row.volatility_20) < volatility_min:
+        return 0
+
     votes = []
     for horizon in horizons:
         predicted_class = int(getattr(row, f"class_h{horizon}"))
@@ -96,10 +137,19 @@ def build_ensemble_signal(row, horizons: list[int], min_confidence: float, min_a
     long_votes = sum(vote == 2 for vote in votes)
     short_votes = sum(vote == 0 for vote in votes)
     if long_votes >= min_agree and short_votes == 0:
-        return 1
-    if short_votes >= min_agree and long_votes == 0:
-        return -1
-    return 0
+        signal = 1
+    elif short_votes >= min_agree and long_votes == 0:
+        signal = -1
+    else:
+        return 0
+
+    if trend_filter == "follow":
+        trend = float(row.trend_20_50)
+        if signal == 1 and trend < trend_min:
+            return 0
+        if signal == -1 and trend > -trend_min:
+            return 0
+    return signal
 
 
 def simulate_futures(
@@ -112,6 +162,10 @@ def simulate_futures(
     leverage: float,
     stop_loss_pct: float,
     take_profit_pct: float,
+    atr_min: float,
+    trend_min: float,
+    volatility_min: float,
+    trend_filter: str,
 ) -> dict:
     capital = initial_capital
     position = 0
@@ -168,7 +222,16 @@ def simulate_futures(
     for row in frame.itertuples(index=False):
         timestamp = row.timestamp
         price = float(row.close)
-        signal = build_ensemble_signal(row, horizons, min_confidence, min_agree)
+        signal = build_ensemble_signal(
+            row,
+            horizons,
+            min_confidence,
+            min_agree,
+            atr_min,
+            trend_min,
+            volatility_min,
+            trend_filter,
+        )
 
         if signal == 0 and position != 0:
             close_position(timestamp, price, "signal_hold")
@@ -223,20 +286,24 @@ def simulate_futures(
 
 
 def iter_grid(args: argparse.Namespace):
-    for horizons, min_confidence, min_agree, stop_loss, take_profit in itertools.product(
+    for horizons, min_confidence, min_agree, stop_loss, take_profit, atr_min, trend_min, volatility_min, trend_filter in itertools.product(
         parse_horizon_sets(args.horizon_sets),
         parse_float_grid(args.confidence_grid),
         parse_int_grid(args.min_agree_grid),
         parse_float_grid(args.stop_loss_grid),
         parse_float_grid(args.take_profit_grid),
+        parse_float_grid(args.atr_min_grid),
+        parse_float_grid(args.trend_min_grid),
+        parse_float_grid(args.volatility_min_grid),
+        parse_string_grid(args.trend_filter_grid, {"off", "strength", "follow"}),
     ):
         if min_agree <= len(horizons):
-            yield horizons, min_confidence, min_agree, stop_loss, take_profit
+            yield horizons, min_confidence, min_agree, stop_loss, take_profit, atr_min, trend_min, volatility_min, trend_filter
 
 
 def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
     results = []
-    for horizons, min_confidence, min_agree, stop_loss, take_profit in iter_grid(args):
+    for horizons, min_confidence, min_agree, stop_loss, take_profit, atr_min, trend_min, volatility_min, trend_filter in iter_grid(args):
         metrics = simulate_futures(
             frame=frame,
             horizons=horizons,
@@ -247,6 +314,10 @@ def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
             leverage=args.leverage,
             stop_loss_pct=stop_loss,
             take_profit_pct=take_profit,
+            atr_min=atr_min,
+            trend_min=trend_min,
+            volatility_min=volatility_min,
+            trend_filter=trend_filter,
         )
         results.append(
             {
@@ -255,6 +326,10 @@ def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
                 "min_agree": min_agree,
                 "stop_loss_pct": stop_loss * 100,
                 "take_profit_pct": take_profit * 100,
+                "atr_min_pct": atr_min * 100,
+                "trend_min_pct": trend_min * 100,
+                "volatility_min_pct": volatility_min * 100,
+                "trend_filter": trend_filter,
                 **metrics,
             }
         )
@@ -314,7 +389,9 @@ def config_key(config: dict) -> str:
     return (
         f"h={','.join(map(str, config['horizons']))}|"
         f"conf={config['min_confidence']}|agree={config['min_agree']}|"
-        f"sl={config['stop_loss_pct']}|tp={config['take_profit_pct']}"
+        f"sl={config['stop_loss_pct']}|tp={config['take_profit_pct']}|"
+        f"atr={config.get('atr_min_pct', 0)}|trend={config.get('trend_min_pct', 0)}|"
+        f"vol={config.get('volatility_min_pct', 0)}|trend_filter={config.get('trend_filter', 'off')}"
     )
 
 
@@ -344,6 +421,10 @@ def run_walk_forward(args: argparse.Namespace) -> dict:
             leverage=args.leverage,
             stop_loss_pct=best_config["stop_loss_pct"] / 100,
             take_profit_pct=best_config["take_profit_pct"] / 100,
+            atr_min=best_config.get("atr_min_pct", 0) / 100,
+            trend_min=best_config.get("trend_min_pct", 0) / 100,
+            volatility_min=best_config.get("volatility_min_pct", 0) / 100,
+            trend_filter=best_config.get("trend_filter", "off"),
         )
         folds.append(
             {
@@ -358,6 +439,10 @@ def run_walk_forward(args: argparse.Namespace) -> dict:
                     "min_agree": best_config["min_agree"],
                     "stop_loss_pct": best_config["stop_loss_pct"],
                     "take_profit_pct": best_config["take_profit_pct"],
+                    "atr_min_pct": best_config.get("atr_min_pct", 0),
+                    "trend_min_pct": best_config.get("trend_min_pct", 0),
+                    "volatility_min_pct": best_config.get("volatility_min_pct", 0),
+                    "trend_filter": best_config.get("trend_filter", "off"),
                     "train_final_capital": best_config["final_capital"],
                     "train_return_pct": best_config["total_return_pct"],
                     "train_drawdown_pct": best_config["max_drawdown_pct"],
@@ -409,6 +494,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-agree-grid", default="1,2,3")
     parser.add_argument("--stop-loss-grid", default="0,0.005,0.01")
     parser.add_argument("--take-profit-grid", default="0,0.01,0.02")
+    parser.add_argument("--atr-min-grid", default="0,0.003,0.006")
+    parser.add_argument("--trend-min-grid", default="0,0.003,0.006")
+    parser.add_argument("--volatility-min-grid", default="0")
+    parser.add_argument("--trend-filter-grid", default="off,follow")
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--fee-rate", type=float, default=0.001)
     parser.add_argument("--leverage", type=float, default=1.0)
