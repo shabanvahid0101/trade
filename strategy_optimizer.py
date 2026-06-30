@@ -14,7 +14,6 @@ from crypto_predictor import (
     horizon_model_paths,
     load_artifacts,
     load_price_csv,
-    prepare_datasets,
 )
 
 
@@ -69,20 +68,24 @@ def load_horizon_predictions(
             raise FileNotFoundError(f"Missing model or artifact for horizon {horizon}: {model_path}")
 
         artifact = load_artifacts(artifact_path)
-        split = prepare_datasets(
-            data,
-            sequence_length=int(artifact["sequence_length"]),
+        feature_columns = artifact["feature_columns"]
+        sequence_length = int(artifact["sequence_length"])
+        featured = prepare_historical_features(
+            data=data,
             horizon=int(artifact["horizon"]),
             timeframe=timeframe,
             max_rows=max_rows,
-            feature_columns=artifact["feature_columns"],
-            target_mode=artifact["target_mode"],
-            target_threshold=float(artifact["target_threshold"]),
-            feature_selection="none",
+            feature_columns=feature_columns,
+        )
+        features = featured[feature_columns].to_numpy(dtype=np.float32)
+        scaled_features = artifact["feature_scaler"].transform(features)
+        X = np.asarray(
+            [scaled_features[end_idx - sequence_length + 1 : end_idx + 1] for end_idx in range(sequence_length - 1, len(featured))],
+            dtype=np.float32,
         )
         model = load_model(model_path)
-        probabilities = model.predict(split.X_test, verbose=0)
-        frame = split.meta_test[["timestamp", "close"]].copy()
+        probabilities = model.predict(X, verbose=0)
+        frame = featured[["timestamp", "close"]].iloc[sequence_length - 1 :].reset_index(drop=True).copy()
         frame[f"class_h{horizon}"] = probabilities.argmax(axis=1).astype(int)
         frame[f"confidence_h{horizon}"] = probabilities.max(axis=1)
         frame[f"short_prob_h{horizon}"] = probabilities[:, 0]
@@ -117,6 +120,27 @@ def load_horizon_predictions(
     ohlc["next_close"] = ohlc["close"].shift(-1)
     merged = merged.drop(columns=["close"]).merge(ohlc, on="timestamp", how="inner")
     return merged.dropna(subset=["next_high", "next_low", "next_close"]).reset_index(drop=True)
+
+
+def prepare_historical_features(
+    data: pd.DataFrame,
+    horizon: int,
+    timeframe: str,
+    max_rows: int,
+    feature_columns: list[str],
+) -> pd.DataFrame:
+    from crypto_predictor import add_features, latest_continuous_block, timeframe_to_milliseconds
+
+    frame = latest_continuous_block(data, timeframe=timeframe)
+    if max_rows is not None and max_rows > 0 and len(frame) > max_rows + 250:
+        frame = frame.tail(max_rows + 250).reset_index(drop=True)
+    featured = add_features(frame, horizon=horizon, require_target=True, feature_columns=feature_columns)
+    if max_rows is not None and max_rows > 0 and len(featured) > max_rows:
+        featured = featured.tail(max_rows).reset_index(drop=True)
+    gap_count = int((featured["timestamp"].diff() > pd.to_timedelta(timeframe_to_milliseconds(timeframe), unit="ms") * 1.5).sum())
+    if gap_count:
+        raise ValueError(f"Historical prediction data contains {gap_count} timestamp gaps after repair.")
+    return featured
 
 
 def build_ensemble_signal(

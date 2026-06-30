@@ -16,10 +16,10 @@ from crypto_predictor import (
     combine_multi_horizon_predictions,
     fetch_and_update_with_fallbacks,
     horizon_model_paths,
+    latest_continuous_block,
     load_artifacts,
     load_price_csv,
     parse_exchange_names,
-    prepare_datasets,
     predict_next_price,
     send_telegram_message,
 )
@@ -152,22 +152,25 @@ def build_historical_ensemble(
         model_path, artifact_path = horizon_model_paths(symbol, timeframe, horizon)
         artifact = load_artifacts(artifact_path)
         target_threshold = float(artifact["target_threshold"])
-        split = prepare_datasets(
-            data,
-            sequence_length=int(artifact["sequence_length"]),
+        featured = build_historical_feature_frame(
+            data=data,
             horizon=int(artifact["horizon"]),
             timeframe=timeframe,
             max_rows=max_rows,
             feature_columns=artifact["feature_columns"],
-            target_mode=artifact["target_mode"],
-            target_threshold=target_threshold,
-            feature_selection="none",
+        )
+        sequence_length = int(artifact["sequence_length"])
+        features = featured[artifact["feature_columns"]].to_numpy(dtype=np.float32)
+        scaled_features = artifact["feature_scaler"].transform(features)
+        X = np.asarray(
+            [scaled_features[end_idx - sequence_length + 1 : end_idx + 1] for end_idx in range(sequence_length - 1, len(featured))],
+            dtype=np.float32,
         )
         model = load_model(model_path)
-        probabilities = model.predict(split.X_test, verbose=0)
+        probabilities = model.predict(X, verbose=0)
         predicted_class = probabilities.argmax(axis=1)
         predicted_class[probabilities.max(axis=1) < min_confidence] = 1
-        frame = split.meta_test[["timestamp", "close", "future_close", "target_return"]].copy()
+        frame = featured[["timestamp", "close", "future_close", "target_return"]].iloc[sequence_length - 1 :].reset_index(drop=True).copy()
         frame[f"class_h{horizon}"] = predicted_class
         frame[f"confidence_h{horizon}"] = probabilities.max(axis=1)
         prediction_frames.append(frame[["timestamp", f"class_h{horizon}", f"confidence_h{horizon}"]])
@@ -194,6 +197,27 @@ def build_historical_ensemble(
 
     predicted_return = class_predictions_to_signal_returns(np.array(final_class), target_threshold)
     return merged, predicted_return
+
+
+def build_historical_feature_frame(
+    data: pd.DataFrame,
+    horizon: int,
+    timeframe: str,
+    max_rows: int,
+    feature_columns: list[str],
+) -> pd.DataFrame:
+    from crypto_predictor import add_features, timeframe_to_milliseconds
+
+    frame = latest_continuous_block(data, timeframe=timeframe)
+    if max_rows is not None and max_rows > 0 and len(frame) > max_rows + 250:
+        frame = frame.tail(max_rows + 250).reset_index(drop=True)
+    featured = add_features(frame, horizon=horizon, require_target=True, feature_columns=feature_columns)
+    if max_rows is not None and max_rows > 0 and len(featured) > max_rows:
+        featured = featured.tail(max_rows).reset_index(drop=True)
+    gap_count = int((featured["timestamp"].diff() > pd.to_timedelta(timeframe_to_milliseconds(timeframe), unit="ms") * 1.5).sum())
+    if gap_count:
+        raise ValueError(f"Historical paper data contains {gap_count} timestamp gaps after repair.")
+    return featured
 
 
 def run_backtest(args: argparse.Namespace) -> dict:
