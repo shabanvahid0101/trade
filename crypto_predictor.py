@@ -18,6 +18,14 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.preprocessing import RobustScaler
 
+from fundamental_data import (
+    FUNDAMENTAL_FEATURE_COLUMNS,
+    add_fundamental_features,
+    load_fundamental_csv,
+    merge_fundamentals_asof,
+    update_fundamental_file,
+)
+
 try:
     import ccxt
 except ImportError:  # Allows offline evaluation on an existing CSV.
@@ -104,10 +112,16 @@ ADVANCED_FEATURE_COLUMNS = [
     "weekday_cos",
 ]
 
+ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS = [
+    *ADVANCED_FEATURE_COLUMNS,
+    *FUNDAMENTAL_FEATURE_COLUMNS,
+]
+
 FEATURE_COLUMNS = ADVANCED_FEATURE_COLUMNS
 FEATURE_SETS = {
     "core": CORE_FEATURE_COLUMNS,
     "advanced": ADVANCED_FEATURE_COLUMNS,
+    "advanced-fundamental": ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS,
 }
 
 
@@ -138,6 +152,45 @@ def safe_symbol_name(symbol: str) -> str:
 def horizon_model_paths(symbol: str, timeframe: str, horizon: int) -> tuple[Path, Path]:
     prefix = f"{safe_symbol_name(symbol)}_{timeframe}_h{horizon}"
     return MODELS_DIR / f"{prefix}.keras", MODELS_DIR / f"{prefix}_artifact.pkl"
+
+
+def default_fundamental_data_path(price_path: str | Path) -> Path:
+    path = Path(price_path)
+    stem = path.stem.replace("_history", "").replace("-history", "")
+    return path.with_name(f"{stem}_fundamentals.csv")
+
+
+def columns_need_fundamentals(feature_columns: list[str] | None) -> bool:
+    return bool(feature_columns) and any(column in FUNDAMENTAL_FEATURE_COLUMNS for column in feature_columns)
+
+
+def attach_fundamentals(
+    data: pd.DataFrame,
+    data_path: str | Path,
+    symbol: str,
+    timeframe: str,
+    fundamental_data: str | Path | None = None,
+    update_fundamentals: bool = False,
+    required: bool = False,
+) -> pd.DataFrame:
+    path = Path(fundamental_data) if fundamental_data else default_fundamental_data_path(data_path)
+    if update_fundamentals:
+        update_fundamental_file(market_data=data_path, output=path, symbol=symbol, timeframe=timeframe)
+    if not path.exists():
+        if required:
+            raise FileNotFoundError(
+                f"Fundamental data file is required but does not exist: {path}. "
+                "Run fundamental_data.py or pass --update-fundamentals."
+            )
+        return data
+    fundamentals = load_fundamental_csv(path)
+    if fundamentals.empty:
+        if required:
+            raise ValueError(f"Fundamental data file is empty: {path}")
+        return data
+    enriched = merge_fundamentals_asof(data, fundamentals)
+    print(f"Attached fundamental data from {path}: rows={len(fundamentals)}")
+    return enriched
 
 
 @dataclass(frozen=True)
@@ -486,7 +539,12 @@ def latest_continuous_block(df: pd.DataFrame, timeframe: str = "5m") -> pd.DataF
     return df.iloc[last_gap_idx:].reset_index(drop=True)
 
 
-def add_features(df: pd.DataFrame, horizon: int = 1, require_target: bool = True) -> pd.DataFrame:
+def add_features(
+    df: pd.DataFrame,
+    horizon: int = 1,
+    require_target: bool = True,
+    feature_columns: list[str] | None = None,
+) -> pd.DataFrame:
     df = df.copy().sort_values("timestamp").reset_index(drop=True)
     close = df["close"].replace(0, np.nan)
     high = df["high"]
@@ -612,10 +670,12 @@ def add_features(df: pd.DataFrame, horizon: int = 1, require_target: bool = True
     nearest_fib_distance[valid_fib_rows] = np.nanmin(fib_distance[valid_fib_rows], axis=1)
     df["fib_reaction"] = nearest_fib_distance / close
 
+    df = add_fundamental_features(df)
+
     df["future_close"] = close.shift(-horizon)
     df["target_return"] = df["future_close"] / close - 1
     df = df.replace([np.inf, -np.inf], np.nan)
-    required_columns = FEATURE_COLUMNS + (["target_return", "future_close"] if require_target else [])
+    required_columns = (feature_columns or FEATURE_COLUMNS) + (["target_return", "future_close"] if require_target else [])
     return df.dropna(subset=required_columns).reset_index(drop=True)
 
 
@@ -727,7 +787,7 @@ def prepare_datasets(
     df = latest_continuous_block(df, timeframe=timeframe)
     if max_rows is not None and max_rows > 0 and len(df) > max_rows + 250:
         df = df.tail(max_rows + 250).reset_index(drop=True)
-    featured = add_features(df, horizon=horizon, require_target=True)
+    featured = add_features(df, horizon=horizon, require_target=True, feature_columns=feature_columns)
     if max_rows is not None and max_rows > 0 and len(featured) > max_rows:
         featured = featured.tail(max_rows).reset_index(drop=True)
     featured_gap_count = int((featured["timestamp"].diff() > pd.to_timedelta(timeframe_to_milliseconds(timeframe), unit="ms") * 1.5).sum())
@@ -1122,7 +1182,9 @@ def backtest_futures_long_short(
 
 
 def save_artifacts(split: SplitData, metrics: dict, path: str | Path = ARTIFACT_PATH) -> None:
-    if split.feature_columns == ADVANCED_FEATURE_COLUMNS:
+    if split.feature_columns == ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS:
+        feature_set = "advanced-fundamental"
+    elif split.feature_columns == ADVANCED_FEATURE_COLUMNS:
         feature_set = "advanced"
     elif split.feature_columns == CORE_FEATURE_COLUMNS:
         feature_set = "core"
@@ -1155,11 +1217,11 @@ def predict_next_price(model, data: pd.DataFrame, artifact: dict) -> dict:
     horizon = int(artifact["horizon"])
     timeframe = artifact.get("timeframe", "5m")
     data = latest_continuous_block(data, timeframe=timeframe)
-    featured = add_features(data, horizon=horizon, require_target=False)
+    feature_columns = artifact["feature_columns"]
+    featured = add_features(data, horizon=horizon, require_target=False, feature_columns=feature_columns)
     if len(featured) < sequence_length:
         raise ValueError("Not enough processed rows for prediction.")
 
-    feature_columns = artifact["feature_columns"]
     raw_sequence = featured[feature_columns].tail(sequence_length).to_numpy(dtype=np.float32)
     scaled_sequence = artifact["feature_scaler"].transform(raw_sequence).reshape(1, sequence_length, len(feature_columns))
     current_price = float(featured["close"].iloc[-1])
@@ -1274,7 +1336,7 @@ def run_training_pipeline(
 
 
 def load_training_data(args: argparse.Namespace) -> pd.DataFrame:
-    return (
+    data = (
         fetch_and_update_data(
             args.symbol,
             args.timeframe,
@@ -1284,6 +1346,15 @@ def load_training_data(args: argparse.Namespace) -> pd.DataFrame:
         )
         if args.update
         else load_price_csv(args.data)
+    )
+    return attach_fundamentals(
+        data=data,
+        data_path=args.data,
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        fundamental_data=args.fundamental_data,
+        update_fundamentals=args.update_fundamentals,
+        required=args.feature_set == "advanced-fundamental",
     )
 
 
@@ -1308,6 +1379,9 @@ def train_multi_command(args: argparse.Namespace) -> None:
 
 def predict_command(args: argparse.Namespace) -> None:
     require_tensorflow()
+    model = load_model(MODEL_PATH)
+    artifact = load_artifacts()
+    artifact.setdefault("timeframe", args.timeframe)
     data = (
         fetch_and_update_data(
             args.symbol,
@@ -1319,9 +1393,15 @@ def predict_command(args: argparse.Namespace) -> None:
         if args.update
         else load_price_csv(args.data)
     )
-    model = load_model(MODEL_PATH)
-    artifact = load_artifacts()
-    artifact.setdefault("timeframe", args.timeframe)
+    data = attach_fundamentals(
+        data=data,
+        data_path=args.data,
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        fundamental_data=args.fundamental_data,
+        update_fundamentals=args.update_fundamentals,
+        required=columns_need_fundamentals(artifact["feature_columns"]),
+    )
     result = predict_next_price(model, data, artifact)
     print(json.dumps(result, indent=2))
     if args.telegram:
@@ -1371,6 +1451,15 @@ def combine_multi_horizon_predictions(results: list[dict], min_agree: int, min_c
 
 def predict_multi_command(args: argparse.Namespace) -> None:
     require_tensorflow()
+    artifacts = []
+    for horizon in parse_horizons(args.horizons):
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        if not model_path.exists() or not artifact_path.exists():
+            raise FileNotFoundError(f"Missing model/artifact for horizon {horizon}. Run train-multi first.")
+        artifact = load_artifacts(artifact_path)
+        artifact.setdefault("timeframe", args.timeframe)
+        artifacts.append((horizon, model_path, artifact_path, artifact))
+
     data = (
         fetch_and_update_data(
             args.symbol,
@@ -1382,14 +1471,18 @@ def predict_multi_command(args: argparse.Namespace) -> None:
         if args.update
         else load_price_csv(args.data)
     )
+    data = attach_fundamentals(
+        data=data,
+        data_path=args.data,
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        fundamental_data=args.fundamental_data,
+        update_fundamentals=args.update_fundamentals,
+        required=any(columns_need_fundamentals(artifact["feature_columns"]) for _, _, _, artifact in artifacts),
+    )
     results = []
-    for horizon in parse_horizons(args.horizons):
-        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
-        if not model_path.exists() or not artifact_path.exists():
-            raise FileNotFoundError(f"Missing model/artifact for horizon {horizon}. Run train-multi first.")
+    for horizon, model_path, artifact_path, artifact in artifacts:
         model = load_model(model_path)
-        artifact = load_artifacts(artifact_path)
-        artifact.setdefault("timeframe", args.timeframe)
         results.append(predict_next_price(model, data, artifact))
 
     final_signal = combine_multi_horizon_predictions(results, args.min_agree, args.min_confidence)
@@ -1419,6 +1512,8 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--timeframe", default="5m")
         command_parser.add_argument("--exchange", default="binance")
         command_parser.add_argument("--update", action="store_true", help="Fetch fresh candles before training.")
+        command_parser.add_argument("--fundamental-data", default=None, help="Optional Binance Futures fundamentals CSV.")
+        command_parser.add_argument("--update-fundamentals", action="store_true", help="Fetch/update Binance Futures fundamentals before training.")
         command_parser.add_argument("--sequence-length", type=int, default=96)
         command_parser.add_argument("--epochs", type=int, default=80)
         command_parser.add_argument("--batch-size", type=int, default=32)
@@ -1455,6 +1550,8 @@ def build_parser() -> argparse.ArgumentParser:
     predict.add_argument("--timeframe", default="5m")
     predict.add_argument("--exchange", default="binance")
     predict.add_argument("--update", action="store_true", help="Fetch fresh candles before prediction.")
+    predict.add_argument("--fundamental-data", default=None, help="Optional Binance Futures fundamentals CSV.")
+    predict.add_argument("--update-fundamentals", action="store_true", help="Fetch/update Binance Futures fundamentals before prediction.")
     predict.add_argument("--max-fetch-batches", type=int, default=200)
     predict.add_argument("--telegram", action="store_true")
     predict.set_defaults(func=predict_command)
@@ -1465,6 +1562,8 @@ def build_parser() -> argparse.ArgumentParser:
     predict_multi.add_argument("--timeframe", default="5m")
     predict_multi.add_argument("--exchange", default="binance")
     predict_multi.add_argument("--update", action="store_true", help="Fetch fresh candles before prediction.")
+    predict_multi.add_argument("--fundamental-data", default=None, help="Optional Binance Futures fundamentals CSV.")
+    predict_multi.add_argument("--update-fundamentals", action="store_true", help="Fetch/update Binance Futures fundamentals before prediction.")
     predict_multi.add_argument("--max-fetch-batches", type=int, default=200)
     predict_multi.add_argument("--horizons", default="1,3,6,12")
     predict_multi.add_argument("--min-agree", type=int, default=2)

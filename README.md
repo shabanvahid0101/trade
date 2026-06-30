@@ -49,6 +49,22 @@ python crypto_predictor.py train --update --exchange binance --market-mode futur
 
 Use `--feature-selection correlation` to rank indicators on the training window only and keep the strongest non-redundant features. The chosen features are saved in `model_artifacts.pkl` and printed in the training metrics.
 
+## Futures Fundamentals
+
+Fetch Binance Futures market data such as funding rate, open interest, global long/short ratio, and taker buy/sell ratio:
+
+```powershell
+python fundamental_data.py --symbol BTC/USDT --timeframe 1h --market-data dataset/1h-btc_history.csv --output dataset/1h-btc_fundamentals.csv
+```
+
+Train with the technical + futures fundamentals feature set:
+
+```powershell
+python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 24 --min-selected-features 10 --target-mode classification --threshold 0.0015 --min-confidence 0.50
+```
+
+Prediction, alerting, paper trading, and strategy optimization also accept `--fundamental-data` and `--update-fundamentals`. Data is joined with a backward as-of merge so each candle only sees fundamental values already published at or before that candle.
+
 ## Multi-Horizon Training
 
 Train separate models for several future windows and only trade when they agree:

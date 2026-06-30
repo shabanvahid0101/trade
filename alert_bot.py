@@ -7,6 +7,8 @@ from tensorflow.keras.models import load_model
 
 from crypto_predictor import (
     DATA_DIR,
+    attach_fundamentals,
+    columns_need_fundamentals,
     combine_multi_horizon_predictions,
     fetch_and_update_with_fallbacks,
     horizon_model_paths,
@@ -70,6 +72,15 @@ def build_alert_message(symbol: str, timeframe: str, result: dict, horizon_resul
 
 def run_once(args: argparse.Namespace) -> dict:
     data_path = Path(args.data)
+    artifacts = []
+    for horizon in parse_horizons(args.horizons):
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        if not model_path.exists() or not artifact_path.exists():
+            raise FileNotFoundError(f"Missing model files for {args.symbol} {args.timeframe} horizon {horizon}.")
+        artifact = load_artifacts(artifact_path)
+        artifact.setdefault("timeframe", args.timeframe)
+        artifacts.append((horizon, model_path, artifact))
+
     data = (
         fetch_and_update_with_fallbacks(
             symbol=args.symbol,
@@ -82,15 +93,19 @@ def run_once(args: argparse.Namespace) -> dict:
         if args.update
         else load_price_csv(data_path)
     )
+    data = attach_fundamentals(
+        data=data,
+        data_path=data_path,
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        fundamental_data=args.fundamental_data,
+        update_fundamentals=args.update_fundamentals,
+        required=any(columns_need_fundamentals(artifact["feature_columns"]) for _, _, artifact in artifacts),
+    )
 
     horizon_results = []
-    for horizon in parse_horizons(args.horizons):
-        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
-        if not model_path.exists() or not artifact_path.exists():
-            raise FileNotFoundError(f"Missing model files for {args.symbol} {args.timeframe} horizon {horizon}.")
+    for horizon, model_path, artifact in artifacts:
         model = load_model(model_path)
-        artifact = load_artifacts(artifact_path)
-        artifact.setdefault("timeframe", args.timeframe)
         horizon_results.append(predict_next_price(model, data, artifact))
 
     final = combine_multi_horizon_predictions(
@@ -152,6 +167,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--exchange", default="binance")
     parser.add_argument("--exchange-fallbacks", default="binance,okx,kucoin,bybit")
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
+    parser.add_argument("--fundamental-data", default=None)
+    parser.add_argument("--update-fundamentals", action="store_true")
     parser.add_argument("--horizons", default="1,3,6")
     parser.add_argument("--min-agree", type=int, default=2)
     parser.add_argument("--min-confidence", type=float, default=0.50)

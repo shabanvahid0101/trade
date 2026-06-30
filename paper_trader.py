@@ -9,8 +9,10 @@ from tensorflow.keras.models import load_model
 
 from crypto_predictor import (
     DATA_DIR,
+    attach_fundamentals,
     backtest_predictions,
     class_predictions_to_signal_returns,
+    columns_need_fundamentals,
     combine_multi_horizon_predictions,
     fetch_and_update_with_fallbacks,
     horizon_model_paths,
@@ -197,6 +199,20 @@ def build_historical_ensemble(
 def run_backtest(args: argparse.Namespace) -> dict:
     data = load_price_csv(args.data)
     horizons = parse_horizons(args.horizons)
+    needs_fundamentals = False
+    for horizon in horizons:
+        _, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        artifact = load_artifacts(artifact_path)
+        needs_fundamentals = needs_fundamentals or columns_need_fundamentals(artifact["feature_columns"])
+    data = attach_fundamentals(
+        data=data,
+        data_path=args.data,
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        fundamental_data=args.fundamental_data,
+        update_fundamentals=args.update_fundamentals,
+        required=needs_fundamentals,
+    )
     meta, predicted_return = build_historical_ensemble(
         data=data,
         symbol=args.symbol,
@@ -230,6 +246,14 @@ def run_backtest(args: argparse.Namespace) -> dict:
 
 
 def run_single(args: argparse.Namespace) -> dict:
+    horizons = parse_horizons(args.horizons)
+    artifacts = []
+    for horizon in horizons:
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        artifact = load_artifacts(artifact_path)
+        artifact.setdefault("timeframe", args.timeframe)
+        artifacts.append((horizon, model_path, artifact))
+
     data = (
         fetch_and_update_with_fallbacks(
             symbol=args.symbol,
@@ -242,14 +266,20 @@ def run_single(args: argparse.Namespace) -> dict:
         if args.update
         else load_price_csv(args.data)
     )
+    data = attach_fundamentals(
+        data=data,
+        data_path=args.data,
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        fundamental_data=args.fundamental_data,
+        update_fundamentals=args.update_fundamentals,
+        required=any(columns_need_fundamentals(artifact["feature_columns"]) for _, _, artifact in artifacts),
+    )
     dataset_last_timestamp = str(data["timestamp"].max()) if not data.empty else None
     print(f"Paper data last timestamp: {dataset_last_timestamp}")
     horizon_results = []
-    for horizon in parse_horizons(args.horizons):
-        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+    for horizon, model_path, artifact in artifacts:
         model = load_model(model_path)
-        artifact = load_artifacts(artifact_path)
-        artifact.setdefault("timeframe", args.timeframe)
         horizon_results.append(predict_next_price(model, data, artifact))
 
     final = combine_multi_horizon_predictions(horizon_results, args.min_agree, args.min_confidence)
@@ -293,6 +323,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--exchange", default="binance")
     parser.add_argument("--exchange-fallbacks", default="binance,okx,kucoin,bybit")
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
+    parser.add_argument("--fundamental-data", default=None)
+    parser.add_argument("--update-fundamentals", action="store_true")
     parser.add_argument("--horizons", default="1,3,6")
     parser.add_argument("--min-agree", type=int, default=2)
     parser.add_argument("--min-confidence", type=float, default=0.50)
