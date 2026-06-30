@@ -1,8 +1,17 @@
 {
-  "capital": 100.0,
-  "position": 0,
-  "entry_price": 0.0,
-  "notional": 0.0,
-  "trades": [],
-  "last_timestamp": "2026-06-30 13:00:00"
+  "capital": 99.9,
+  "position": 1,
+  "entry_price": 58946.01,
+  "notional": 100.0,
+  "trades": [
+    {
+      "timestamp": "2026-06-30 14:00:00",
+      "side": "OPEN_LONG",
+      "price": 58946.01,
+      "notional": 100.0,
+      "fee": 0.1,
+      "capital": 99.9
+    }
+  ],
+  "last_timestamp": "2026-06-30 14:00:00"
 }
