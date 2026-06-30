@@ -19,3 +19,4 @@ temp/
 
 alert_state.json
 strategy_optimization*.json
+strategy_walkforward*.json
