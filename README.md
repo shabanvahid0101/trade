@@ -22,6 +22,7 @@
 - اجرای خودکار با GitHub Actions
 - بازآموزی شبانه مدل در ساعت `02:00 UTC`
 - گزارش عملکرد روزانه و Health Check دوره‌ای
+- گزارش عملکرد سیگنال‌ها بر اساس دلیل تصمیم مدل
 
 ### نصب و راه‌اندازی
 
@@ -148,6 +149,14 @@ Workflow فایل `.github/workflows/paper-trading.yml` هر ساعت اجرا �
 
 Paper Trading دلیل آخرین سیگنال را در `last_signal_reason` و `last_signal_reasons` ذخیره می‌کند. اگر معامله‌ای باز یا بسته شود، خلاصه دلیل تصمیم در همان رکورد معامله هم ذخیره می‌شود.
 
+### گزارش عملکرد سیگنال‌ها
+
+```powershell
+python signal_report.py --symbol BTC/USDT --state-file paper_state.json --telegram
+```
+
+این گزارش از تاریخچه Paper Trading می‌خواند و نتیجه را بر اساس سیگنال، جهت معامله، رژیم بازار، استراتژی و دلیل بسته شدن معامله گروه‌بندی می‌کند. Workflow فایل `.github/workflows/signal-report.yml` هر روز ساعت `03:30 UTC` آن را به تلگرام می‌فرستد.
+
 ### گزارش عملکرد
 
 ```powershell
@@ -232,6 +241,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - GitHub Actions automation
 - Nightly retraining at `02:00 UTC`
 - Daily performance report and scheduled health checks
+- Signal-performance report grouped by model decision reasons
 
 ### Setup
 
@@ -357,6 +367,14 @@ python paper_trader.py --mode single --update --update-fundamentals --telegram -
 The `.github/workflows/paper-trading.yml` workflow runs hourly, updates market/fundamental data, applies the hybrid strategy and risk controls, sends a Telegram status message, and commits the virtual account state to `paper_state.json`.
 
 Paper trading stores the latest signal explanation in `last_signal_reason` and `last_signal_reasons`. When a trade opens or closes, the trade record also keeps a short decision summary.
+
+### Signal Performance Report
+
+```powershell
+python signal_report.py --symbol BTC/USDT --state-file paper_state.json --telegram
+```
+
+This report reads the paper-trading history and groups results by signal, trade direction, market regime, strategy, and close reason. The `.github/workflows/signal-report.yml` workflow sends it to Telegram every day at `03:30 UTC`.
 
 ### Performance Report
 
