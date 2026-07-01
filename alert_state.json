@@ -1,7 +1,7 @@
 {
   "last_signal": "SHORT",
-  "last_timestamp": "2026-07-01 10:00:00",
-  "last_sent_at": 1782906083,
+  "last_timestamp": "2026-07-01 12:00:00",
+  "last_sent_at": 1782914228,
   "last_seen_at": 1782902222,
-  "last_signal_reason": "SHORT via hybrid/trend_or_unclear; votes L/S/H=0/1/2; confidence=0.60; expected=-0.150%."
+  "last_signal_reason": "SHORT via hybrid/trend_or_unclear; votes L/S/H=0/1/2; confidence=0.61; expected=-0.150%."
 }
