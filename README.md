@@ -65,7 +65,7 @@ python crypto_predictor.py train-multi --update --update-fundamentals --symbol B
 
 Prediction, alerting, paper trading, and strategy optimization also accept `--fundamental-data` and `--update-fundamentals`. Data is joined with a backward as-of merge so each candle only sees fundamental values already published at or before that candle.
 
-The GitHub Actions workflow `.github/workflows/model-retrain.yml` retrains the 1h multi-horizon models every night at `02:00 UTC`. It refreshes market/fundamental data, retrains horizons `1,3,6`, runs walk-forward validation, and commits the refreshed model weights/artifacts back to `main`.
+The GitHub Actions workflow `.github/workflows/model-retrain.yml` retrains the 1h multi-horizon models every night at `02:00 UTC`. It refreshes market/fundamental data, retrains horizons `1,3,6`, runs walk-forward validation, checks the result with `validate_retrain.py`, and commits the refreshed model weights/artifacts back to `main` only if the quality gate passes.
 
 ## Multi-Horizon Training
 
