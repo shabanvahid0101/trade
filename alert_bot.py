@@ -149,7 +149,7 @@ def run_once(args: argparse.Namespace) -> dict:
             }
         )
         save_state(state_path, state)
-    elif is_actionable and changed_signal:
+    elif changed_signal:
         state.update(
             {
                 "last_signal": final["signal"],
