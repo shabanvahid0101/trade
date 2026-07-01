@@ -17,6 +17,7 @@
 - پشتیبانی از Paper Trading با سرمایه مجازی 100 دلار
 - استراتژی Hybrid برای استفاده از مدل در بازار رونددار و Mean Reversion در بازار رنج
 - کنترل ریسک برای کاهش حجم یا جلوگیری از ورود بعد از افت سرمایه یا ضررهای پشت سر هم
+- شبیه‌سازی واقع‌بینانه‌تر اجرا با Spread و Slippage
 - ارسال پیام تلگرام حتی برای `HOLD`
 - توضیح دلیل سیگنال در پیام تلگرام و ذخیره دلیل تصمیم در Paper Trading
 - اجرای خودکار با GitHub Actions
@@ -136,16 +137,18 @@ Workflow فایل `.github/workflows/telegram-alert.yml` هر 15 دقیقه اج
 بک‌تست با سرمایه مجازی 100 دلار:
 
 ```powershell
-python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --days 7
+python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --days 7 --fee-rate 0.001 --spread-bps 2 --slippage-bps 2
 ```
 
 اجرای یک مرحله Paper Trading زنده:
 
 ```powershell
-python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3
+python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3 --spread-bps 2 --slippage-bps 2
 ```
 
 Workflow فایل `.github/workflows/paper-trading.yml` هر ساعت اجرا می‌شود، دیتای بازار و فاندامنتال را آپدیت می‌کند، استراتژی Hybrid و کنترل ریسک را اعمال می‌کند، پیام تلگرام می‌فرستد و وضعیت حساب مجازی را در `paper_state.json` ذخیره می‌کند.
+
+برای نزدیک‌تر شدن به اجرای واقعی، `--spread-bps` و `--slippage-bps` قیمت ورود و خروج را علیه معامله تنظیم می‌کنند. مثلا با `--spread-bps 2 --slippage-bps 2` هر ورود/خروج حدود 3 bps بدتر از قیمت mid شبیه‌سازی می‌شود.
 
 Paper Trading دلیل آخرین سیگنال را در `last_signal_reason` و `last_signal_reasons` ذخیره می‌کند. اگر معامله‌ای باز یا بسته شود، خلاصه دلیل تصمیم در همان رکورد معامله هم ذخیره می‌شود.
 
@@ -178,13 +181,13 @@ Workflow فایل `.github/workflows/health-check.yml` هر 6 ساعت سلام�
 جستجوی تنظیمات بهتر برای Paper Trading:
 
 ```powershell
-python strategy_optimizer.py --data dataset/1h-btc_history.csv --days 14 --initial-capital 100 --top 10
+python strategy_optimizer.py --data dataset/1h-btc_history.csv --days 14 --initial-capital 100 --top 10 --spread-bps 2 --slippage-bps 2
 ```
 
 Walk-forward validation:
 
 ```powershell
-python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100
+python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100 --spread-bps 2 --slippage-bps 2
 ```
 
 تست استراتژی Hybrid و Range:
@@ -236,6 +239,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Paper trading with a virtual 100 USD account
 - Hybrid strategy: model-driven trend trades plus range-market mean reversion
 - Risk controls that reduce size or block new entries after drawdown or loss streaks
+- More realistic execution simulation with spread and slippage
 - Telegram alerts, including `HOLD` messages
 - Signal explanation in Telegram messages and paper-trading state
 - GitHub Actions automation
@@ -355,16 +359,18 @@ Telegram messages include a `Why` section with horizon votes, confidence, range/
 Backtest the current 1h setup with a virtual 100 USD futures account:
 
 ```powershell
-python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --days 7
+python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --days 7 --fee-rate 0.001 --spread-bps 2 --slippage-bps 2
 ```
 
 Run one live paper-trading step:
 
 ```powershell
-python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3
+python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3 --spread-bps 2 --slippage-bps 2
 ```
 
 The `.github/workflows/paper-trading.yml` workflow runs hourly, updates market/fundamental data, applies the hybrid strategy and risk controls, sends a Telegram status message, and commits the virtual account state to `paper_state.json`.
+
+Use `--spread-bps` and `--slippage-bps` to make fills more conservative. For example, `--spread-bps 2 --slippage-bps 2` makes each entry/exit roughly 3 bps worse than the mid price.
 
 Paper trading stores the latest signal explanation in `last_signal_reason` and `last_signal_reasons`. When a trade opens or closes, the trade record also keeps a short decision summary.
 
@@ -397,13 +403,13 @@ The `.github/workflows/health-check.yml` workflow runs every 6 hours. It checks 
 Search for better paper-trading settings:
 
 ```powershell
-python strategy_optimizer.py --data dataset/1h-btc_history.csv --days 14 --initial-capital 100 --top 10
+python strategy_optimizer.py --data dataset/1h-btc_history.csv --days 14 --initial-capital 100 --top 10 --spread-bps 2 --slippage-bps 2
 ```
 
 Walk-forward validation:
 
 ```powershell
-python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100
+python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.csv --train-days 14 --test-days 3 --step-days 3 --walkforward-days 45 --initial-capital 100 --spread-bps 2 --slippage-bps 2
 ```
 
 Test hybrid and range strategies:

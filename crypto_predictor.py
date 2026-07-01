@@ -1020,15 +1020,30 @@ def backtest_predictions(
     initial_capital: float = 10_000.0,
     market_mode: str = "futures",
     leverage: float = 1.0,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
 ) -> dict:
     if market_mode not in {"spot", "futures"}:
         raise ValueError("market_mode must be 'spot' or 'futures'.")
     if leverage <= 0:
         raise ValueError("leverage must be positive.")
+    if spread_bps < 0 or slippage_bps < 0:
+        raise ValueError("spread_bps and slippage_bps must be non-negative.")
     if market_mode == "spot":
-        return backtest_spot_long_only(meta, predicted_return, threshold, fee_rate, initial_capital)
+        return backtest_spot_long_only(meta, predicted_return, threshold, fee_rate, initial_capital, spread_bps, slippage_bps)
 
-    return backtest_futures_long_short(meta, predicted_return, threshold, fee_rate, initial_capital, leverage)
+    return backtest_futures_long_short(meta, predicted_return, threshold, fee_rate, initial_capital, leverage, spread_bps, slippage_bps)
+
+
+def execution_price(mid_price: float, side: int, action: str, spread_bps: float = 0.0, slippage_bps: float = 0.0) -> float:
+    """Return conservative fill price for a long/short open or close."""
+    if side not in {-1, 1}:
+        return float(mid_price)
+    if action not in {"open", "close"}:
+        raise ValueError("action must be 'open' or 'close'.")
+    cost = (spread_bps / 2 + slippage_bps) / 10_000
+    direction = side if action == "open" else -side
+    return float(mid_price) * (1 + direction * cost)
 
 
 def backtest_spot_long_only(
@@ -1037,6 +1052,8 @@ def backtest_spot_long_only(
     threshold: float,
     fee_rate: float,
     initial_capital: float,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
 ) -> dict:
     capital = initial_capital
     units = 0.0
@@ -1049,12 +1066,14 @@ def backtest_spot_long_only(
         signal = 1 if pred_ret > threshold else -1 if pred_ret < -threshold else 0
 
         if signal == 1 and units == 0:
-            units = (capital * (1 - fee_rate)) / price
-            trades.append({"timestamp": str(row.timestamp), "side": "BUY", "price": price})
+            fill_price = execution_price(price, 1, "open", spread_bps, slippage_bps)
+            units = (capital * (1 - fee_rate)) / fill_price
+            trades.append({"timestamp": str(row.timestamp), "side": "BUY", "price": fill_price, "mid_price": price})
             capital = 0.0
         elif signal == -1 and units > 0:
-            capital = units * price * (1 - fee_rate)
-            trades.append({"timestamp": str(row.timestamp), "side": "SELL", "price": price})
+            fill_price = execution_price(price, 1, "close", spread_bps, slippage_bps)
+            capital = units * fill_price * (1 - fee_rate)
+            trades.append({"timestamp": str(row.timestamp), "side": "SELL", "price": fill_price, "mid_price": price})
             units = 0.0
 
         equity = capital + units * future_price
@@ -1062,8 +1081,9 @@ def backtest_spot_long_only(
 
     if units > 0:
         final_price = float(meta["future_close"].iloc[-1])
-        capital = units * final_price * (1 - fee_rate)
-        trades.append({"timestamp": str(meta["timestamp"].iloc[-1]), "side": "FINAL_SELL", "price": final_price})
+        fill_price = execution_price(final_price, 1, "close", spread_bps, slippage_bps)
+        capital = units * fill_price * (1 - fee_rate)
+        trades.append({"timestamp": str(meta["timestamp"].iloc[-1]), "side": "FINAL_SELL", "price": fill_price, "mid_price": final_price})
     else:
         capital = capital if capital else equity_curve[-1]
 
@@ -1080,6 +1100,8 @@ def backtest_spot_long_only(
         "total_return_pct": float((capital / initial_capital - 1) * 100),
         "max_drawdown_pct": max_drawdown,
         "trade_count": len(trades),
+        "spread_bps": spread_bps,
+        "slippage_bps": slippage_bps,
         "sharpe_like": float((returns.mean() / returns.std()) * np.sqrt(365 * 24 * 12)) if len(returns) > 2 and returns.std() else 0.0,
         "last_trades": trades[-10:],
     }
@@ -1092,6 +1114,8 @@ def backtest_futures_long_short(
     fee_rate: float,
     initial_capital: float,
     leverage: float,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
 ) -> dict:
     capital = initial_capital
     position = 0
@@ -1109,14 +1133,16 @@ def backtest_futures_long_short(
         nonlocal capital, position, entry_price, notional
         if position == 0:
             return
-        pnl = unrealized_pnl(price)
+        fill_price = execution_price(price, position, "close", spread_bps, slippage_bps)
+        pnl = unrealized_pnl(fill_price)
         close_fee = notional * fee_rate
         capital += pnl - close_fee
         trades.append(
             {
                 "timestamp": str(timestamp),
                 "side": "CLOSE_LONG" if position == 1 else "CLOSE_SHORT",
-                "price": price,
+                "price": fill_price,
+                "mid_price": price,
                 "pnl": float(pnl - close_fee),
                 "reason": reason,
             }
@@ -1131,12 +1157,14 @@ def backtest_futures_long_short(
         open_fee = notional * fee_rate
         capital -= open_fee
         position = side
-        entry_price = price
+        fill_price = execution_price(price, side, "open", spread_bps, slippage_bps)
+        entry_price = fill_price
         trades.append(
             {
                 "timestamp": str(timestamp),
                 "side": "OPEN_LONG" if side == 1 else "OPEN_SHORT",
-                "price": price,
+                "price": fill_price,
+                "mid_price": price,
                 "notional": float(notional),
                 "fee": float(open_fee),
             }
@@ -1176,6 +1204,8 @@ def backtest_futures_long_short(
         "total_return_pct": float((capital / initial_capital - 1) * 100),
         "max_drawdown_pct": max_drawdown,
         "trade_count": len(trades),
+        "spread_bps": spread_bps,
+        "slippage_bps": slippage_bps,
         "sharpe_like": float((returns.mean() / returns.std()) * np.sqrt(365 * 24 * 12)) if len(returns) > 2 and returns.std() else 0.0,
         "last_trades": trades[-10:],
     }
@@ -1317,6 +1347,8 @@ def run_training_pipeline(
         fee_rate=args.fee_rate,
         market_mode=args.market_mode,
         leverage=args.leverage,
+        spread_bps=args.spread_bps,
+        slippage_bps=args.slippage_bps,
     )
 
     model_path = Path(model_path)
@@ -1520,6 +1552,8 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--training-verbose", type=int, choices=[0, 1, 2], default=2)
         command_parser.add_argument("--threshold", type=float, default=0.0015)
         command_parser.add_argument("--fee-rate", type=float, default=0.001)
+        command_parser.add_argument("--spread-bps", type=float, default=0.0)
+        command_parser.add_argument("--slippage-bps", type=float, default=0.0)
         command_parser.add_argument("--market-mode", choices=["spot", "futures"], default="futures")
         command_parser.add_argument("--leverage", type=float, default=1.0)
         command_parser.add_argument("--max-fetch-batches", type=int, default=200)

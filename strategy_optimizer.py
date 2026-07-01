@@ -11,6 +11,7 @@ from crypto_predictor import (
     DATA_DIR,
     attach_fundamentals,
     columns_need_fundamentals,
+    execution_price,
     horizon_model_paths,
     load_artifacts,
     load_price_csv,
@@ -296,6 +297,8 @@ def simulate_futures(
     range_trend_max: float,
     range_width_min: float,
     range_width_max: float,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
 ) -> dict:
     capital = initial_capital
     position = 0
@@ -313,13 +316,15 @@ def simulate_futures(
         nonlocal capital, position, entry_price, notional
         if position == 0:
             return
-        net_pnl = pnl_at(price) - notional * fee_rate
+        fill_price = execution_price(price, position, "close", spread_bps, slippage_bps)
+        net_pnl = pnl_at(fill_price) - notional * fee_rate
         capital += net_pnl
         trades.append(
             {
                 "timestamp": str(timestamp),
                 "side": "CLOSE_LONG" if position == 1 else "CLOSE_SHORT",
-                "price": float(price),
+                "price": float(fill_price),
+                "mid_price": float(price),
                 "pnl": float(net_pnl),
                 "reason": reason,
                 "capital": float(capital),
@@ -337,12 +342,14 @@ def simulate_futures(
         fee = notional * fee_rate
         capital -= fee
         position = side
-        entry_price = price
+        fill_price = execution_price(price, side, "open", spread_bps, slippage_bps)
+        entry_price = fill_price
         trades.append(
             {
                 "timestamp": str(timestamp),
                 "side": "OPEN_LONG" if side == 1 else "OPEN_SHORT",
-                "price": float(price),
+                "price": float(fill_price),
+                "mid_price": float(price),
                 "notional": float(notional),
                 "fee": float(fee),
                 "capital": float(capital),
@@ -417,6 +424,8 @@ def simulate_futures(
         "trade_count": len(trades),
         "closed_trade_count": len(closes),
         "win_rate_pct": float(len(wins) / len(closes) * 100) if closes else 0.0,
+        "spread_bps": spread_bps,
+        "slippage_bps": slippage_bps,
         "sharpe_like": float((returns.mean() / returns.std()) * np.sqrt(365 * 24)) if len(returns) > 2 and returns.std() else 0.0,
         "last_trades": trades[-8:],
     }
@@ -520,6 +529,8 @@ def evaluate_grid(frame: pd.DataFrame, args: argparse.Namespace) -> list[dict]:
             range_trend_max=range_trend_max,
             range_width_min=range_width_min,
             range_width_max=range_width_max,
+            spread_bps=args.spread_bps,
+            slippage_bps=args.slippage_bps,
         )
         results.append(
             {
@@ -657,6 +668,8 @@ def run_walk_forward(args: argparse.Namespace) -> dict:
             range_trend_max=best_config.get("range_trend_max_pct", 0.3) / 100,
             range_width_min=best_config.get("range_width_min_pct", 0.8) / 100,
             range_width_max=best_config.get("range_width_max_pct", 6.0) / 100,
+            spread_bps=args.spread_bps,
+            slippage_bps=args.slippage_bps,
         )
         folds.append(
             {
@@ -748,6 +761,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--range-width-max-grid", default="0.06")
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--fee-rate", type=float, default=0.001)
+    parser.add_argument("--spread-bps", type=float, default=0.0)
+    parser.add_argument("--slippage-bps", type=float, default=0.0)
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--max-train-rows", type=int, default=5000)
     parser.add_argument("--days", type=int, default=14)

@@ -14,6 +14,7 @@ from crypto_predictor import (
     class_predictions_to_signal_returns,
     columns_need_fundamentals,
     combine_multi_horizon_predictions,
+    execution_price,
     fetch_and_update_with_fallbacks,
     horizon_model_paths,
     latest_continuous_block,
@@ -80,13 +81,16 @@ def close_position(
     price: float,
     fee_rate: float,
     reason: str,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
     signal_explanation: dict | None = None,
 ) -> None:
     position = int(state.get("position", 0))
     if position == 0:
         return
     notional = float(state["notional"])
-    pnl = unrealized_pnl(state, price)
+    fill_price = execution_price(price, position, "close", spread_bps, slippage_bps)
+    pnl = unrealized_pnl(state, fill_price)
     close_fee = notional * fee_rate
     net_pnl = pnl - close_fee
     state["capital"] = float(state["capital"] + net_pnl)
@@ -94,7 +98,8 @@ def close_position(
         {
             "timestamp": timestamp,
             "side": "CLOSE_LONG" if position == 1 else "CLOSE_SHORT",
-            "price": price,
+            "price": fill_price,
+            "mid_price": price,
             "pnl": float(net_pnl),
             "reason": reason,
             "signal_reason": signal_explanation.get("summary") if signal_explanation else None,
@@ -114,6 +119,8 @@ def open_position(
     fee_rate: float,
     leverage: float,
     position_size_pct: float,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
     signal_explanation: dict | None = None,
 ) -> None:
     if side == 0 or float(state["capital"]) <= 0:
@@ -123,15 +130,17 @@ def open_position(
     if notional <= 0:
         return
     open_fee = notional * fee_rate
+    fill_price = execution_price(price, side, "open", spread_bps, slippage_bps)
     state["capital"] = float(state["capital"] - open_fee)
     state["position"] = side
-    state["entry_price"] = price
+    state["entry_price"] = fill_price
     state["notional"] = notional
     state["trades"].append(
         {
             "timestamp": timestamp,
             "side": "OPEN_LONG" if side == 1 else "OPEN_SHORT",
-            "price": price,
+            "price": fill_price,
+            "mid_price": price,
             "notional": notional,
             "fee": float(open_fee),
             "position_size_pct": float(position_size_pct),
@@ -149,6 +158,8 @@ def apply_signal(
     fee_rate: float,
     leverage: float,
     risk: dict,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
     signal_explanation: dict | None = None,
 ) -> dict:
     desired_side = signal_to_side(signal)
@@ -158,14 +169,20 @@ def apply_signal(
         return {"changed": False, "equity": equity, "reason": "already_processed"}
 
     if desired_side == 0 and current_side != 0:
-        close_position(state, timestamp, price, fee_rate, "signal_hold", signal_explanation)
+        close_position(state, timestamp, price, fee_rate, "signal_hold", spread_bps, slippage_bps, signal_explanation)
     elif desired_side != 0 and desired_side != current_side:
-        close_position(state, timestamp, price, fee_rate, "signal_flip", signal_explanation)
+        close_position(state, timestamp, price, fee_rate, "signal_flip", spread_bps, slippage_bps, signal_explanation)
         if risk["allow_new_position"]:
-            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"], signal_explanation)
+            open_position(
+                state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"],
+                spread_bps, slippage_bps, signal_explanation
+            )
     elif desired_side != 0 and current_side == 0:
         if risk["allow_new_position"]:
-            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"], signal_explanation)
+            open_position(
+                state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"],
+                spread_bps, slippage_bps, signal_explanation
+            )
 
     state["last_timestamp"] = timestamp
     if signal_explanation:
@@ -311,6 +328,8 @@ def run_backtest(args: argparse.Namespace) -> dict:
         initial_capital=args.initial_capital,
         market_mode="futures",
         leverage=args.leverage,
+        spread_bps=args.spread_bps,
+        slippage_bps=args.slippage_bps,
     )
     output = {
         "start": str(meta_window["timestamp"].iloc[0]),
@@ -405,6 +424,8 @@ def run_single(args: argparse.Namespace) -> dict:
         fee_rate=args.fee_rate,
         leverage=args.leverage,
         risk=risk,
+        spread_bps=args.spread_bps,
+        slippage_bps=args.slippage_bps,
         signal_explanation=signal_explanation,
     )
     save_state(state_path, state)
@@ -413,6 +434,7 @@ def run_single(args: argparse.Namespace) -> dict:
         "final": final,
         "risk": risk,
         "signal_explanation": signal_explanation,
+        "execution_costs": {"fee_rate": args.fee_rate, "spread_bps": args.spread_bps, "slippage_bps": args.slippage_bps},
         "paper": {"state": state, **trade_result},
     }
     print(json.dumps(output, indent=2))
@@ -425,6 +447,7 @@ def run_single(args: argparse.Namespace) -> dict:
             f"Signal: {final['signal']}\n"
             f"Strategy: {final.get('strategy', 'model')} | Regime: {final.get('market_regime', 'model')}\n"
             f"Risk: {risk['risk_level']} | Size: {risk['position_size_pct']:.2f} | {risk['reason']}\n"
+            f"Costs: fee {args.fee_rate:.4f} | spread {args.spread_bps:.2f} bps | slip {args.slippage_bps:.2f} bps\n"
             f"Position: {position_name}\n"
             f"Price: ${final['current_price']:.2f}\n"
             f"Equity: ${trade_result['equity']:.2f}\n"
@@ -457,6 +480,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--range-lookback", type=int, default=48)
     parser.add_argument("--threshold", type=float, default=0.0015)
     parser.add_argument("--fee-rate", type=float, default=0.001)
+    parser.add_argument("--spread-bps", type=float, default=0.0)
+    parser.add_argument("--slippage-bps", type=float, default=0.0)
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--risk-enabled", action=argparse.BooleanOptionalAction, default=True)
