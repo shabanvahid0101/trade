@@ -33,14 +33,14 @@
       "capital": 99.62945738096808
     }
   ],
-  "last_timestamp": "2026-07-01 15:00:00",
-  "last_signal_reason": "SHORT via hybrid/trend_or_unclear; votes L/S/H=0/1/2; confidence=0.77; expected=-0.150%.",
+  "last_timestamp": "2026-07-01 18:00:00",
+  "last_signal_reason": "SHORT via hybrid/trend_or_unclear; votes L/S/H=0/1/2; confidence=0.83; expected=-0.150%.",
   "last_signal_reasons": [
     "SHORT selected because bearish votes reached 1.",
-    "Strongest horizon is h6 with SHORT confidence 0.77.",
+    "Strongest horizon is h6 with SHORT confidence 0.83.",
     "Supporting horizons: h6.",
-    "Range context: position=72.0% between 57809.40 and 60683.84.",
+    "Range context: position=84.7% between 57809.40 and 60585.99.",
     "Range filter is not active, so the model vote remains the main signal.",
-    "Risk decision: normal | size=0.71 | ok | quality=0.62 | size_reason=dynamic_signal_quality."
+    "Risk decision: normal | size=0.74 | ok | quality=0.66 | size_reason=dynamic_signal_quality."
   ]
 }
