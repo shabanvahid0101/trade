@@ -24,6 +24,7 @@ from crypto_predictor import (
     send_telegram_message,
 )
 from risk_manager import decision_to_dict, evaluate_risk
+from signal_explainer import build_signal_explanation, format_explanation_for_telegram
 from strategy_rules import apply_hybrid_to_latest, apply_hybrid_to_returns
 
 
@@ -73,7 +74,14 @@ def unrealized_pnl(state: dict, mark_price: float) -> float:
     return notional * position * ((mark_price - entry_price) / entry_price)
 
 
-def close_position(state: dict, timestamp: str, price: float, fee_rate: float, reason: str) -> None:
+def close_position(
+    state: dict,
+    timestamp: str,
+    price: float,
+    fee_rate: float,
+    reason: str,
+    signal_explanation: dict | None = None,
+) -> None:
     position = int(state.get("position", 0))
     if position == 0:
         return
@@ -89,6 +97,7 @@ def close_position(state: dict, timestamp: str, price: float, fee_rate: float, r
             "price": price,
             "pnl": float(net_pnl),
             "reason": reason,
+            "signal_reason": signal_explanation.get("summary") if signal_explanation else None,
             "capital": float(state["capital"]),
         }
     )
@@ -105,6 +114,7 @@ def open_position(
     fee_rate: float,
     leverage: float,
     position_size_pct: float,
+    signal_explanation: dict | None = None,
 ) -> None:
     if side == 0 or float(state["capital"]) <= 0:
         return
@@ -125,6 +135,7 @@ def open_position(
             "notional": notional,
             "fee": float(open_fee),
             "position_size_pct": float(position_size_pct),
+            "signal_reason": signal_explanation.get("summary") if signal_explanation else None,
             "capital": float(state["capital"]),
         }
     )
@@ -138,6 +149,7 @@ def apply_signal(
     fee_rate: float,
     leverage: float,
     risk: dict,
+    signal_explanation: dict | None = None,
 ) -> dict:
     desired_side = signal_to_side(signal)
     current_side = int(state.get("position", 0))
@@ -146,16 +158,19 @@ def apply_signal(
         return {"changed": False, "equity": equity, "reason": "already_processed"}
 
     if desired_side == 0 and current_side != 0:
-        close_position(state, timestamp, price, fee_rate, "signal_hold")
+        close_position(state, timestamp, price, fee_rate, "signal_hold", signal_explanation)
     elif desired_side != 0 and desired_side != current_side:
-        close_position(state, timestamp, price, fee_rate, "signal_flip")
+        close_position(state, timestamp, price, fee_rate, "signal_flip", signal_explanation)
         if risk["allow_new_position"]:
-            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"])
+            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"], signal_explanation)
     elif desired_side != 0 and current_side == 0:
         if risk["allow_new_position"]:
-            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"])
+            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"], signal_explanation)
 
     state["last_timestamp"] = timestamp
+    if signal_explanation:
+        state["last_signal_reason"] = signal_explanation.get("summary")
+        state["last_signal_reasons"] = signal_explanation.get("reasons", [])
     equity = float(state["capital"]) + unrealized_pnl(state, price)
     reason = "processed" if risk["allow_new_position"] or desired_side == 0 or current_side != 0 else f"risk_blocked:{risk['reason']}"
     return {"changed": True, "equity": equity, "reason": reason}
@@ -381,6 +396,7 @@ def run_single(args: argparse.Namespace) -> dict:
         "drawdown_pct": 0.0,
         "loss_streak": 0,
     }
+    signal_explanation = build_signal_explanation(final, horizon_results, risk=risk)
     trade_result = apply_signal(
         state,
         signal=final["signal"],
@@ -389,12 +405,14 @@ def run_single(args: argparse.Namespace) -> dict:
         fee_rate=args.fee_rate,
         leverage=args.leverage,
         risk=risk,
+        signal_explanation=signal_explanation,
     )
     save_state(state_path, state)
     output = {
         "data_last_timestamp": dataset_last_timestamp,
         "final": final,
         "risk": risk,
+        "signal_explanation": signal_explanation,
         "paper": {"state": state, **trade_result},
     }
     print(json.dumps(output, indent=2))
@@ -411,7 +429,8 @@ def run_single(args: argparse.Namespace) -> dict:
             f"Price: ${final['current_price']:.2f}\n"
             f"Equity: ${trade_result['equity']:.2f}\n"
             f"Capital: ${float(state['capital']):.2f}\n"
-            f"Confidence: {final['confidence']:.2f}"
+            f"Confidence: {final['confidence']:.2f}\n\n"
+            f"{format_explanation_for_telegram(signal_explanation)}"
         )
     return output
 

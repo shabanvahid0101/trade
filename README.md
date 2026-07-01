@@ -18,6 +18,7 @@
 - استراتژی Hybrid برای استفاده از مدل در بازار رونددار و Mean Reversion در بازار رنج
 - کنترل ریسک برای کاهش حجم یا جلوگیری از ورود بعد از افت سرمایه یا ضررهای پشت سر هم
 - ارسال پیام تلگرام حتی برای `HOLD`
+- توضیح دلیل سیگنال در پیام تلگرام و ذخیره دلیل تصمیم در Paper Trading
 - اجرای خودکار با GitHub Actions
 - بازآموزی شبانه مدل در ساعت `02:00 UTC`
 - گزارش عملکرد روزانه و Health Check دوره‌ای
@@ -127,6 +128,8 @@ python alert_bot.py --mode loop --update --update-fundamentals --telegram --send
 
 Workflow فایل `.github/workflows/telegram-alert.yml` هر 15 دقیقه اجرا می‌شود و حتی پیام `HOLD` هم ارسال می‌کند.
 
+پیام تلگرام بخش `Why` هم دارد که نشان می‌دهد رأی هر افق مدل چه بوده، بازار رنج/رونددار تشخیص داده شده یا نه، confidence چقدر است و چرا سیگنال نهایی `LONG`، `SHORT` یا `HOLD` شده است.
+
 ### Paper Trading
 
 بک‌تست با سرمایه مجازی 100 دلار:
@@ -142,6 +145,8 @@ python paper_trader.py --mode single --update --update-fundamentals --telegram -
 ```
 
 Workflow فایل `.github/workflows/paper-trading.yml` هر ساعت اجرا می‌شود، دیتای بازار و فاندامنتال را آپدیت می‌کند، استراتژی Hybrid و کنترل ریسک را اعمال می‌کند، پیام تلگرام می‌فرستد و وضعیت حساب مجازی را در `paper_state.json` ذخیره می‌کند.
+
+Paper Trading دلیل آخرین سیگنال را در `last_signal_reason` و `last_signal_reasons` ذخیره می‌کند. اگر معامله‌ای باز یا بسته شود، خلاصه دلیل تصمیم در همان رکورد معامله هم ذخیره می‌شود.
 
 ### گزارش عملکرد
 
@@ -223,6 +228,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Hybrid strategy: model-driven trend trades plus range-market mean reversion
 - Risk controls that reduce size or block new entries after drawdown or loss streaks
 - Telegram alerts, including `HOLD` messages
+- Signal explanation in Telegram messages and paper-trading state
 - GitHub Actions automation
 - Nightly retraining at `02:00 UTC`
 - Daily performance report and scheduled health checks
@@ -332,6 +338,8 @@ python alert_bot.py --mode loop --update --update-fundamentals --telegram --send
 
 The `.github/workflows/telegram-alert.yml` workflow runs every 15 minutes and sends `HOLD` updates too.
 
+Telegram messages include a `Why` section with horizon votes, confidence, range/trend regime context, and the reason behind the final `LONG`, `SHORT`, or `HOLD` signal.
+
 ### Paper Trading
 
 Backtest the current 1h setup with a virtual 100 USD futures account:
@@ -347,6 +355,8 @@ python paper_trader.py --mode single --update --update-fundamentals --telegram -
 ```
 
 The `.github/workflows/paper-trading.yml` workflow runs hourly, updates market/fundamental data, applies the hybrid strategy and risk controls, sends a Telegram status message, and commits the virtual account state to `paper_state.json`.
+
+Paper trading stores the latest signal explanation in `last_signal_reason` and `last_signal_reasons`. When a trade opens or closes, the trade record also keeps a short decision summary.
 
 ### Performance Report
 

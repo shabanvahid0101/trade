@@ -18,6 +18,7 @@ from crypto_predictor import (
     predict_next_price,
     send_telegram_message,
 )
+from signal_explainer import build_signal_explanation, format_explanation_for_telegram
 from strategy_rules import apply_hybrid_to_latest
 
 
@@ -47,19 +48,9 @@ def parse_horizons(value: str) -> list[int]:
 
 
 def build_alert_message(symbol: str, timeframe: str, result: dict, horizon_results: list[dict]) -> str:
-    direction = "لانگ" if result["signal"] == "LONG" else "شورت"
-    horizon_lines = []
-    for item in horizon_results:
-        horizon_lines.append(
-            f"h{item['horizon_candles']}: {item['signal']} | "
-            f"conf {item['confidence']:.2f} | "
-            f"S {item.get('class_probabilities', {}).get('SHORT', 0):.2f} "
-            f"H {item.get('class_probabilities', {}).get('HOLD', 0):.2f} "
-            f"L {item.get('class_probabilities', {}).get('LONG', 0):.2f}"
-        )
-
+    explanation = build_signal_explanation(result, horizon_results)
     return (
-        f"<b>سیگنال {direction} {symbol}</b>\n"
+        f"<b>Signal {result['signal']} {symbol}</b>\n"
         f"Timeframe: {timeframe}\n"
         f"Time: {result['timestamp']}\n"
         f"Price: ${result['current_price']:.2f}\n"
@@ -67,8 +58,8 @@ def build_alert_message(symbol: str, timeframe: str, result: dict, horizon_resul
         f"Expected: {result['predicted_return_pct']:.3f}%\n"
         f"Confidence: {result['confidence']:.2f}\n"
         f"Votes: LONG {result['long_votes']} | SHORT {result['short_votes']} | HOLD {result['hold_votes']}\n\n"
-        + "\n".join(horizon_lines)
-        + "\n\nاین پیام هشدار ورود است، نه تضمین سود. مدیریت ریسک و حد ضرر لازم است."
+        f"{format_explanation_for_telegram(explanation)}\n\n"
+        "This is a trade alert, not a profit guarantee. Risk control and stop loss are required."
     )
 
 
@@ -128,7 +119,8 @@ def run_once(args: argparse.Namespace) -> dict:
         range_width_max=args.range_width_max,
         range_lookback=args.range_lookback,
     )
-    output = {"final": final, "horizons": horizon_results}
+    explanation = build_signal_explanation(final, horizon_results)
+    output = {"final": final, "horizons": horizon_results, "signal_explanation": explanation}
     print(json.dumps(output, indent=2))
 
     state_path = Path(args.state_file)
@@ -146,22 +138,26 @@ def run_once(args: argparse.Namespace) -> dict:
         should_send = True
 
     if should_send:
-        if final["signal"] == "HOLD":
-            message = (
-                f"<b>HOLD {args.symbol}</b>\n"
-                f"Timeframe: {args.timeframe}\n"
-                f"Time: {final['timestamp']}\n"
-                f"Price: ${final['current_price']:.2f}\n"
-                f"Strategy: {final.get('strategy', 'model')} | Regime: {final.get('market_regime', 'model')}\n"
-                f"Confidence: {final['confidence']:.2f}"
-            )
-        else:
-            message = build_alert_message(args.symbol, args.timeframe, final, horizon_results)
+        message = build_alert_message(args.symbol, args.timeframe, final, horizon_results)
         send_telegram_message(message)
-        state.update({"last_signal": final["signal"], "last_timestamp": final["timestamp"], "last_sent_at": now})
+        state.update(
+            {
+                "last_signal": final["signal"],
+                "last_timestamp": final["timestamp"],
+                "last_sent_at": now,
+                "last_signal_reason": explanation["summary"],
+            }
+        )
         save_state(state_path, state)
     elif is_actionable and changed_signal:
-        state.update({"last_signal": final["signal"], "last_timestamp": final["timestamp"], "last_seen_at": now})
+        state.update(
+            {
+                "last_signal": final["signal"],
+                "last_timestamp": final["timestamp"],
+                "last_seen_at": now,
+                "last_signal_reason": explanation["summary"],
+            }
+        )
         save_state(state_path, state)
     else:
         print(
