@@ -24,7 +24,7 @@ from crypto_predictor import (
     predict_next_price,
     send_telegram_message,
 )
-from risk_manager import decision_to_dict, evaluate_risk
+from risk_manager import apply_dynamic_position_sizing, decision_to_dict, evaluate_risk
 from signal_explainer import build_signal_explanation, format_explanation_for_telegram
 from strategy_rules import apply_hybrid_to_latest, apply_hybrid_to_returns
 
@@ -415,6 +415,19 @@ def run_single(args: argparse.Namespace) -> dict:
         "drawdown_pct": 0.0,
         "loss_streak": 0,
     }
+    if args.dynamic_position_sizing:
+        risk = apply_dynamic_position_sizing(
+            risk=risk,
+            final=final,
+            horizon_results=horizon_results,
+            min_position_size_pct=args.dynamic_min_position_size_pct,
+            max_position_size_pct=args.dynamic_max_position_size_pct,
+        )
+    else:
+        risk["dynamic_position_sizing"] = False
+        risk["base_position_size_pct"] = risk["position_size_pct"]
+        risk["signal_quality_score"] = None
+        risk["position_size_reason"] = "dynamic_position_sizing_disabled"
     signal_explanation = build_signal_explanation(final, horizon_results, risk=risk)
     trade_result = apply_signal(
         state,
@@ -442,11 +455,14 @@ def run_single(args: argparse.Namespace) -> dict:
     if args.telegram:
         position = int(state.get("position", 0))
         position_name = "LONG" if position == 1 else "SHORT" if position == -1 else "FLAT"
+        quality = risk.get("signal_quality_score")
+        quality_text = f"{float(quality):.2f}" if quality is not None else "n/a"
         send_telegram_message(
             f"<b>Paper Trading {args.symbol}</b>\n"
             f"Signal: {final['signal']}\n"
             f"Strategy: {final.get('strategy', 'model')} | Regime: {final.get('market_regime', 'model')}\n"
             f"Risk: {risk['risk_level']} | Size: {risk['position_size_pct']:.2f} | {risk['reason']}\n"
+            f"Size reason: {risk.get('position_size_reason', 'n/a')} | Quality: {quality_text}\n"
             f"Costs: fee {args.fee_rate:.4f} | spread {args.spread_bps:.2f} bps | slip {args.slippage_bps:.2f} bps\n"
             f"Position: {position_name}\n"
             f"Price: ${final['current_price']:.2f}\n"
@@ -491,6 +507,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--risk-max-drawdown-pct", type=float, default=5.0)
     parser.add_argument("--risk-max-loss-streak", type=int, default=3)
     parser.add_argument("--risk-min-equity", type=float, default=50.0)
+    parser.add_argument("--dynamic-position-sizing", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--dynamic-min-position-size-pct", type=float, default=0.25)
+    parser.add_argument("--dynamic-max-position-size-pct", type=float, default=1.0)
     parser.add_argument("--max-train-rows", type=int, default=5000)
     parser.add_argument("--max-fetch-batches", type=int, default=5)
     parser.add_argument("--max-data-age-hours", type=float, default=4.0)

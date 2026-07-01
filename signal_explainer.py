@@ -68,10 +68,16 @@ def build_signal_explanation(final: dict, horizon_results: list[dict], risk: dic
 
     risk_summary = None
     if risk is not None:
+        quality = risk.get("signal_quality_score")
+        quality_text = f" | quality={float(quality):.2f}" if quality is not None else ""
+        size_reason = risk.get("position_size_reason")
+        reason_text = f" | size_reason={size_reason}" if size_reason else ""
         risk_summary = (
             f"{risk.get('risk_level', 'unknown')} | "
             f"size={float(risk.get('position_size_pct', 0.0)):.2f} | "
             f"{risk.get('reason', 'unknown')}"
+            f"{quality_text}"
+            f"{reason_text}"
         )
         reasons.append(f"Risk decision: {risk_summary}.")
 

@@ -17,6 +17,7 @@
 - پشتیبانی از Paper Trading با سرمایه مجازی 100 دلار
 - استراتژی Hybrid برای استفاده از مدل در بازار رونددار و Mean Reversion در بازار رنج
 - کنترل ریسک برای کاهش حجم یا جلوگیری از ورود بعد از افت سرمایه یا ضررهای پشت سر هم
+- تنظیم هوشمند حجم معامله بر اساس کیفیت سیگنال
 - شبیه‌سازی واقع‌بینانه‌تر اجرا با Spread و Slippage
 - ارسال پیام تلگرام حتی برای `HOLD`
 - توضیح دلیل سیگنال در پیام تلگرام و ذخیره دلیل تصمیم در Paper Trading
@@ -143,10 +144,12 @@ python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timef
 اجرای یک مرحله Paper Trading زنده:
 
 ```powershell
-python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3 --spread-bps 2 --slippage-bps 2
+python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3 --dynamic-position-sizing --dynamic-min-position-size-pct 0.25 --dynamic-max-position-size-pct 1.0 --spread-bps 2 --slippage-bps 2
 ```
 
 Workflow فایل `.github/workflows/paper-trading.yml` هر ساعت اجرا می‌شود، دیتای بازار و فاندامنتال را آپدیت می‌کند، استراتژی Hybrid و کنترل ریسک را اعمال می‌کند، پیام تلگرام می‌فرستد و وضعیت حساب مجازی را در `paper_state.json` ذخیره می‌کند.
+
+Dynamic Position Sizing بعد از Risk Manager اجرا می‌شود. اگر کنترل ریسک اجازه ورود بدهد، کیفیت سیگنال با confidence، تعداد رأی‌های موافق، قوی‌ترین افق مدل و رژیم بازار سنجیده می‌شود و حجم معامله بین حداقل و حداکثر تعیین‌شده تنظیم می‌شود.
 
 برای نزدیک‌تر شدن به اجرای واقعی، `--spread-bps` و `--slippage-bps` قیمت ورود و خروج را علیه معامله تنظیم می‌کنند. مثلا با `--spread-bps 2 --slippage-bps 2` هر ورود/خروج حدود 3 bps بدتر از قیمت mid شبیه‌سازی می‌شود.
 
@@ -239,6 +242,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Paper trading with a virtual 100 USD account
 - Hybrid strategy: model-driven trend trades plus range-market mean reversion
 - Risk controls that reduce size or block new entries after drawdown or loss streaks
+- Dynamic position sizing based on signal quality
 - More realistic execution simulation with spread and slippage
 - Telegram alerts, including `HOLD` messages
 - Signal explanation in Telegram messages and paper-trading state
@@ -365,10 +369,12 @@ python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timef
 Run one live paper-trading step:
 
 ```powershell
-python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3 --spread-bps 2 --slippage-bps 2
+python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3 --dynamic-position-sizing --dynamic-min-position-size-pct 0.25 --dynamic-max-position-size-pct 1.0 --spread-bps 2 --slippage-bps 2
 ```
 
 The `.github/workflows/paper-trading.yml` workflow runs hourly, updates market/fundamental data, applies the hybrid strategy and risk controls, sends a Telegram status message, and commits the virtual account state to `paper_state.json`.
+
+Dynamic position sizing runs after the risk manager. If risk allows a new entry, signal quality is scored with confidence, agreeing horizon votes, strongest horizon confidence, and market regime, then position size is scaled between the configured minimum and maximum.
 
 Use `--spread-bps` and `--slippage-bps` to make fills more conservative. For example, `--spread-bps 2 --slippage-bps 2` makes each entry/exit roughly 3 bps worse than the mid price.
 

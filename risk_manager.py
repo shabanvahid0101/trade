@@ -83,3 +83,88 @@ def decision_to_dict(decision: RiskDecision) -> dict:
         "drawdown_pct": decision.drawdown_pct,
         "loss_streak": decision.loss_streak,
     }
+
+
+def _clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(value, high))
+
+
+def signal_quality_score(final: dict, horizon_results: list[dict]) -> tuple[float, list[str]]:
+    signal = final.get("signal", "HOLD")
+    if signal not in {"LONG", "SHORT"}:
+        return 0.0, ["no_trade_signal"]
+
+    confidence = _clamp(float(final.get("confidence", 0.0)), 0.0, 1.0)
+    horizon_count = max(1, len(horizon_results))
+    vote_key = "long_votes" if signal == "LONG" else "short_votes"
+    agree_votes = int(final.get(vote_key, 0) or 0)
+    agreement = _clamp(agree_votes / horizon_count, 0.0, 1.0)
+
+    strongest = max((float(item.get("confidence", 0.0) or 0.0) for item in horizon_results), default=confidence)
+    strongest = _clamp(strongest, 0.0, 1.0)
+
+    regime = final.get("market_regime", "model")
+    if regime == "range":
+        regime_factor = 0.85
+        regime_reason = "range_regime_size_discount"
+    elif regime == "trend_or_unclear":
+        regime_factor = 1.0
+        regime_reason = "trend_or_unclear"
+    else:
+        regime_factor = 0.95
+        regime_reason = f"regime_{regime}"
+
+    score = (0.50 * confidence + 0.35 * agreement + 0.15 * strongest) * regime_factor
+    reasons = [
+        f"confidence={confidence:.2f}",
+        f"agreement={agree_votes}/{horizon_count}",
+        f"strongest_confidence={strongest:.2f}",
+        regime_reason,
+    ]
+    return _clamp(score, 0.0, 1.0), reasons
+
+
+def apply_dynamic_position_sizing(
+    risk: dict,
+    final: dict,
+    horizon_results: list[dict],
+    min_position_size_pct: float,
+    max_position_size_pct: float,
+) -> dict:
+    updated = dict(risk)
+    original_cap = _clamp(float(risk.get("position_size_pct", 0.0) or 0.0), 0.0, 1.0)
+    min_size = _clamp(min_position_size_pct, 0.0, 1.0)
+    max_size = _clamp(max_position_size_pct, min_size, 1.0)
+
+    if not risk.get("allow_new_position", False):
+        updated.update(
+            {
+                "dynamic_position_sizing": True,
+                "base_position_size_pct": original_cap,
+                "signal_quality_score": 0.0,
+                "position_size_pct": 0.0,
+                "position_size_reason": "risk_blocked",
+            }
+        )
+        return updated
+
+    score, quality_reasons = signal_quality_score(final, horizon_results)
+    if final.get("signal") not in {"LONG", "SHORT"}:
+        dynamic_size = 0.0
+        reason = "no_trade_signal"
+    else:
+        dynamic_size = min_size + (max_size - min_size) * score
+        dynamic_size = min(dynamic_size, original_cap)
+        reason = "dynamic_signal_quality"
+
+    updated.update(
+        {
+            "dynamic_position_sizing": True,
+            "base_position_size_pct": original_cap,
+            "signal_quality_score": float(score),
+            "position_size_pct": float(_clamp(dynamic_size, 0.0, original_cap)),
+            "position_size_reason": reason,
+            "position_size_inputs": quality_reasons,
+        }
+    )
+    return updated
