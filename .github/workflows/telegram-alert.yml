@@ -30,6 +30,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Smoke test models
+        run: |
+          python smoke_test_models.py --symbol BTC/USDT --timeframe 1h --horizons 1,3,6 --sanitize
+
       - name: Run alert check
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}

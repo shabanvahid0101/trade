@@ -1379,7 +1379,7 @@ def train_multi_command(args: argparse.Namespace) -> None:
 
 def predict_command(args: argparse.Namespace) -> None:
     require_tensorflow()
-    model = load_model(MODEL_PATH)
+    model = load_model(MODEL_PATH, compile=False)
     artifact = load_artifacts()
     artifact.setdefault("timeframe", args.timeframe)
     data = (
@@ -1482,7 +1482,7 @@ def predict_multi_command(args: argparse.Namespace) -> None:
     )
     results = []
     for horizon, model_path, artifact_path, artifact in artifacts:
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
         results.append(predict_next_price(model, data, artifact))
 
     final_signal = combine_multi_horizon_predictions(results, args.min_agree, args.min_confidence)

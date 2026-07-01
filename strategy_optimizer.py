@@ -83,7 +83,7 @@ def load_horizon_predictions(
             [scaled_features[end_idx - sequence_length + 1 : end_idx + 1] for end_idx in range(sequence_length - 1, len(featured))],
             dtype=np.float32,
         )
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
         probabilities = model.predict(X, verbose=0)
         frame = featured[["timestamp", "close"]].iloc[sequence_length - 1 :].reset_index(drop=True).copy()
         frame[f"class_h{horizon}"] = probabilities.argmax(axis=1).astype(int)

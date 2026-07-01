@@ -191,7 +191,7 @@ def build_historical_ensemble(
             [scaled_features[end_idx - sequence_length + 1 : end_idx + 1] for end_idx in range(sequence_length - 1, len(featured))],
             dtype=np.float32,
         )
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
         probabilities = model.predict(X, verbose=0)
         predicted_class = probabilities.argmax(axis=1)
         predicted_class[probabilities.max(axis=1) < min_confidence] = 1
@@ -343,7 +343,7 @@ def run_single(args: argparse.Namespace) -> dict:
     print(f"Paper data last timestamp: {dataset_last_timestamp}")
     horizon_results = []
     for horizon, model_path, artifact in artifacts:
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
         horizon_results.append(predict_next_price(model, data, artifact))
 
     final = combine_multi_horizon_predictions(horizon_results, args.min_agree, args.min_confidence)

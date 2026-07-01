@@ -20,6 +20,8 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
+The TensorFlow/Keras versions are pinned because saved `.keras` model files are sensitive to serialization changes between Keras releases.
+
 Optional `.env` values:
 
 ```text
@@ -92,6 +94,16 @@ With fresh exchange data and Telegram:
 ```powershell
 python crypto_predictor.py predict --update --symbol BTC/USDT --timeframe 5m --data dataset/5m_btc_history.csv --telegram
 ```
+
+## Model Smoke Test
+
+Check that all saved 1h models can be loaded and can run a tiny prediction:
+
+```powershell
+python smoke_test_models.py --symbol BTC/USDT --timeframe 1h --horizons 1,3,6 --sanitize
+```
+
+The `--sanitize` option removes unsupported Keras config keys from saved model archives before loading. GitHub Actions runs this before alert, paper trading, and nightly validation.
 
 ## Live Loop
 

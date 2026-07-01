@@ -14,7 +14,7 @@ from crypto_predictor import (
 
 
 def live_predict_only(symbol: str, timeframe: str, exchange: str, sleep_seconds: int, telegram: bool) -> None:
-    model = load_model(MODEL_PATH)
+    model = load_model(MODEL_PATH, compile=False)
     artifact = load_artifacts(ARTIFACT_PATH)
 
     while True:
