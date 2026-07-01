@@ -133,10 +133,10 @@ python paper_trader.py --mode backtest --data dataset/1h-btc_history.csv --timef
 Run one live paper-trading step and save the virtual account state in `paper_state.json`:
 
 ```powershell
-python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid
+python paper_trader.py --mode single --update --update-fundamentals --telegram --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --timeframe 1h --horizons 1,3,6 --initial-capital 100 --min-agree 1 --min-confidence 0.45 --strategy hybrid --risk-enabled --risk-max-drawdown-pct 5 --risk-max-loss-streak 3
 ```
 
-The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs every hour, updates market/fundamental data, applies the hybrid trend/range strategy, sends a Telegram status message, and commits the virtual account state back to the repository.
+The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs every hour, updates market/fundamental data, applies the hybrid trend/range strategy, applies risk controls, sends a Telegram status message, and commits the virtual account state back to the repository.
 
 Send a paper-trading performance report:
 

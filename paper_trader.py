@@ -23,6 +23,7 @@ from crypto_predictor import (
     predict_next_price,
     send_telegram_message,
 )
+from risk_manager import decision_to_dict, evaluate_risk
 from strategy_rules import apply_hybrid_to_latest, apply_hybrid_to_returns
 
 
@@ -96,10 +97,21 @@ def close_position(state: dict, timestamp: str, price: float, fee_rate: float, r
     state["notional"] = 0.0
 
 
-def open_position(state: dict, timestamp: str, side: int, price: float, fee_rate: float, leverage: float) -> None:
+def open_position(
+    state: dict,
+    timestamp: str,
+    side: int,
+    price: float,
+    fee_rate: float,
+    leverage: float,
+    position_size_pct: float,
+) -> None:
     if side == 0 or float(state["capital"]) <= 0:
         return
-    notional = float(state["capital"]) * leverage
+    position_size_pct = max(0.0, min(position_size_pct, 1.0))
+    notional = float(state["capital"]) * leverage * position_size_pct
+    if notional <= 0:
+        return
     open_fee = notional * fee_rate
     state["capital"] = float(state["capital"] - open_fee)
     state["position"] = side
@@ -112,12 +124,21 @@ def open_position(state: dict, timestamp: str, side: int, price: float, fee_rate
             "price": price,
             "notional": notional,
             "fee": float(open_fee),
+            "position_size_pct": float(position_size_pct),
             "capital": float(state["capital"]),
         }
     )
 
 
-def apply_signal(state: dict, signal: str, timestamp: str, price: float, fee_rate: float, leverage: float) -> dict:
+def apply_signal(
+    state: dict,
+    signal: str,
+    timestamp: str,
+    price: float,
+    fee_rate: float,
+    leverage: float,
+    risk: dict,
+) -> dict:
     desired_side = signal_to_side(signal)
     current_side = int(state.get("position", 0))
     if state.get("last_timestamp") == timestamp:
@@ -128,13 +149,16 @@ def apply_signal(state: dict, signal: str, timestamp: str, price: float, fee_rat
         close_position(state, timestamp, price, fee_rate, "signal_hold")
     elif desired_side != 0 and desired_side != current_side:
         close_position(state, timestamp, price, fee_rate, "signal_flip")
-        open_position(state, timestamp, desired_side, price, fee_rate, leverage)
+        if risk["allow_new_position"]:
+            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"])
     elif desired_side != 0 and current_side == 0:
-        open_position(state, timestamp, desired_side, price, fee_rate, leverage)
+        if risk["allow_new_position"]:
+            open_position(state, timestamp, desired_side, price, fee_rate, leverage, risk["position_size_pct"])
 
     state["last_timestamp"] = timestamp
     equity = float(state["capital"]) + unrealized_pnl(state, price)
-    return {"changed": True, "equity": equity, "reason": "processed"}
+    reason = "processed" if risk["allow_new_position"] or desired_side == 0 or current_side != 0 else f"risk_blocked:{risk['reason']}"
+    return {"changed": True, "equity": equity, "reason": reason}
 
 
 def build_historical_ensemble(
@@ -338,6 +362,25 @@ def run_single(args: argparse.Namespace) -> dict:
     )
     state_path = Path(args.state_file)
     state = load_state(state_path, args.initial_capital)
+    risk_decision = evaluate_risk(
+        state=state,
+        mark_price=float(final["current_price"]),
+        initial_capital=args.initial_capital,
+        max_drawdown_pct=args.risk_max_drawdown_pct,
+        reduce_drawdown_pct=args.risk_reduce_drawdown_pct,
+        max_loss_streak=args.risk_max_loss_streak,
+        base_position_size_pct=args.risk_position_size_pct,
+        reduced_position_size_pct=args.risk_reduced_position_size_pct,
+        min_equity=args.risk_min_equity,
+    )
+    risk = decision_to_dict(risk_decision) if args.risk_enabled else {
+        "allow_new_position": True,
+        "risk_level": "disabled",
+        "position_size_pct": args.risk_position_size_pct,
+        "reason": "risk_disabled",
+        "drawdown_pct": 0.0,
+        "loss_streak": 0,
+    }
     trade_result = apply_signal(
         state,
         signal=final["signal"],
@@ -345,11 +388,13 @@ def run_single(args: argparse.Namespace) -> dict:
         price=float(final["current_price"]),
         fee_rate=args.fee_rate,
         leverage=args.leverage,
+        risk=risk,
     )
     save_state(state_path, state)
     output = {
         "data_last_timestamp": dataset_last_timestamp,
         "final": final,
+        "risk": risk,
         "paper": {"state": state, **trade_result},
     }
     print(json.dumps(output, indent=2))
@@ -361,6 +406,7 @@ def run_single(args: argparse.Namespace) -> dict:
             f"<b>Paper Trading {args.symbol}</b>\n"
             f"Signal: {final['signal']}\n"
             f"Strategy: {final.get('strategy', 'model')} | Regime: {final.get('market_regime', 'model')}\n"
+            f"Risk: {risk['risk_level']} | Size: {risk['position_size_pct']:.2f} | {risk['reason']}\n"
             f"Position: {position_name}\n"
             f"Price: ${final['current_price']:.2f}\n"
             f"Equity: ${trade_result['equity']:.2f}\n"
@@ -394,6 +440,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fee-rate", type=float, default=0.001)
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--initial-capital", type=float, default=100.0)
+    parser.add_argument("--risk-enabled", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--risk-position-size-pct", type=float, default=1.0)
+    parser.add_argument("--risk-reduced-position-size-pct", type=float, default=0.5)
+    parser.add_argument("--risk-reduce-drawdown-pct", type=float, default=3.0)
+    parser.add_argument("--risk-max-drawdown-pct", type=float, default=5.0)
+    parser.add_argument("--risk-max-loss-streak", type=int, default=3)
+    parser.add_argument("--risk-min-equity", type=float, default=50.0)
     parser.add_argument("--max-train-rows", type=int, default=5000)
     parser.add_argument("--max-fetch-batches", type=int, default=5)
     parser.add_argument("--max-data-age-hours", type=float, default=4.0)
