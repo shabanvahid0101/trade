@@ -146,6 +146,14 @@ python performance_report.py --telegram --symbol BTC/USDT --data dataset/1h-btc_
 
 The included GitHub Actions workflow `.github/workflows/performance-report.yml` sends this report every day at `03:00 UTC`. It reports equity, realized/unrealized PnL, win rate, drawdown, best/worst trade, and the current paper position.
 
+Run a full bot health check:
+
+```powershell
+python health_check.py --telegram --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --paper-state paper_state.json --alert-state alert_state.json
+```
+
+The included GitHub Actions workflow `.github/workflows/health-check.yml` sends a health report every 6 hours. It checks market-data freshness, fundamental-data freshness, model files, paper/alert state timestamps, dataset gaps, and paper equity.
+
 ## Strategy Optimization
 
 Search for better 1h paper-trading settings across confidence, horizon agreement, stop loss, take profit, and market regime filters:
