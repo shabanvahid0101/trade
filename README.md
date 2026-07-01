@@ -138,6 +138,14 @@ python paper_trader.py --mode single --update --update-fundamentals --telegram -
 
 The included GitHub Actions workflow `.github/workflows/paper-trading.yml` runs every hour, updates market/fundamental data, applies the hybrid trend/range strategy, sends a Telegram status message, and commits the virtual account state back to the repository.
 
+Send a paper-trading performance report:
+
+```powershell
+python performance_report.py --telegram --symbol BTC/USDT --data dataset/1h-btc_history.csv --state-file paper_state.json --initial-capital 100
+```
+
+The included GitHub Actions workflow `.github/workflows/performance-report.yml` sends this report every day at `03:00 UTC`. It reports equity, realized/unrealized PnL, win rate, drawdown, best/worst trade, and the current paper position.
+
 ## Strategy Optimization
 
 Search for better 1h paper-trading settings across confidence, horizon agreement, stop loss, take profit, and market regime filters:
