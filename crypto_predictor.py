@@ -149,9 +149,10 @@ def safe_symbol_name(symbol: str) -> str:
     return "".join(char for char in symbol.upper() if char.isalnum())
 
 
-def horizon_model_paths(symbol: str, timeframe: str, horizon: int) -> tuple[Path, Path]:
+def horizon_model_paths(symbol: str, timeframe: str, horizon: int, model_dir: str | Path | None = None) -> tuple[Path, Path]:
     prefix = f"{safe_symbol_name(symbol)}_{timeframe}_h{horizon}"
-    return MODELS_DIR / f"{prefix}.keras", MODELS_DIR / f"{prefix}_artifact.pkl"
+    base_dir = Path(model_dir) if model_dir else MODELS_DIR
+    return base_dir / f"{prefix}.keras", base_dir / f"{prefix}_artifact.pkl"
 
 
 def default_fundamental_data_path(price_path: str | Path) -> Path:
@@ -1403,7 +1404,7 @@ def train_multi_command(args: argparse.Namespace) -> None:
     data = load_training_data(args)
     results = []
     for horizon in parse_horizons(args.horizons):
-        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon, args.model_dir)
         print(f"Training horizon {horizon} -> {model_path}")
         results.append(run_training_pipeline(args, data, horizon, model_path, artifact_path))
     print(json.dumps({"results": results}, indent=2))
@@ -1543,6 +1544,7 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--symbol", default="BTC/USDT")
         command_parser.add_argument("--timeframe", default="5m")
         command_parser.add_argument("--exchange", default="binance")
+        command_parser.add_argument("--model-dir", default=str(MODELS_DIR))
         command_parser.add_argument("--update", action="store_true", help="Fetch fresh candles before training.")
         command_parser.add_argument("--fundamental-data", default=None, help="Optional Binance Futures fundamentals CSV.")
         command_parser.add_argument("--update-fundamentals", action="store_true", help="Fetch/update Binance Futures fundamentals before training.")

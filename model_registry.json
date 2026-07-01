@@ -1,0 +1,24 @@
+{
+  "updated_at": "2026-07-01T10:48:00+00:00",
+  "active_status": "production_existing",
+  "last_retrain_status": "unknown",
+  "symbol": "BTC/USDT",
+  "timeframe": "1h",
+  "horizons": [
+    1,
+    3,
+    6
+  ],
+  "git_sha": null,
+  "staging_dir": "models/staging",
+  "production_dir": "models",
+  "promoted_files": [],
+  "quality_gate": {
+    "passed": null,
+    "failures": [],
+    "fold_count": null,
+    "average_test_return_pct": null,
+    "profitable_fold_pct": null,
+    "worst_drawdown_pct": null
+  }
+}

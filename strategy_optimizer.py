@@ -9,6 +9,7 @@ from tensorflow.keras.models import load_model
 
 from crypto_predictor import (
     DATA_DIR,
+    MODELS_DIR,
     attach_fundamentals,
     columns_need_fundamentals,
     execution_price,
@@ -59,12 +60,13 @@ def load_horizon_predictions(
     timeframe: str,
     horizons: list[int],
     max_rows: int,
+    model_dir: str | Path = MODELS_DIR,
 ) -> pd.DataFrame:
     prediction_frames = []
     base = None
 
     for horizon in sorted(set(horizons)):
-        model_path, artifact_path = horizon_model_paths(symbol, timeframe, horizon)
+        model_path, artifact_path = horizon_model_paths(symbol, timeframe, horizon, model_dir)
         if not model_path.exists() or not artifact_path.exists():
             raise FileNotFoundError(f"Missing model or artifact for horizon {horizon}: {model_path}")
 
@@ -575,7 +577,7 @@ def prepare_prediction_frame(args: argparse.Namespace) -> pd.DataFrame:
     all_horizons = sorted(set(itertools.chain.from_iterable(horizon_sets)))
     artifacts = []
     for horizon in all_horizons:
-        _, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        _, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon, args.model_dir)
         if artifact_path.exists():
             artifacts.append(load_artifacts(artifact_path))
     data = attach_fundamentals(
@@ -593,6 +595,7 @@ def prepare_prediction_frame(args: argparse.Namespace) -> pd.DataFrame:
         timeframe=args.timeframe,
         horizons=all_horizons,
         max_rows=args.max_train_rows,
+        model_dir=args.model_dir,
     )
 
 
@@ -740,6 +743,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mode", choices=["optimize", "walk-forward"], default="optimize")
     parser.add_argument("--symbol", default="BTC/USDT")
     parser.add_argument("--timeframe", default="1h")
+    parser.add_argument("--model-dir", default=str(MODELS_DIR))
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
     parser.add_argument("--fundamental-data", default=None)
     parser.add_argument("--update-fundamentals", action="store_true")

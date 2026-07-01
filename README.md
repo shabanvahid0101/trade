@@ -23,6 +23,7 @@
 - توضیح دلیل سیگنال در پیام تلگرام و ذخیره دلیل تصمیم در Paper Trading
 - اجرای خودکار با GitHub Actions
 - بازآموزی شبانه مدل در ساعت `02:00 UTC`
+- بازآموزی امن با مدل staging، quality gate و گزارش تلگرام
 - گزارش عملکرد روزانه و Health Check دوره‌ای
 - گزارش عملکرد سیگنال‌ها بر اساس دلیل تصمیم مدل
 
@@ -206,10 +207,12 @@ python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.c
 Workflow فایل `.github/workflows/model-retrain.yml` هر شب ساعت `02:00 UTC` مدل‌های 1 ساعته را دوباره آموزش می‌دهد. مراحل آن:
 
 1. دریافت کندل‌ها و داده فاندامنتال جدید
-2. آموزش مدل‌های افق `1,3,6`
-3. اجرای Walk-forward validation
-4. بررسی کیفیت با `validate_retrain.py`
-5. کامیت وزن‌های جدید فقط اگر Quality Gate قبول شود
+2. آموزش مدل‌های افق `1,3,6` داخل `models/staging`
+3. Smoke test مدل‌های staging
+4. اجرای Walk-forward validation روی staging
+5. بررسی کیفیت با Quality Gate
+6. اگر قبول شد، staging به مدل production در `models/` منتقل می‌شود
+7. در هر حالت، گزارش تلگرام ارسال می‌شود و `model_registry.json` وضعیت آخرین retrain را نگه می‌دارد
 
 ### اجرای رایگان روی GitHub Actions
 
@@ -248,6 +251,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Signal explanation in Telegram messages and paper-trading state
 - GitHub Actions automation
 - Nightly retraining at `02:00 UTC`
+- Safe staging retraining with quality gate and Telegram report
 - Daily performance report and scheduled health checks
 - Signal-performance report grouped by model decision reasons
 
@@ -431,10 +435,12 @@ python strategy_optimizer.py --mode walk-forward --data dataset/1h-btc_history.c
 The `.github/workflows/model-retrain.yml` workflow retrains the 1h models every night at `02:00 UTC`:
 
 1. Refresh market and fundamental data
-2. Train horizons `1,3,6`
-3. Run walk-forward validation
-4. Validate quality with `validate_retrain.py`
-5. Commit refreshed weights only if the quality gate passes
+2. Train horizons `1,3,6` into `models/staging`
+3. Smoke test staging models
+4. Run walk-forward validation against staging
+5. Check the quality gate
+6. If accepted, promote staging into production `models/`
+7. Send a Telegram report either way and store the latest retrain state in `model_registry.json`
 
 ### Free Scheduled Execution
 
