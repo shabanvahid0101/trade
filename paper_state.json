@@ -1,8 +1,8 @@
 {
-  "capital": 99.9,
-  "position": 1,
-  "entry_price": 58946.01,
-  "notional": 100.0,
+  "capital": 99.6925966320706,
+  "position": 0,
+  "entry_price": 0.0,
+  "notional": 0.0,
   "trades": [
     {
       "timestamp": "2026-06-30 14:00:00",
@@ -11,7 +11,24 @@
       "notional": 100.0,
       "fee": 0.1,
       "capital": 99.9
+    },
+    {
+      "timestamp": "2026-07-01 10:00:00",
+      "side": "CLOSE_LONG",
+      "price": 58882.7,
+      "pnl": -0.20740336792940683,
+      "reason": "signal_hold",
+      "signal_reason": "HOLD via hybrid/trend_or_unclear; votes L/S/H=0/0/3; confidence=0.38; expected=0.000%.",
+      "capital": 99.6925966320706
     }
   ],
-  "last_timestamp": "2026-07-01 05:00:00"
+  "last_timestamp": "2026-07-01 10:00:00",
+  "last_signal_reason": "HOLD via hybrid/trend_or_unclear; votes L/S/H=0/0/3; confidence=0.38; expected=0.000%.",
+  "last_signal_reasons": [
+    "HOLD selected because the models did not produce a strong trade signal.",
+    "Strongest horizon is h6 with HOLD confidence 0.42.",
+    "Range context: position=36.1% between 57809.40 and 60780.57.",
+    "Range filter is not active, so the model vote remains the main signal.",
+    "Risk decision: normal | size=1.00 | ok."
+  ]
 }
