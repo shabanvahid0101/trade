@@ -7,7 +7,7 @@ def load_metrics(path: str | Path) -> dict:
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f"Validation output not found: {path}")
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def validate_metrics(

@@ -250,7 +250,7 @@ def send_telegram_message(message: str) -> bool:
         print("Telegram message sent.")
         return True
     except Exception as exc:
-        error = f"Telegram send failed: {exc}"
+        error = f"Telegram send failed: {str(exc).replace(token, '<redacted-token>')}"
         logging.error(error)
         print(error)
         if strict:

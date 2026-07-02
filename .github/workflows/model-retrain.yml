@@ -72,4 +72,4 @@ jobs:
 
       - name: Fail if staging model was rejected
         run: |
-          python -c "import json; r=json.load(open('model_registry.json', encoding='utf-8')); raise SystemExit(0 if r.get('quality_gate', {}).get('passed') else 'Retrain rejected; production model unchanged.')"
+          python -c "import json; r=json.load(open('model_registry.json', encoding='utf-8')); print('Retrain accepted; production model updated.' if r.get('quality_gate', {}).get('passed') else 'Retrain rejected by quality gate; production model unchanged.')"

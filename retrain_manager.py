@@ -86,6 +86,14 @@ def build_registry(
     }
 
 
+def send_retrain_report(message: str) -> bool:
+    try:
+        return send_telegram_message(message)
+    except Exception as exc:
+        print(f"Retrain report telegram send failed: {exc}")
+        return False
+
+
 def format_value(value, suffix: str = "") -> str:
     if value is None:
         return "n/a"
@@ -159,7 +167,7 @@ def main(args: argparse.Namespace) -> dict:
     Path(args.registry).write_text(json.dumps(registry, indent=2), encoding="utf-8")
     print(json.dumps(registry, indent=2))
     if args.telegram:
-        send_telegram_message(build_message(registry))
+        send_retrain_report(build_message(registry))
     if not passed and args.fail_on_reject:
         raise SystemExit("Retrain quality gate failed; production models were not changed.")
     return registry
