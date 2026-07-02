@@ -26,16 +26,36 @@ FUNDAMENTAL_FEATURE_COLUMNS = [
     "funding_rate",
     "funding_rate_change",
     "funding_rate_zscore",
+    "funding_rate_ema_24",
+    "funding_rate_extreme",
     "open_interest_change",
+    "open_interest_change_6",
+    "open_interest_change_24",
     "open_interest_zscore",
     "open_interest_value_change",
+    "open_interest_value_change_24",
     "global_long_short_ratio",
     "global_long_short_ratio_change",
+    "global_long_short_ratio_zscore",
     "global_long_account",
     "global_short_account",
+    "long_account_change",
+    "short_account_change",
+    "long_short_crowding",
     "taker_buy_sell_ratio",
     "taker_buy_sell_ratio_change",
     "taker_buy_pressure",
+    "taker_buy_pressure_change",
+    "taker_buy_pressure_zscore",
+    "taker_buy_imbalance",
+    "taker_buy_imbalance_zscore",
+    "futures_leverage_pressure",
+    "futures_directional_pressure",
+    "futures_crowding_pressure",
+    "futures_squeeze_risk",
+    "futures_pain_risk",
+    "oi_price_divergence_24",
+    "volume_oi_confirmation",
 ]
 
 
@@ -261,24 +281,62 @@ def add_fundamental_features(df: pd.DataFrame) -> pd.DataFrame:
     funding_std = funding.rolling(72).std().replace(0, np.nan)
     frame["funding_rate_change"] = funding.diff()
     frame["funding_rate_zscore"] = (funding - funding.rolling(72).mean()) / funding_std
+    frame["funding_rate_ema_24"] = funding.ewm(span=24, adjust=False).mean()
+    frame["funding_rate_extreme"] = frame["funding_rate_zscore"].abs()
 
     open_interest = frame["open_interest"].replace(0, np.nan)
     oi_std = open_interest.rolling(72).std().replace(0, np.nan)
     frame["open_interest_change"] = np.log(open_interest / open_interest.shift(1))
+    frame["open_interest_change_6"] = np.log(open_interest / open_interest.shift(6))
+    frame["open_interest_change_24"] = np.log(open_interest / open_interest.shift(24))
     frame["open_interest_zscore"] = (open_interest - open_interest.rolling(72).mean()) / oi_std
-    frame["open_interest_value_change"] = np.log(
-        frame["open_interest_value"].replace(0, np.nan) / frame["open_interest_value"].replace(0, np.nan).shift(1)
-    )
+    open_interest_value = frame["open_interest_value"].replace(0, np.nan)
+    frame["open_interest_value_change"] = np.log(open_interest_value / open_interest_value.shift(1))
+    frame["open_interest_value_change_24"] = np.log(open_interest_value / open_interest_value.shift(24))
 
-    frame["global_long_short_ratio_change"] = np.log(
-        frame["global_long_short_ratio"].replace(0, np.nan)
-        / frame["global_long_short_ratio"].replace(0, np.nan).shift(1)
-    )
-    frame["taker_buy_sell_ratio_change"] = np.log(
-        frame["taker_buy_sell_ratio"].replace(0, np.nan) / frame["taker_buy_sell_ratio"].replace(0, np.nan).shift(1)
-    )
+    long_short_ratio = frame["global_long_short_ratio"].replace(0, np.nan)
+    ratio_std = long_short_ratio.rolling(72).std().replace(0, np.nan)
+    frame["global_long_short_ratio_change"] = np.log(long_short_ratio / long_short_ratio.shift(1))
+    frame["global_long_short_ratio_zscore"] = (long_short_ratio - long_short_ratio.rolling(72).mean()) / ratio_std
+    frame["long_account_change"] = frame["global_long_account"].diff()
+    frame["short_account_change"] = frame["global_short_account"].diff()
+    frame["long_short_crowding"] = frame["global_long_account"] - frame["global_short_account"]
+
+    taker_ratio = frame["taker_buy_sell_ratio"].replace(0, np.nan)
+    frame["taker_buy_sell_ratio_change"] = np.log(taker_ratio / taker_ratio.shift(1))
     total_taker = frame["taker_buy_vol"] + frame["taker_sell_vol"]
     frame["taker_buy_pressure"] = frame["taker_buy_vol"] / total_taker.replace(0, np.nan)
+    pressure_std = frame["taker_buy_pressure"].rolling(72).std().replace(0, np.nan)
+    frame["taker_buy_pressure_change"] = frame["taker_buy_pressure"].diff()
+    frame["taker_buy_pressure_zscore"] = (
+        frame["taker_buy_pressure"] - frame["taker_buy_pressure"].rolling(72).mean()
+    ) / pressure_std
+    frame["taker_buy_imbalance"] = (frame["taker_buy_vol"] - frame["taker_sell_vol"]) / total_taker.replace(0, np.nan)
+    imbalance_std = frame["taker_buy_imbalance"].rolling(72).std().replace(0, np.nan)
+    frame["taker_buy_imbalance_zscore"] = (
+        frame["taker_buy_imbalance"] - frame["taker_buy_imbalance"].rolling(72).mean()
+    ) / imbalance_std
+
+    if "close" in frame.columns:
+        close = frame["close"].replace(0, np.nan)
+        price_return_1 = np.log(close / close.shift(1))
+        price_return_24 = np.log(close / close.shift(24))
+    else:
+        price_return_1 = pd.Series(np.nan, index=frame.index)
+        price_return_24 = pd.Series(np.nan, index=frame.index)
+    if "volume" in frame.columns:
+        volume = frame["volume"].replace(0, np.nan)
+        volume_change_24 = np.log(volume / volume.shift(24))
+    else:
+        volume_change_24 = pd.Series(np.nan, index=frame.index)
+
+    frame["futures_leverage_pressure"] = frame["open_interest_change_24"] * frame["funding_rate_zscore"]
+    frame["futures_directional_pressure"] = frame["taker_buy_imbalance_zscore"] * frame["open_interest_change_6"]
+    frame["futures_crowding_pressure"] = frame["funding_rate_zscore"] * frame["long_short_crowding"]
+    frame["futures_squeeze_risk"] = frame["open_interest_zscore"] * (-frame["long_short_crowding"]) * price_return_1.clip(lower=0)
+    frame["futures_pain_risk"] = frame["open_interest_zscore"] * frame["long_short_crowding"] * (-price_return_1.clip(upper=0))
+    frame["oi_price_divergence_24"] = frame["open_interest_change_24"] - price_return_24
+    frame["volume_oi_confirmation"] = volume_change_24 * frame["open_interest_change_24"]
     return frame
 
 

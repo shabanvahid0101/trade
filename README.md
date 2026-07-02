@@ -11,7 +11,7 @@
 - دریافت و به‌روزرسانی کندل‌های جدید بازار
 - آموزش مدل روی داده‌های پیوسته و بدون گپ
 - پیش‌بینی چند افقی با مدل‌های `1,3,6` کندل آینده
-- استفاده از فیچرهای تکنیکال و داده‌های فاندامنتال فیوچرز مثل Funding Rate، Open Interest و Long/Short Ratio
+- استفاده از فیچرهای تکنیکال و داده‌های فاندامنتال فیوچرز مثل Funding Rate، Open Interest، ازدحام لانگ/شورت، فشار خرید/فروش Taker، فشار اهرمی، ریسک Short/Long Squeeze و واگرایی Open Interest با قیمت
 - انتخاب فیچرهای مهم با روش همبستگی روی پنجره آموزش
 - سیگنال‌های `LONG`، `SHORT` و `HOLD`
 - پشتیبانی از Paper Trading با سرمایه مجازی 100 دلار
@@ -91,10 +91,10 @@ python fundamental_data.py --symbol BTC/USDT --timeframe 1h --market-data datase
 بعد مدل‌های چند افقی را آموزش بده:
 
 ```powershell
-python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 24 --min-selected-features 10 --target-mode classification --threshold 0.0015 --min-confidence 0.50
+python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 32 --min-selected-features 12 --target-mode classification --threshold 0.0015 --min-confidence 0.50
 ```
 
-داده فاندامنتال با روش backward as-of merge به کندل‌ها وصل می‌شود؛ یعنی هر کندل فقط داده‌هایی را می‌بیند که در همان زمان یا قبل از آن منتشر شده‌اند.
+داده فاندامنتال با روش backward as-of merge به کندل‌ها وصل می‌شود؛ یعنی هر کندل فقط داده‌هایی را می‌بیند که در همان زمان یا قبل از آن منتشر شده‌اند. فیچرهای مشتق‌شده فیوچرز برای گرفتن نیروهای کوتاه‌مدت اصلی بازار بیت‌کوین ساخته شده‌اند: رشد اهرم، شلوغ شدن سمت لانگ یا شورت، جریان سفارش‌های تهاجمی، افراط Funding، ریسک Squeeze و حالت‌هایی که Open Interest زیاد می‌شود ولی قیمت آن را تایید نمی‌کند.
 
 ### تست سالم بودن مدل‌ها
 
@@ -239,7 +239,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Fetches and updates fresh market candles
 - Trains on continuous data with gap checks
 - Multi-horizon forecasts for `1,3,6` future candles
-- Technical features plus futures fundamentals such as funding rate, open interest, and long/short ratio
+- Technical features plus futures fundamentals such as funding rate, open interest, long/short crowding, taker buy/sell pressure, leverage pressure, squeeze risk, and open-interest/price divergence
 - Correlation-based feature selection on the training window only
 - `LONG`, `SHORT`, and `HOLD` signals
 - Paper trading with a virtual 100 USD account
@@ -319,10 +319,10 @@ python fundamental_data.py --symbol BTC/USDT --timeframe 1h --market-data datase
 Train multi-horizon models:
 
 ```powershell
-python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 24 --min-selected-features 10 --target-mode classification --threshold 0.0015 --min-confidence 0.50
+python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 32 --min-selected-features 12 --target-mode classification --threshold 0.0015 --min-confidence 0.50
 ```
 
-Fundamental data is joined with a backward as-of merge, so each candle only sees values published at or before that candle.
+Fundamental data is joined with a backward as-of merge, so each candle only sees values published at or before that candle. The derived futures features are designed to capture the main short-horizon forces behind BTC moves: leverage expansion, crowded longs/shorts, aggressive taker flow, funding extremes, squeeze risk, and cases where open interest rises while price fails to confirm.
 
 ### Model Smoke Test
 
