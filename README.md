@@ -94,7 +94,7 @@ python fundamental_data.py --symbol BTC/USDT --timeframe 1h --market-data datase
 python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 32 --min-selected-features 12 --target-mode classification --threshold 0.0015 --min-confidence 0.50
 ```
 
-داده فاندامنتال با روش backward as-of merge به کندل‌ها وصل می‌شود؛ یعنی هر کندل فقط داده‌هایی را می‌بیند که در همان زمان یا قبل از آن منتشر شده‌اند. فیچرهای مشتق‌شده فیوچرز برای گرفتن نیروهای کوتاه‌مدت اصلی بازار بیت‌کوین ساخته شده‌اند: رشد اهرم، شلوغ شدن سمت لانگ یا شورت، جریان سفارش‌های تهاجمی، افراط Funding، ریسک Squeeze و حالت‌هایی که Open Interest زیاد می‌شود ولی قیمت آن را تایید نمی‌کند.
+داده فاندامنتال با روش backward as-of merge به کندل‌ها وصل می‌شود؛ یعنی هر کندل فقط داده‌هایی را می‌بیند که در همان زمان یا قبل از آن منتشر شده‌اند. فایل فاندامنتال با کندل‌های بازار هم‌تراز می‌شود و فیچر `fundamental_source_age_hours` به مدل می‌گوید داده واقعی فاندامنتال چند ساعت قدیمی است. فیچرهای مشتق‌شده فیوچرز برای گرفتن نیروهای کوتاه‌مدت اصلی بازار بیت‌کوین ساخته شده‌اند: رشد اهرم، شلوغ شدن سمت لانگ یا شورت، جریان سفارش‌های تهاجمی، افراط Funding، ریسک Squeeze و حالت‌هایی که Open Interest زیاد می‌شود ولی قیمت آن را تایید نمی‌کند.
 
 ### تست سالم بودن مدل‌ها
 
@@ -322,7 +322,7 @@ Train multi-horizon models:
 python crypto_predictor.py train-multi --update --update-fundamentals --symbol BTC/USDT --timeframe 1h --data dataset/1h-btc_history.csv --fundamental-data dataset/1h-btc_fundamentals.csv --horizons 1,3,6 --sequence-length 96 --epochs 40 --max-train-rows 5000 --feature-set advanced-fundamental --feature-selection correlation --max-selected-features 32 --min-selected-features 12 --target-mode classification --threshold 0.0015 --min-confidence 0.50
 ```
 
-Fundamental data is joined with a backward as-of merge, so each candle only sees values published at or before that candle. The derived futures features are designed to capture the main short-horizon forces behind BTC moves: leverage expansion, crowded longs/shorts, aggressive taker flow, funding extremes, squeeze risk, and cases where open interest rises while price fails to confirm.
+Fundamental data is joined with a backward as-of merge, so each candle only sees values published at or before that candle. The fundamental file is aligned to market candles, and `fundamental_source_age_hours` tells the model how old the real source data is. The derived futures features are designed to capture the main short-horizon forces behind BTC moves: leverage expansion, crowded longs/shorts, aggressive taker flow, funding extremes, squeeze risk, and cases where open interest rises while price fails to confirm.
 
 ### Model Smoke Test
 

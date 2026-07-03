@@ -20,6 +20,7 @@ FUNDAMENTAL_COLUMNS = [
     "taker_buy_sell_ratio",
     "taker_buy_vol",
     "taker_sell_vol",
+    "fundamental_source_age_hours",
 ]
 
 FUNDAMENTAL_FEATURE_COLUMNS = [
@@ -56,6 +57,8 @@ FUNDAMENTAL_FEATURE_COLUMNS = [
     "futures_pain_risk",
     "oi_price_divergence_24",
     "volume_oi_confirmation",
+    "fundamental_source_age_hours",
+    "fundamental_source_stale",
 ]
 
 
@@ -143,6 +146,39 @@ def load_market_span(path: str | Path) -> tuple[pd.Timestamp, pd.Timestamp]:
     frame = pd.read_csv(path, usecols=["timestamp"])
     timestamps = pd.to_datetime(frame["timestamp"])
     return timestamps.min(), timestamps.max()
+
+
+def load_market_timestamps(path: str | Path) -> pd.Series:
+    frame = pd.read_csv(path, usecols=["timestamp"])
+    return pd.to_datetime(frame["timestamp"], format="mixed").dropna().sort_values().drop_duplicates().reset_index(drop=True)
+
+
+def align_fundamentals_to_market(fundamentals: pd.DataFrame, market_timestamps: pd.Series) -> pd.DataFrame:
+    market = pd.DataFrame({"timestamp": pd.to_datetime(market_timestamps)})
+    values = fundamentals.copy().sort_values("timestamp").drop_duplicates(subset=["timestamp"], keep="last")
+    if market.empty:
+        return values[["timestamp", *FUNDAMENTAL_COLUMNS]]
+    raw_columns = [column for column in FUNDAMENTAL_COLUMNS if column != "fundamental_source_age_hours"]
+    for column in raw_columns:
+        if column not in values.columns:
+            values[column] = np.nan
+    if values.empty:
+        values = pd.DataFrame(columns=["timestamp", "source_timestamp", *raw_columns])
+    else:
+        non_empty = values[raw_columns].notna().any(axis=1)
+        values["source_timestamp"] = values["timestamp"].where(non_empty)
+    aligned = pd.merge_asof(
+        market,
+        values[["timestamp", "source_timestamp", *raw_columns]],
+        on="timestamp",
+        direction="backward",
+    )
+    aligned[raw_columns] = aligned[raw_columns].ffill()
+    aligned["source_timestamp"] = pd.to_datetime(aligned["source_timestamp"]).ffill()
+    aligned["fundamental_source_age_hours"] = (
+        (aligned["timestamp"] - aligned["source_timestamp"]).dt.total_seconds() / 3600
+    ).clip(lower=0)
+    return aligned[["timestamp", *FUNDAMENTAL_COLUMNS]]
 
 
 def fetch_binance_fundamentals(
@@ -276,6 +312,8 @@ def add_fundamental_features(df: pd.DataFrame) -> pd.DataFrame:
 
     for column in FUNDAMENTAL_COLUMNS:
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    frame["fundamental_source_age_hours"] = frame["fundamental_source_age_hours"].fillna(0)
+    frame["fundamental_source_stale"] = (frame["fundamental_source_age_hours"] / 24).clip(lower=0, upper=7)
 
     funding = frame["funding_rate"]
     funding_std = funding.rolling(72).std().replace(0, np.nan)
@@ -361,8 +399,14 @@ def update_fundamental_file(
         .sort_values("timestamp")
         .reset_index(drop=True)
     )
+    combined = align_fundamentals_to_market(combined, load_market_timestamps(market_data))
     combined.to_csv(output, index=False)
-    print(f"Fundamental data updated: {output} rows={len(combined)} last={combined['timestamp'].max() if not combined.empty else None}")
+    max_source_age = combined["fundamental_source_age_hours"].max() if "fundamental_source_age_hours" in combined else None
+    print(
+        f"Fundamental data updated: {output} rows={len(combined)} "
+        f"last={combined['timestamp'].max() if not combined.empty else None} "
+        f"max_source_age_hours={max_source_age}"
+    )
     return combined
 
 

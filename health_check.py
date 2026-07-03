@@ -82,17 +82,29 @@ def fundamentals_health(path: str | Path, max_age_hours: float) -> dict:
     status = file_status(path)
     if not status["exists"]:
         return {**status, "ok": False, "error": "missing_file"}
-    timestamps = read_timestamps(path)
+    frame = pd.read_csv(path)
+    if "timestamp" not in frame.columns:
+        return {**status, "ok": False, "error": "missing_timestamp"}
+    frame["timestamp"] = pd.to_datetime(frame["timestamp"], format="mixed")
+    frame = frame.dropna(subset=["timestamp"]).sort_values("timestamp").reset_index(drop=True)
+    timestamps = frame["timestamp"]
     if timestamps.empty:
         return {**status, "ok": False, "error": "empty_dataset"}
     last_timestamp = timestamps.iloc[-1]
     age = hours_since(last_timestamp)
+    source_age = None
+    if "fundamental_source_age_hours" in frame.columns and not frame.empty:
+        source_age = pd.to_numeric(frame["fundamental_source_age_hours"], errors="coerce").iloc[-1]
+        if pd.isna(source_age):
+            source_age = None
+    source_ok = source_age is None or float(source_age) <= max_age_hours
     return {
         **status,
-        "ok": age <= max_age_hours,
+        "ok": age <= max_age_hours and source_ok,
         "rows": int(len(timestamps)),
         "last_timestamp": str(last_timestamp),
         "age_hours": age,
+        "source_age_hours": None if source_age is None else float(source_age),
         "max_age_hours": max_age_hours,
     }
 
@@ -168,10 +180,13 @@ def build_message(report: dict) -> str:
     market = report["market_data"]
     fundamentals = report["fundamentals"]
     paper = report["paper_equity"]
+    source_age = fundamentals.get("source_age_hours")
+    source_age_text = f"{source_age:.2f}h" if source_age is not None else "n/a"
     lines = [
         f"<b>Bot Health: {status}</b>",
         f"Market last: {market.get('last_timestamp')} ({market.get('age_hours', 0):.2f}h old)",
-        f"Fundamentals last: {fundamentals.get('last_timestamp')} ({fundamentals.get('age_hours', 0):.2f}h old)",
+        f"Fundamentals last: {fundamentals.get('last_timestamp')} "
+        f"({fundamentals.get('age_hours', 0):.2f}h file, {source_age_text} source)",
         f"Models: {'OK' if report['models']['ok'] else 'WARN'}",
         f"Paper state: {report['paper_state'].get('last_timestamp')} | Alert state: {report['alert_state'].get('last_timestamp')}",
         f"Position: {paper['position']} | Equity: ${paper['equity']:.2f} ({paper['return_pct']:+.2f}%)",
