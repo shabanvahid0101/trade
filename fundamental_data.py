@@ -1,4 +1,5 @@
 import argparse
+import os
 import time
 from pathlib import Path
 
@@ -154,8 +155,9 @@ def load_market_timestamps(path: str | Path) -> pd.Series:
 
 
 def align_fundamentals_to_market(fundamentals: pd.DataFrame, market_timestamps: pd.Series) -> pd.DataFrame:
-    market = pd.DataFrame({"timestamp": pd.to_datetime(market_timestamps)})
+    market = pd.DataFrame({"timestamp": pd.to_datetime(market_timestamps).astype("datetime64[ns]")})
     values = fundamentals.copy().sort_values("timestamp").drop_duplicates(subset=["timestamp"], keep="last")
+    values["timestamp"] = pd.to_datetime(values["timestamp"], format="mixed").astype("datetime64[ns]")
     if market.empty:
         return values[["timestamp", *FUNDAMENTAL_COLUMNS]]
     raw_columns = [column for column in FUNDAMENTAL_COLUMNS if column != "fundamental_source_age_hours"]
@@ -400,7 +402,9 @@ def update_fundamental_file(
         .reset_index(drop=True)
     )
     combined = align_fundamentals_to_market(combined, load_market_timestamps(market_data))
-    combined.to_csv(output, index=False)
+    temp_output = output.with_name(f"{output.name}.tmp.{os.getpid()}")
+    combined.to_csv(temp_output, index=False)
+    temp_output.replace(output)
     max_source_age = combined["fundamental_source_age_hours"].max() if "fundamental_source_age_hours" in combined else None
     print(
         f"Fundamental data updated: {output} rows={len(combined)} "
