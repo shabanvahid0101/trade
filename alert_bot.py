@@ -18,7 +18,7 @@ from crypto_predictor import (
     predict_next_price,
     send_telegram_message,
 )
-from signal_explainer import build_signal_explanation, format_explanation_for_telegram
+from signal_explainer import build_signal_explanation, fa_regime, fa_signal, fa_strategy, format_explanation_for_telegram
 from strategy_rules import apply_hybrid_to_latest
 
 
@@ -50,16 +50,16 @@ def parse_horizons(value: str) -> list[int]:
 def build_alert_message(symbol: str, timeframe: str, result: dict, horizon_results: list[dict]) -> str:
     explanation = build_signal_explanation(result, horizon_results)
     return (
-        f"<b>Signal {result['signal']} {symbol}</b>\n"
-        f"Timeframe: {timeframe}\n"
-        f"Time: {result['timestamp']}\n"
-        f"Price: ${result['current_price']:.2f}\n"
-        f"Strategy: {result.get('strategy', 'model')} | Regime: {result.get('market_regime', 'model')}\n"
-        f"Expected: {result['predicted_return_pct']:.3f}%\n"
-        f"Confidence: {result['confidence']:.2f}\n"
-        f"Votes: LONG {result['long_votes']} | SHORT {result['short_votes']} | HOLD {result['hold_votes']}\n\n"
+        f"<b>سیگنال {fa_signal(result['signal'])} ({result['signal']}) برای {symbol}</b>\n"
+        f"تایم‌فریم: {timeframe}\n"
+        f"زمان کندل: {result['timestamp']} UTC\n"
+        f"قیمت فعلی: ${result['current_price']:.2f}\n"
+        f"استراتژی: {fa_strategy(result.get('strategy', 'model'))} | وضعیت بازار: {fa_regime(result.get('market_regime', 'model'))}\n"
+        f"حرکت مورد انتظار: {result['predicted_return_pct']:.3f}%\n"
+        f"اطمینان مدل: {result['confidence']:.2f}\n"
+        f"رأی‌ها: لانگ {result['long_votes']} | شورت {result['short_votes']} | هولد {result['hold_votes']}\n\n"
         f"{format_explanation_for_telegram(explanation)}\n\n"
-        "This is a trade alert, not a profit guarantee. Risk control and stop loss are required."
+        "این فقط هشدار معاملاتی است، تضمین سود نیست. مدیریت ریسک و حد ضرر لازم است."
     )
 
 

@@ -181,19 +181,28 @@ def build_message(report: dict) -> str:
     fundamentals = report["fundamentals"]
     paper = report["paper_equity"]
     source_age = fundamentals.get("source_age_hours")
-    source_age_text = f"{source_age:.2f}h" if source_age is not None else "n/a"
+    source_age_text = f"{source_age:.2f} ساعت" if source_age is not None else "n/a"
+    status_text = "سالم" if status == "OK" else "هشدار"
+    position_text = {"LONG": "لانگ", "SHORT": "شورت", "FLAT": "بدون پوزیشن"}.get(paper["position"], paper["position"])
+    warning_names = {
+        "market_data_stale_or_gapped": "دیتای بازار قدیمی است یا گپ دارد",
+        "fundamentals_stale_or_missing": "دیتای فاندامنتال قدیمی یا ناقص است",
+        "models_missing_or_empty": "فایل‌های مدل ناقص هستند",
+        "paper_state_not_on_latest_market_candle": "Paper Trading روی آخرین کندل بازار نیست",
+        "alert_state_not_on_latest_market_candle": "Alert روی آخرین کندل بازار نیست",
+    }
     lines = [
-        f"<b>Bot Health: {status}</b>",
-        f"Market last: {market.get('last_timestamp')} ({market.get('age_hours', 0):.2f}h old)",
-        f"Fundamentals last: {fundamentals.get('last_timestamp')} "
-        f"({fundamentals.get('age_hours', 0):.2f}h file, {source_age_text} source)",
-        f"Models: {'OK' if report['models']['ok'] else 'WARN'}",
-        f"Paper state: {report['paper_state'].get('last_timestamp')} | Alert state: {report['alert_state'].get('last_timestamp')}",
-        f"Position: {paper['position']} | Equity: ${paper['equity']:.2f} ({paper['return_pct']:+.2f}%)",
+        f"<b>سلامت بات: {status_text} ({status})</b>",
+        f"آخرین کندل بازار: {market.get('last_timestamp')} ({market.get('age_hours', 0):.2f} ساعت قبل)",
+        f"آخرین فاندامنتال: {fundamentals.get('last_timestamp')} "
+        f"({fundamentals.get('age_hours', 0):.2f} ساعت فایل، {source_age_text} منبع)",
+        f"مدل‌ها: {'سالم' if report['models']['ok'] else 'هشدار'}",
+        f"Paper: {report['paper_state'].get('last_timestamp')} | Alert: {report['alert_state'].get('last_timestamp')}",
+        f"پوزیشن: {position_text} | ارزش حساب: ${paper['equity']:.2f} ({paper['return_pct']:+.2f}%)",
     ]
     if report["warnings"]:
-        lines.append("Warnings:")
-        lines.extend(f"- {warning}" for warning in report["warnings"])
+        lines.append("هشدارها:")
+        lines.extend(f"- {warning_names.get(warning, warning)}" for warning in report["warnings"])
     return "\n".join(lines)
 
 

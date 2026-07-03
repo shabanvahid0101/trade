@@ -25,7 +25,7 @@ from crypto_predictor import (
     send_telegram_message,
 )
 from risk_manager import apply_dynamic_position_sizing, decision_to_dict, evaluate_risk
-from signal_explainer import build_signal_explanation, format_explanation_for_telegram
+from signal_explainer import build_signal_explanation, fa_code, fa_regime, fa_signal, fa_strategy, format_explanation_for_telegram
 from strategy_rules import apply_hybrid_to_latest, apply_hybrid_to_returns
 
 
@@ -458,17 +458,17 @@ def run_single(args: argparse.Namespace) -> dict:
         quality = risk.get("signal_quality_score")
         quality_text = f"{float(quality):.2f}" if quality is not None else "n/a"
         send_telegram_message(
-            f"<b>Paper Trading {args.symbol}</b>\n"
-            f"Signal: {final['signal']}\n"
-            f"Strategy: {final.get('strategy', 'model')} | Regime: {final.get('market_regime', 'model')}\n"
-            f"Risk: {risk['risk_level']} | Size: {risk['position_size_pct']:.2f} | {risk['reason']}\n"
-            f"Size reason: {risk.get('position_size_reason', 'n/a')} | Quality: {quality_text}\n"
-            f"Costs: fee {args.fee_rate:.4f} | spread {args.spread_bps:.2f} bps | slip {args.slippage_bps:.2f} bps\n"
-            f"Position: {position_name}\n"
-            f"Price: ${final['current_price']:.2f}\n"
-            f"Equity: ${trade_result['equity']:.2f}\n"
-            f"Capital: ${float(state['capital']):.2f}\n"
-            f"Confidence: {final['confidence']:.2f}\n\n"
+            f"<b>Paper Trading - {args.symbol}</b>\n"
+            f"سیگنال: {fa_signal(final['signal'])} ({final['signal']})\n"
+            f"استراتژی: {fa_strategy(final.get('strategy', 'model'))} | وضعیت بازار: {fa_regime(final.get('market_regime', 'model'))}\n"
+            f"ریسک: {fa_code(risk['risk_level'])} | حجم معامله: {risk['position_size_pct']:.2f} | دلیل: {fa_code(risk['reason'])}\n"
+            f"دلیل حجم: {fa_code(risk.get('position_size_reason'))} | کیفیت سیگنال: {quality_text}\n"
+            f"هزینه‌ها: کارمزد {args.fee_rate:.4f} | اسپرد {args.spread_bps:.2f} bps | اسلیپیج {args.slippage_bps:.2f} bps\n"
+            f"پوزیشن فعلی: {fa_signal(position_name)} ({position_name})\n"
+            f"قیمت: ${final['current_price']:.2f}\n"
+            f"ارزش حساب: ${trade_result['equity']:.2f}\n"
+            f"سرمایه آزاد: ${float(state['capital']):.2f}\n"
+            f"اطمینان مدل: {final['confidence']:.2f}\n\n"
             f"{format_explanation_for_telegram(signal_explanation)}"
         )
     return output

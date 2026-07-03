@@ -105,20 +105,20 @@ def format_value(value, suffix: str = "") -> str:
 
 def build_message(registry: dict) -> str:
     gate = registry["quality_gate"]
-    status_text = "PASSED - production updated" if gate["passed"] else "FAILED - production unchanged"
+    status_text = "قبول شد - مدل اصلی آپدیت شد" if gate["passed"] else "رد شد - مدل قبلی فعال ماند"
     failures = gate.get("failures") or []
-    failure_text = "\n".join(f"- {failure}" for failure in failures) if failures else "none"
+    failure_text = "\n".join(f"- {failure}" for failure in failures) if failures else "ندارد"
     return (
-        f"<b>Nightly Model Retrain</b>\n"
-        f"Status: {status_text}\n"
-        f"Symbol: {registry['symbol']} {registry['timeframe']}\n"
-        f"Horizons: {','.join(str(h) for h in registry['horizons'])}\n"
-        f"Avg return: {format_value(gate.get('average_test_return_pct'), '%')}\n"
-        f"Profitable folds: {format_value(gate.get('profitable_fold_pct'), '%')}\n"
-        f"Worst drawdown: {format_value(gate.get('worst_drawdown_pct'), '%')}\n"
-        f"Fold count: {gate.get('fold_count', 'n/a')}\n"
+        f"<b>گزارش آموزش شبانه مدل</b>\n"
+        f"وضعیت: {status_text}\n"
+        f"نماد: {registry['symbol']} | تایم‌فریم: {registry['timeframe']}\n"
+        f"افق‌ها: {','.join(str(h) for h in registry['horizons'])}\n"
+        f"میانگین بازده تست: {format_value(gate.get('average_test_return_pct'), '%')}\n"
+        f"درصد foldهای سودده: {format_value(gate.get('profitable_fold_pct'), '%')}\n"
+        f"بدترین افت سرمایه: {format_value(gate.get('worst_drawdown_pct'), '%')}\n"
+        f"تعداد fold: {gate.get('fold_count', 'n/a')}\n"
         f"Git: {registry.get('git_sha') or 'n/a'}\n"
-        f"Failures: {failure_text}"
+        f"دلایل رد شدن: {failure_text}"
     )
 
 

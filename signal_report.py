@@ -170,10 +170,10 @@ def _format_group_lines(groups: dict[str, dict], title: str, limit: int = 6) -> 
     ranked = sorted(groups.items(), key=lambda item: item[1]["pnl"], reverse=True)
     for name, stats in ranked[:limit]:
         confidence = stats.get("avg_confidence")
-        confidence_text = f", conf {confidence:.2f}" if confidence is not None else ""
+        confidence_text = f"، اطمینان {confidence:.2f}" if confidence is not None else ""
         lines.append(
-            f"- {name}: {stats['count']} trades, pnl {_money(stats['pnl'])}, "
-            f"win {stats['win_rate_pct']:.1f}%{confidence_text}"
+            f"- {name}: {stats['count']} معامله، سود/ضرر {_money(stats['pnl'])}، "
+            f"نرخ برد {stats['win_rate_pct']:.1f}%{confidence_text}"
         )
     return lines
 
@@ -181,35 +181,35 @@ def _format_group_lines(groups: dict[str, dict], title: str, limit: int = 6) -> 
 def build_message(report: dict, symbol: str) -> str:
     overall = report["overall"]
     lines = [
-        f"<b>Signal Performance {symbol}</b>",
-        f"Closed trades: {report['closed_trade_count']} | Open events: {report['open_trade_count']}",
-        f"Total signal PnL: {_money(overall['pnl'])}",
-        f"Win rate: {overall['win_rate_pct']:.1f}% | Avg trade: {_money(overall['avg_pnl'])}",
+        f"<b>گزارش کیفیت سیگنال‌ها - {symbol}</b>",
+        f"معاملات بسته‌شده: {report['closed_trade_count']} | رویدادهای باز: {report['open_trade_count']}",
+        f"سود/ضرر کل سیگنال‌ها: {_money(overall['pnl'])}",
+        f"نرخ برد: {overall['win_rate_pct']:.1f}% | میانگین هر معامله: {_money(overall['avg_pnl'])}",
     ]
     if report["missing_signal_reason_count"]:
-        lines.append(f"Missing reason events: {report['missing_signal_reason_count']} old events")
+        lines.append(f"رویدادهای قدیمی بدون دلیل ثبت‌شده: {report['missing_signal_reason_count']}")
 
     lines.append("")
-    lines.extend(_format_group_lines(report["by_signal"], "By Signal"))
+    lines.extend(_format_group_lines(report["by_signal"], "بر اساس سیگنال"))
     lines.append("")
-    lines.extend(_format_group_lines(report["by_regime"], "By Regime"))
+    lines.extend(_format_group_lines(report["by_regime"], "بر اساس وضعیت بازار"))
 
     best = report.get("best_trade")
     worst = report.get("worst_trade")
     lines.append("")
     if best:
-        lines.append(f"Best: {_money(best['pnl'])} | {best.get('signal_reason') or best.get('reason')}")
+        lines.append(f"بهترین: {_money(best['pnl'])} | {best.get('signal_reason') or best.get('reason')}")
     else:
-        lines.append("Best: n/a")
+        lines.append("بهترین: n/a")
     if worst:
-        lines.append(f"Worst: {_money(worst['pnl'])} | {worst.get('signal_reason') or worst.get('reason')}")
+        lines.append(f"بدترین: {_money(worst['pnl'])} | {worst.get('signal_reason') or worst.get('reason')}")
     else:
-        lines.append("Worst: n/a")
+        lines.append("بدترین: n/a")
 
     last_reason = report.get("last_signal_reason")
     if last_reason:
         lines.append("")
-        lines.append(f"Last signal: {last_reason}")
+        lines.append(f"آخرین سیگنال: {last_reason}")
     return "\n".join(lines)
 
 

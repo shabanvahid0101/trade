@@ -149,6 +149,10 @@ def safe_symbol_name(symbol: str) -> str:
     return "".join(char for char in symbol.upper() if char.isalnum())
 
 
+def fa_signal(signal: str) -> str:
+    return {"LONG": "لانگ", "SHORT": "شورت", "HOLD": "هولد", "FLAT": "بدون پوزیشن"}.get(str(signal), str(signal))
+
+
 def horizon_model_paths(symbol: str, timeframe: str, horizon: int, model_dir: str | Path | None = None) -> tuple[Path, Path]:
     prefix = f"{safe_symbol_name(symbol)}_{timeframe}_h{horizon}"
     base_dir = Path(model_dir) if model_dir else MODELS_DIR
@@ -1439,11 +1443,11 @@ def predict_command(args: argparse.Namespace) -> None:
     print(json.dumps(result, indent=2))
     if args.telegram:
         send_telegram_message(
-            f"<b>{result['signal']}</b> {args.symbol}\n"
-            f"Current: ${result['current_price']:.2f}\n"
-            f"Predicted: ${result['predicted_price']:.2f}\n"
-            f"Expected: {result['predicted_return_pct']:.3f}%\n"
-            f"Confidence: {result['confidence']:.2f}"
+            f"<b>پیش‌بینی {fa_signal(result['signal'])} ({result['signal']}) برای {args.symbol}</b>\n"
+            f"قیمت فعلی: ${result['current_price']:.2f}\n"
+            f"قیمت پیش‌بینی‌شده: ${result['predicted_price']:.2f}\n"
+            f"حرکت مورد انتظار: {result['predicted_return_pct']:.3f}%\n"
+            f"اطمینان مدل: {result['confidence']:.2f}"
         )
 
 
@@ -1523,10 +1527,10 @@ def predict_multi_command(args: argparse.Namespace) -> None:
     print(json.dumps(output, indent=2))
     if args.telegram:
         send_telegram_message(
-            f"<b>{final_signal['signal']}</b> {args.symbol} multi-horizon\n"
-            f"Current: ${final_signal['current_price']:.2f}\n"
-            f"Expected: {final_signal['predicted_return_pct']:.3f}%\n"
-            f"Confidence: {final_signal['confidence']:.2f}"
+            f"<b>پیش‌بینی چندافقی {fa_signal(final_signal['signal'])} ({final_signal['signal']}) برای {args.symbol}</b>\n"
+            f"قیمت فعلی: ${final_signal['current_price']:.2f}\n"
+            f"حرکت مورد انتظار: {final_signal['predicted_return_pct']:.3f}%\n"
+            f"اطمینان مدل: {final_signal['confidence']:.2f}"
         )
 
 

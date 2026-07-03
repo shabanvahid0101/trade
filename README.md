@@ -20,6 +20,7 @@
 - تنظیم هوشمند حجم معامله بر اساس کیفیت سیگنال
 - شبیه‌سازی واقع‌بینانه‌تر اجرا با Spread و Slippage
 - ارسال پیام تلگرام حتی برای `HOLD`
+- پیام‌های فارسی تلگرام برای Alert، Paper Trading، Health Check، Retrain و گزارش عملکرد
 - توضیح دلیل سیگنال در پیام تلگرام و ذخیره دلیل تصمیم در Paper Trading
 - اجرای خودکار با GitHub Actions
 - بازآموزی شبانه مدل در ساعت `02:00 UTC`
@@ -248,6 +249,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Dynamic position sizing based on signal quality
 - More realistic execution simulation with spread and slippage
 - Telegram alerts, including `HOLD` messages
+- Persian Telegram messages for alerts, paper trading, health checks, retraining, and performance reports
 - Signal explanation in Telegram messages and paper-trading state
 - GitHub Actions automation
 - Nightly retraining at `02:00 UTC`
