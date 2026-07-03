@@ -43,12 +43,12 @@
       "capital": 95.71018183153046
     }
   ],
-  "last_timestamp": "2026-07-03 11:00:00",
-  "last_signal_reason": "HOLD via hybrid/trend_or_unclear; votes L/S/H=0/0/3; confidence=0.41; expected=0.000%.",
+  "last_timestamp": "2026-07-03 13:00:00",
+  "last_signal_reason": "HOLD via hybrid/trend_or_unclear; votes L/S/H=0/0/3; confidence=0.42; expected=0.000%.",
   "last_signal_reasons": [
     "HOLD selected because the models did not produce a strong trade signal.",
-    "Strongest horizon is h3 with HOLD confidence 0.44.",
-    "Range context: position=92.3% between 58368.10 and 62209.20.",
+    "Strongest horizon is h3 with HOLD confidence 0.46.",
+    "Range context: position=94.4% between 58525.20 and 62209.20.",
     "Range filter is not active, so the model vote remains the main signal.",
     "Risk decision: reduced | size=0.00 | drawdown_reduced_size | quality=0.00 | size_reason=no_trade_signal."
   ]
