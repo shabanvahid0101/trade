@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-04T05:46:59+00:00",
+  "updated_at": "2026-07-04T13:41:12+00:00",
   "active_status": "production_updated",
   "last_retrain_status": "passed",
   "symbol": "BTC/USDT",
@@ -9,23 +9,23 @@
     3,
     6
   ],
-  "git_sha": "f6a9bc3",
-  "staging_dir": "models/staging",
+  "git_sha": "32640b0",
+  "staging_dir": "models\\staging",
   "production_dir": "models",
   "promoted_files": [
-    "models/BTCUSDT_1h_h1.keras",
-    "models/BTCUSDT_1h_h1_artifact.pkl",
-    "models/BTCUSDT_1h_h3.keras",
-    "models/BTCUSDT_1h_h3_artifact.pkl",
-    "models/BTCUSDT_1h_h6.keras",
-    "models/BTCUSDT_1h_h6_artifact.pkl"
+    "models\\BTCUSDT_1h_h1.keras",
+    "models\\BTCUSDT_1h_h1_artifact.pkl",
+    "models\\BTCUSDT_1h_h3.keras",
+    "models\\BTCUSDT_1h_h3_artifact.pkl",
+    "models\\BTCUSDT_1h_h6.keras",
+    "models\\BTCUSDT_1h_h6_artifact.pkl"
   ],
   "quality_gate": {
     "passed": true,
     "failures": [],
     "fold_count": 4,
-    "average_test_return_pct": 0.9002052074623845,
+    "average_test_return_pct": 2.102293822235726,
     "profitable_fold_pct": 50.0,
-    "worst_drawdown_pct": -3.207725208858847
+    "worst_drawdown_pct": -2.4096087989257886
   }
 }
