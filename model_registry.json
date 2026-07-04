@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-03T05:54:11+00:00",
+  "updated_at": "2026-07-04T05:46:59+00:00",
   "active_status": "production_updated",
   "last_retrain_status": "passed",
   "symbol": "BTC/USDT",
@@ -9,7 +9,7 @@
     3,
     6
   ],
-  "git_sha": "f035d6e",
+  "git_sha": "f6a9bc3",
   "staging_dir": "models/staging",
   "production_dir": "models",
   "promoted_files": [
@@ -24,8 +24,8 @@
     "passed": true,
     "failures": [],
     "fold_count": 4,
-    "average_test_return_pct": 3.2279211514763317,
-    "profitable_fold_pct": 75.0,
-    "worst_drawdown_pct": -3.3091009413801498
+    "average_test_return_pct": 0.9002052074623845,
+    "profitable_fold_pct": 50.0,
+    "worst_drawdown_pct": -3.207725208858847
   }
 }
