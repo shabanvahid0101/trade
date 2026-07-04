@@ -24,8 +24,7 @@ FUNDAMENTAL_COLUMNS = [
     "fundamental_source_age_hours",
 ]
 
-FUNDAMENTAL_FEATURE_COLUMNS = [
-    "funding_rate",
+DERIVED_FUNDAMENTAL_FEATURE_COLUMNS = [
     "funding_rate_change",
     "funding_rate_zscore",
     "funding_rate_ema_24",
@@ -36,15 +35,11 @@ FUNDAMENTAL_FEATURE_COLUMNS = [
     "open_interest_zscore",
     "open_interest_value_change",
     "open_interest_value_change_24",
-    "global_long_short_ratio",
     "global_long_short_ratio_change",
     "global_long_short_ratio_zscore",
-    "global_long_account",
-    "global_short_account",
     "long_account_change",
     "short_account_change",
     "long_short_crowding",
-    "taker_buy_sell_ratio",
     "taker_buy_sell_ratio_change",
     "taker_buy_pressure",
     "taker_buy_pressure_change",
@@ -58,6 +53,22 @@ FUNDAMENTAL_FEATURE_COLUMNS = [
     "futures_pain_risk",
     "oi_price_divergence_24",
     "volume_oi_confirmation",
+    "fundamental_source_stale",
+]
+
+FUNDAMENTAL_FEATURE_COLUMNS = [
+    "funding_rate",
+    *DERIVED_FUNDAMENTAL_FEATURE_COLUMNS[:10],
+    "global_long_short_ratio",
+    "global_long_short_ratio_change",
+    "global_long_short_ratio_zscore",
+    "global_long_account",
+    "global_short_account",
+    "long_account_change",
+    "short_account_change",
+    "long_short_crowding",
+    "taker_buy_sell_ratio",
+    *DERIVED_FUNDAMENTAL_FEATURE_COLUMNS[15:28],
     "fundamental_source_age_hours",
     "fundamental_source_stale",
 ]
@@ -377,6 +388,9 @@ def add_fundamental_features(df: pd.DataFrame) -> pd.DataFrame:
     frame["futures_pain_risk"] = frame["open_interest_zscore"] * frame["long_short_crowding"] * (-price_return_1.clip(upper=0))
     frame["oi_price_divergence_24"] = frame["open_interest_change_24"] - price_return_24
     frame["volume_oi_confirmation"] = volume_change_24 * frame["open_interest_change_24"]
+    for column in DERIVED_FUNDAMENTAL_FEATURE_COLUMNS:
+        if column in frame.columns:
+            frame[column] = frame[column].replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return frame
 
 
