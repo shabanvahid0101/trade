@@ -1,0 +1,505 @@
+{
+  "dataset": "dataset/1h-btc_history.csv",
+  "rows": 5605,
+  "first_timestamp": "2025-11-12 23:00:00",
+  "last_timestamp": "2026-07-04 11:00:00",
+  "thresholds": {
+    "abs_return_p95": 0.010415128201333636,
+    "up_return_p95": 0.007415811148974571,
+    "down_return_p05": -0.007567529412461541
+  },
+  "top_hours_by_avg_abs_return": [
+    {
+      "hour": 15,
+      "rows": 233,
+      "avg_return": 0.0001520986735526544,
+      "avg_abs_return": 0.005406694137724934,
+      "median_abs_return": 0.003154008213079207,
+      "p95_abs_return": 0.017678970297343336,
+      "big_move_rate": 0.15879828326180256,
+      "big_up_rate": 0.12875536480686695,
+      "big_down_rate": 0.11158798283261803
+    },
+    {
+      "hour": 14,
+      "rows": 233,
+      "avg_return": -6.602800170820396e-05,
+      "avg_abs_return": 0.004804753842493164,
+      "median_abs_return": 0.0032322218388280977,
+      "p95_abs_return": 0.014583237683764457,
+      "big_move_rate": 0.11587982832618025,
+      "big_up_rate": 0.11587982832618025,
+      "big_down_rate": 0.0944206008583691
+    },
+    {
+      "hour": 13,
+      "rows": 233,
+      "avg_return": -0.0008297422304941927,
+      "avg_abs_return": 0.004380021098531109,
+      "median_abs_return": 0.002834505992487024,
+      "p95_abs_return": 0.012880284911067673,
+      "big_move_rate": 0.09012875536480687,
+      "big_up_rate": 0.08583690987124463,
+      "big_down_rate": 0.0944206008583691
+    },
+    {
+      "hour": 17,
+      "rows": 233,
+      "avg_return": -0.0004586972662800007,
+      "avg_abs_return": 0.00407546746980037,
+      "median_abs_return": 0.003003036527641334,
+      "p95_abs_return": 0.011895010706664166,
+      "big_move_rate": 0.07296137339055794,
+      "big_up_rate": 0.04721030042918455,
+      "big_down_rate": 0.10300429184549356
+    },
+    {
+      "hour": 16,
+      "rows": 233,
+      "avg_return": -0.0003555971804722762,
+      "avg_abs_return": 0.0038964667852656744,
+      "median_abs_return": 0.002729099564240167,
+      "p95_abs_return": 0.01241769950560398,
+      "big_move_rate": 0.07725321888412018,
+      "big_up_rate": 0.04291845493562232,
+      "big_down_rate": 0.06437768240343347
+    },
+    {
+      "hour": 18,
+      "rows": 233,
+      "avg_return": -0.00045343721477505614,
+      "avg_abs_return": 0.0035456442657519132,
+      "median_abs_return": 0.002497820771878212,
+      "p95_abs_return": 0.010894211618766155,
+      "big_move_rate": 0.055793991416309016,
+      "big_up_rate": 0.04721030042918455,
+      "big_down_rate": 0.07296137339055794
+    },
+    {
+      "hour": 1,
+      "rows": 234,
+      "avg_return": 0.00014463185078788363,
+      "avg_abs_return": 0.0035117453473682346,
+      "median_abs_return": 0.0022437590038001387,
+      "p95_abs_return": 0.010801259838190047,
+      "big_move_rate": 0.05555555555555555,
+      "big_up_rate": 0.05982905982905983,
+      "big_down_rate": 0.038461538461538464
+    },
+    {
+      "hour": 22,
+      "rows": 233,
+      "avg_return": 0.00018485006288808137,
+      "avg_abs_return": 0.003265854482864775,
+      "median_abs_return": 0.0018576887600474379,
+      "p95_abs_return": 0.010878048280741678,
+      "big_move_rate": 0.055793991416309016,
+      "big_up_rate": 0.06437768240343347,
+      "big_down_rate": 0.034334763948497854
+    }
+  ],
+  "top_hours_by_big_move_rate": [
+    {
+      "hour": 15,
+      "rows": 233,
+      "avg_return": 0.0001520986735526544,
+      "avg_abs_return": 0.005406694137724934,
+      "median_abs_return": 0.003154008213079207,
+      "p95_abs_return": 0.017678970297343336,
+      "big_move_rate": 0.15879828326180256,
+      "big_up_rate": 0.12875536480686695,
+      "big_down_rate": 0.11158798283261803
+    },
+    {
+      "hour": 14,
+      "rows": 233,
+      "avg_return": -6.602800170820396e-05,
+      "avg_abs_return": 0.004804753842493164,
+      "median_abs_return": 0.0032322218388280977,
+      "p95_abs_return": 0.014583237683764457,
+      "big_move_rate": 0.11587982832618025,
+      "big_up_rate": 0.11587982832618025,
+      "big_down_rate": 0.0944206008583691
+    },
+    {
+      "hour": 13,
+      "rows": 233,
+      "avg_return": -0.0008297422304941927,
+      "avg_abs_return": 0.004380021098531109,
+      "median_abs_return": 0.002834505992487024,
+      "p95_abs_return": 0.012880284911067673,
+      "big_move_rate": 0.09012875536480687,
+      "big_up_rate": 0.08583690987124463,
+      "big_down_rate": 0.0944206008583691
+    },
+    {
+      "hour": 16,
+      "rows": 233,
+      "avg_return": -0.0003555971804722762,
+      "avg_abs_return": 0.0038964667852656744,
+      "median_abs_return": 0.002729099564240167,
+      "p95_abs_return": 0.01241769950560398,
+      "big_move_rate": 0.07725321888412018,
+      "big_up_rate": 0.04291845493562232,
+      "big_down_rate": 0.06437768240343347
+    },
+    {
+      "hour": 17,
+      "rows": 233,
+      "avg_return": -0.0004586972662800007,
+      "avg_abs_return": 0.00407546746980037,
+      "median_abs_return": 0.003003036527641334,
+      "p95_abs_return": 0.011895010706664166,
+      "big_move_rate": 0.07296137339055794,
+      "big_up_rate": 0.04721030042918455,
+      "big_down_rate": 0.10300429184549356
+    },
+    {
+      "hour": 18,
+      "rows": 233,
+      "avg_return": -0.00045343721477505614,
+      "avg_abs_return": 0.0035456442657519132,
+      "median_abs_return": 0.002497820771878212,
+      "p95_abs_return": 0.010894211618766155,
+      "big_move_rate": 0.055793991416309016,
+      "big_up_rate": 0.04721030042918455,
+      "big_down_rate": 0.07296137339055794
+    },
+    {
+      "hour": 22,
+      "rows": 233,
+      "avg_return": 0.00018485006288808137,
+      "avg_abs_return": 0.003265854482864775,
+      "median_abs_return": 0.0018576887600474379,
+      "p95_abs_return": 0.010878048280741678,
+      "big_move_rate": 0.055793991416309016,
+      "big_up_rate": 0.06437768240343347,
+      "big_down_rate": 0.034334763948497854
+    },
+    {
+      "hour": 1,
+      "rows": 234,
+      "avg_return": 0.00014463185078788363,
+      "avg_abs_return": 0.0035117453473682346,
+      "median_abs_return": 0.0022437590038001387,
+      "p95_abs_return": 0.010801259838190047,
+      "big_move_rate": 0.05555555555555555,
+      "big_up_rate": 0.05982905982905983,
+      "big_down_rate": 0.038461538461538464
+    }
+  ],
+  "weekdays_by_avg_abs_return": [
+    {
+      "weekday_name": "Fri",
+      "rows": 816,
+      "avg_return": -9.565200440682892e-06,
+      "avg_abs_return": 0.003788752950608481,
+      "median_abs_return": 0.0025519593209453184,
+      "p95_abs_return": 0.012444332546921344,
+      "big_move_rate": 0.07720588235294118,
+      "big_up_rate": 0.06495098039215687,
+      "big_down_rate": 0.0625
+    },
+    {
+      "weekday_name": "Mon",
+      "rows": 792,
+      "avg_return": 0.00022012721730189696,
+      "avg_abs_return": 0.003732511931079906,
+      "median_abs_return": 0.0026196764289697083,
+      "p95_abs_return": 0.010712402931467838,
+      "big_move_rate": 0.054292929292929296,
+      "big_up_rate": 0.06944444444444445,
+      "big_down_rate": 0.050505050505050504
+    },
+    {
+      "weekday_name": "Thu",
+      "rows": 816,
+      "avg_return": -0.00044163404564734576,
+      "avg_abs_return": 0.003695356636191777,
+      "median_abs_return": 0.0024252927574866523,
+      "p95_abs_return": 0.011019139286839785,
+      "big_move_rate": 0.058823529411764705,
+      "big_up_rate": 0.05269607843137255,
+      "big_down_rate": 0.0625
+    },
+    {
+      "weekday_name": "Wed",
+      "rows": 792,
+      "avg_return": -3.365392823299279e-05,
+      "avg_abs_return": 0.003691617204539349,
+      "median_abs_return": 0.0025744381780195003,
+      "p95_abs_return": 0.011017759044634744,
+      "big_move_rate": 0.05555555555555555,
+      "big_up_rate": 0.05555555555555555,
+      "big_down_rate": 0.05808080808080808
+    },
+    {
+      "weekday_name": "Tue",
+      "rows": 792,
+      "avg_return": -0.00011646263564396869,
+      "avg_abs_return": 0.0036184077405648557,
+      "median_abs_return": 0.002424918852250546,
+      "p95_abs_return": 0.010739228872171876,
+      "big_move_rate": 0.056818181818181816,
+      "big_up_rate": 0.06186868686868687,
+      "big_down_rate": 0.06060606060606061
+    },
+    {
+      "weekday_name": "Sun",
+      "rows": 792,
+      "avg_return": -7.509031723139774e-05,
+      "avg_abs_return": 0.0025331008314875498,
+      "median_abs_return": 0.0016503105353842806,
+      "p95_abs_return": 0.008373346515399204,
+      "big_move_rate": 0.030303030303030304,
+      "big_up_rate": 0.030303030303030304,
+      "big_down_rate": 0.036616161616161616
+    },
+    {
+      "weekday_name": "Sat",
+      "rows": 804,
+      "avg_return": -5.4667428120675125e-05,
+      "avg_abs_return": 0.0019848395396452915,
+      "median_abs_return": 0.0011342166052054625,
+      "p95_abs_return": 0.0062918029237701385,
+      "big_move_rate": 0.017412935323383085,
+      "big_up_rate": 0.01616915422885572,
+      "big_down_rate": 0.01990049751243781
+    }
+  ],
+  "largest_positive_candles": [
+    {
+      "timestamp": "2026-02-06 01:00:00",
+      "open": 63509.4,
+      "high": 65760.0,
+      "low": 63509.39,
+      "close": 65714.96,
+      "volume": 6085.05108,
+      "return": 0.03472825042092209,
+      "hour": 1,
+      "weekday_name": "Fri"
+    },
+    {
+      "timestamp": "2026-03-02 15:00:00",
+      "open": 67177.05,
+      "high": 69617.74,
+      "low": 66975.29,
+      "close": 69130.2,
+      "volume": 5476.56874,
+      "return": 0.02907450847059989,
+      "hour": 15,
+      "weekday_name": "Mon"
+    },
+    {
+      "timestamp": "2026-03-02 14:00:00",
+      "open": 65440.01,
+      "high": 67220.81,
+      "low": 65259.21,
+      "close": 67177.06,
+      "volume": 3015.13713,
+      "return": 0.02654415853542802,
+      "hour": 14,
+      "weekday_name": "Mon"
+    },
+    {
+      "timestamp": "2025-12-09 15:00:00",
+      "open": 90324.0,
+      "high": 92842.0,
+      "low": 90294.0,
+      "close": 92710.0,
+      "volume": 9362570.24088466,
+      "return": 0.02641601346264566,
+      "hour": 15,
+      "weekday_name": "Tue"
+    },
+    {
+      "timestamp": "2026-02-25 01:00:00",
+      "open": 64224.29,
+      "high": 66300.0,
+      "low": 64145.2,
+      "close": 65896.75,
+      "volume": 2840.08056,
+      "return": 0.026040766501152834,
+      "hour": 1,
+      "weekday_name": "Wed"
+    },
+    {
+      "timestamp": "2026-06-26 03:00:00",
+      "open": 58562.0,
+      "high": 60131.37,
+      "low": 58337.0,
+      "close": 60036.01,
+      "volume": 1886.07235,
+      "return": 0.025170251215848483,
+      "hour": 3,
+      "weekday_name": "Fri"
+    },
+    {
+      "timestamp": "2026-03-04 15:00:00",
+      "open": 71621.03,
+      "high": 73479.75,
+      "low": 71580.62,
+      "close": 73396.88,
+      "volume": 4184.35996,
+      "return": 0.02479494852350661,
+      "hour": 15,
+      "weekday_name": "Wed"
+    },
+    {
+      "timestamp": "2026-02-03 19:00:00",
+      "open": 73139.12,
+      "high": 75291.1,
+      "low": 72945.5,
+      "close": 74935.0,
+      "volume": 3497.82279,
+      "return": 0.024554161363417926,
+      "hour": 19,
+      "weekday_name": "Tue"
+    },
+    {
+      "timestamp": "2025-11-21 16:00:00",
+      "open": 82919.0,
+      "high": 84897.0,
+      "low": 82341.0,
+      "close": 84897.0,
+      "volume": 6009340.853429,
+      "return": 0.02386695289321983,
+      "hour": 16,
+      "weekday_name": "Fri"
+    },
+    {
+      "timestamp": "2026-02-06 05:00:00",
+      "open": 64905.54,
+      "high": 66826.5,
+      "low": 64800.01,
+      "close": 66408.11,
+      "volume": 3077.34633,
+      "return": 0.023145374900009008,
+      "hour": 5,
+      "weekday_name": "Fri"
+    }
+  ],
+  "largest_negative_candles": [
+    {
+      "timestamp": "2026-06-25 13:00:00",
+      "open": 61244.01,
+      "high": 61369.18,
+      "low": 58115.01,
+      "close": 58290.17,
+      "volume": 6396.00513,
+      "return": -0.04823067594692121,
+      "hour": 13,
+      "weekday_name": "Thu"
+    },
+    {
+      "timestamp": "2025-12-01 00:00:00",
+      "open": 90367.0,
+      "high": 90385.0,
+      "low": 87022.0,
+      "close": 87026.0,
+      "volume": 9523896.92760844,
+      "return": -0.03697146082087488,
+      "hour": 0,
+      "weekday_name": "Mon"
+    },
+    {
+      "timestamp": "2026-02-28 06:00:00",
+      "open": 65591.03,
+      "high": 65591.04,
+      "low": 63030.0,
+      "close": 63216.01,
+      "volume": 3175.19445,
+      "return": -0.03620952438161129,
+      "hour": 6,
+      "weekday_name": "Sat"
+    },
+    {
+      "timestamp": "2026-02-23 01:00:00",
+      "open": 66740.47,
+      "high": 66740.47,
+      "low": 64290.71,
+      "close": 64427.65,
+      "volume": 7324.06208,
+      "return": -0.03465393635975289,
+      "hour": 1,
+      "weekday_name": "Mon"
+    },
+    {
+      "timestamp": "2026-02-05 17:00:00",
+      "open": 68295.15,
+      "high": 68374.79,
+      "low": 66152.0,
+      "close": 66181.69,
+      "volume": 6127.2285,
+      "return": -0.030945974933798248,
+      "hour": 17,
+      "weekday_name": "Thu"
+    },
+    {
+      "timestamp": "2026-01-21 16:00:00",
+      "open": 90288.04,
+      "high": 90360.0,
+      "low": 87590.0,
+      "close": 87602.4,
+      "volume": 2075.92566,
+      "return": -0.029745246435740502,
+      "hour": 16,
+      "weekday_name": "Wed"
+    },
+    {
+      "timestamp": "2026-02-05 15:00:00",
+      "open": 69404.75,
+      "high": 69616.29,
+      "low": 66720.15,
+      "close": 67489.07,
+      "volume": 13836.57347,
+      "return": -0.02760170916231086,
+      "hour": 15,
+      "weekday_name": "Thu"
+    },
+    {
+      "timestamp": "2025-12-12 15:00:00",
+      "open": 92451.0,
+      "high": 92451.0,
+      "low": 89800.0,
+      "close": 89939.0,
+      "volume": 9162638.79230566,
+      "return": -0.02718167265175442,
+      "hour": 15,
+      "weekday_name": "Fri"
+    },
+    {
+      "timestamp": "2025-12-17 15:00:00",
+      "open": 89640.0,
+      "high": 90350.0,
+      "low": 87137.0,
+      "close": 87245.0,
+      "volume": 12420100.92458741,
+      "return": -0.026707125246823393,
+      "hour": 15,
+      "weekday_name": "Wed"
+    },
+    {
+      "timestamp": "2026-01-29 15:00:00",
+      "open": 87014.4,
+      "high": 87039.51,
+      "low": 84366.56,
+      "close": 84934.02,
+      "volume": 8241.9564,
+      "return": -0.023908456531332667,
+      "hour": 15,
+      "weekday_name": "Thu"
+    }
+  ],
+  "implemented_features": [
+    "hour_return_mean",
+    "hour_abs_return_mean",
+    "hour_big_move_rate",
+    "weekday_return_mean",
+    "weekday_abs_return_mean",
+    "weekday_big_move_rate",
+    "is_us_session",
+    "is_weekend"
+  ],
+  "leakage_note": "Rolling calendar features use only prior candles in the same hour/week day, with prior global fallback for early rows."
+}

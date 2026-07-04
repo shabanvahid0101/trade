@@ -18,6 +18,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.preprocessing import RobustScaler
 
+from data_quality import sanitize_price_frame
 from fundamental_data import (
     FUNDAMENTAL_FEATURE_COLUMNS,
     add_fundamental_features,
@@ -110,6 +111,14 @@ ADVANCED_FEATURE_COLUMNS = [
     "hour_cos",
     "weekday_sin",
     "weekday_cos",
+    "hour_return_mean",
+    "hour_abs_return_mean",
+    "hour_big_move_rate",
+    "weekday_return_mean",
+    "weekday_abs_return_mean",
+    "weekday_big_move_rate",
+    "is_us_session",
+    "is_weekend",
 ]
 
 ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS = [
@@ -359,10 +368,13 @@ def fetch_and_update_data(
         .sort_values("timestamp")
         .reset_index(drop=True)
     )
+    combined, clean_actions = sanitize_price_frame(combined)
+    combined["timestamp"] = pd.to_datetime(combined["timestamp"], format="mixed")
     combined.to_csv(file, index=False)
     print(
         f"Dataset updated: {file} rows={len(combined)} "
-        f"last={combined['timestamp'].max()} added_or_merged={len(new_df)}"
+        f"last={combined['timestamp'].max()} added_or_merged={len(new_df)} "
+        f"dropped_invalid={clean_actions['dropped_rows']}"
     )
     logging.info("Dataset updated: %s rows saved to %s", len(combined), file)
     return combined
@@ -544,6 +556,10 @@ def latest_continuous_block(df: pd.DataFrame, timeframe: str = "5m") -> pd.DataF
     return df.iloc[last_gap_idx:].reset_index(drop=True)
 
 
+def prior_group_mean(series: pd.Series, groups: pd.Series, min_periods: int) -> pd.Series:
+    return series.groupby(groups).transform(lambda values: values.shift(1).expanding(min_periods=min_periods).mean())
+
+
 def add_features(
     df: pd.DataFrame,
     horizon: int = 1,
@@ -663,6 +679,23 @@ def add_features(
     df["hour_cos"] = np.cos(2 * np.pi * minute_of_day / 1440)
     df["weekday_sin"] = np.sin(2 * np.pi * timestamp.dt.dayofweek / 7)
     df["weekday_cos"] = np.cos(2 * np.pi * timestamp.dt.dayofweek / 7)
+    hour = timestamp.dt.hour
+    weekday = timestamp.dt.dayofweek
+    abs_return = df["log_return_1"].abs()
+    prior_global_return_mean = df["log_return_1"].shift(1).expanding(min_periods=50).mean()
+    prior_global_abs_return_mean = abs_return.shift(1).expanding(min_periods=50).mean()
+    prior_global_abs_return_q95 = abs_return.shift(1).expanding(min_periods=100).quantile(0.95)
+    big_move = (abs_return > prior_global_abs_return_q95).astype(float).where(prior_global_abs_return_q95.notna())
+    prior_global_big_move_rate = big_move.shift(1).expanding(min_periods=50).mean()
+
+    df["hour_return_mean"] = prior_group_mean(df["log_return_1"], hour, min_periods=20).fillna(prior_global_return_mean).fillna(0)
+    df["hour_abs_return_mean"] = prior_group_mean(abs_return, hour, min_periods=20).fillna(prior_global_abs_return_mean).fillna(0)
+    df["hour_big_move_rate"] = prior_group_mean(big_move, hour, min_periods=20).fillna(prior_global_big_move_rate).fillna(0)
+    df["weekday_return_mean"] = prior_group_mean(df["log_return_1"], weekday, min_periods=20).fillna(prior_global_return_mean).fillna(0)
+    df["weekday_abs_return_mean"] = prior_group_mean(abs_return, weekday, min_periods=20).fillna(prior_global_abs_return_mean).fillna(0)
+    df["weekday_big_move_rate"] = prior_group_mean(big_move, weekday, min_periods=20).fillna(prior_global_big_move_rate).fillna(0)
+    df["is_us_session"] = hour.between(13, 18).astype(float)
+    df["is_weekend"] = weekday.isin([5, 6]).astype(float)
 
     swing_high = high.rolling(48).max().shift(1)
     swing_low = low.rolling(48).min().shift(1)
