@@ -1,0 +1,78 @@
+{
+  "price_data": {
+    "path": "dataset\\1h-btc_history.csv",
+    "before": {
+      "rows": 5605,
+      "first_timestamp": "2025-11-12 23:00:00",
+      "last_timestamp": "2026-07-04 11:00:00",
+      "bad_timestamps": 0,
+      "duplicate_timestamps": 0,
+      "monotonic": true,
+      "gap_count": 0,
+      "expected_step": "0 days 01:00:00",
+      "invalid_ohlcv_rows": 0,
+      "nulls": {
+        "timestamp": 0,
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 0
+      },
+      "max_abs_log_return": 0.04943258021870921
+    },
+    "after": {
+      "rows": 5605,
+      "first_timestamp": "2025-11-12 23:00:00",
+      "last_timestamp": "2026-07-04 11:00:00",
+      "bad_timestamps": 0,
+      "duplicate_timestamps": 0,
+      "monotonic": true,
+      "gap_count": 0,
+      "expected_step": "0 days 01:00:00",
+      "invalid_ohlcv_rows": 0,
+      "nulls": {
+        "timestamp": 0,
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 0
+      },
+      "max_abs_log_return": 0.04943258021870921
+    },
+    "actions": {
+      "dropped_rows": 0,
+      "kept_rows": 5605
+    }
+  },
+  "fundamental_data": {
+    "path": "dataset\\1h-btc_fundamentals.csv",
+    "rows": 5605,
+    "first_timestamp": "2025-11-12 23:00:00",
+    "last_timestamp": "2026-07-04 11:00:00",
+    "nulls": {
+      "timestamp": 0,
+      "funding_rate": 2,
+      "open_interest": 5012,
+      "open_interest_value": 5012,
+      "global_long_short_ratio": 5012,
+      "global_long_account": 5012,
+      "global_short_account": 5012,
+      "taker_buy_sell_ratio": 5010,
+      "taker_buy_vol": 5010,
+      "taker_sell_vol": 5010,
+      "fundamental_source_age_hours": 2
+    },
+    "actions": {
+      "input_rows": 5605,
+      "aligned_rows": 5605,
+      "max_source_age_hours": 0.0,
+      "last_source_age_hours": 0.0
+    },
+    "source_age_hours": {
+      "max": 0.0,
+      "last": 0.0
+    }
+  }
+}
