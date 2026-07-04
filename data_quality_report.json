@@ -1,6 +1,6 @@
 {
   "price_data": {
-    "path": "dataset\\1h-btc_history.csv",
+    "path": "dataset/1h-btc_history.csv",
     "before": {
       "rows": 5607,
       "first_timestamp": "2025-11-12 23:00:00",
@@ -47,7 +47,7 @@
     }
   },
   "fundamental_data": {
-    "path": "dataset\\1h-btc_fundamentals.csv",
+    "path": "dataset/1h-btc_fundamentals.csv",
     "rows": 5607,
     "first_timestamp": "2025-11-12 23:00:00",
     "last_timestamp": "2026-07-04 13:00:00",
