@@ -2,9 +2,9 @@
   "price_data": {
     "path": "dataset/1h-btc_history.csv",
     "before": {
-      "rows": 5626,
+      "rows": 5628,
       "first_timestamp": "2025-11-12 23:00:00",
-      "last_timestamp": "2026-07-05 08:00:00",
+      "last_timestamp": "2026-07-05 10:00:00",
       "bad_timestamps": 0,
       "duplicate_timestamps": 0,
       "monotonic": true,
@@ -22,9 +22,9 @@
       "max_abs_log_return": 0.04943258021870921
     },
     "after": {
-      "rows": 5626,
+      "rows": 5628,
       "first_timestamp": "2025-11-12 23:00:00",
-      "last_timestamp": "2026-07-05 08:00:00",
+      "last_timestamp": "2026-07-05 10:00:00",
       "bad_timestamps": 0,
       "duplicate_timestamps": 0,
       "monotonic": true,
@@ -43,14 +43,14 @@
     },
     "actions": {
       "dropped_rows": 0,
-      "kept_rows": 5626
+      "kept_rows": 5628
     }
   },
   "fundamental_data": {
     "path": "dataset/1h-btc_fundamentals.csv",
-    "rows": 5626,
+    "rows": 5628,
     "first_timestamp": "2025-11-12 23:00:00",
-    "last_timestamp": "2026-07-05 08:00:00",
+    "last_timestamp": "2026-07-05 10:00:00",
     "nulls": {
       "timestamp": 0,
       "funding_rate": 2,
@@ -65,8 +65,8 @@
       "fundamental_source_age_hours": 2
     },
     "actions": {
-      "input_rows": 5626,
-      "aligned_rows": 5626,
+      "input_rows": 5628,
+      "aligned_rows": 5628,
       "max_source_age_hours": 0.0,
       "last_source_age_hours": 0.0
     },
