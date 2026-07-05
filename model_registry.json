@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-07-04T13:41:12+00:00",
-  "active_status": "production_updated",
-  "last_retrain_status": "passed",
+  "updated_at": "2026-07-05T06:06:33+00:00",
+  "active_status": "production_unchanged",
+  "last_retrain_status": "failed",
   "symbol": "BTC/USDT",
   "timeframe": "1h",
   "horizons": [
@@ -9,23 +9,96 @@
     3,
     6
   ],
-  "git_sha": "32640b0",
-  "staging_dir": "models\\staging",
+  "git_sha": "96e1694",
+  "staging_dir": "models/staging",
   "production_dir": "models",
-  "promoted_files": [
-    "models\\BTCUSDT_1h_h1.keras",
-    "models\\BTCUSDT_1h_h1_artifact.pkl",
-    "models\\BTCUSDT_1h_h3.keras",
-    "models\\BTCUSDT_1h_h3_artifact.pkl",
-    "models\\BTCUSDT_1h_h6.keras",
-    "models\\BTCUSDT_1h_h6_artifact.pkl"
-  ],
+  "promoted_files": [],
+  "feature_summary": {
+    "by_horizon": {
+      "1": {
+        "feature_count": 32,
+        "calendar_features": [
+          "is_us_session",
+          "hour_abs_return_mean",
+          "hour_return_mean"
+        ],
+        "top_features": [
+          "futures_directional_pressure",
+          "log_return_6",
+          "momentum_10",
+          "funding_rate_change",
+          "bb_position",
+          "ema_20_dist",
+          "adx_14",
+          "sma_20_dist"
+        ]
+      },
+      "3": {
+        "feature_count": 32,
+        "calendar_features": [
+          "is_us_session"
+        ],
+        "top_features": [
+          "log_return_6",
+          "plus_di_14",
+          "sma_20_dist",
+          "ema_20_dist",
+          "cci_20",
+          "bb_position",
+          "funding_rate_extreme",
+          "log_return_3"
+        ]
+      },
+      "6": {
+        "feature_count": 32,
+        "calendar_features": [
+          "is_weekend"
+        ],
+        "top_features": [
+          "log_return_3",
+          "plus_di_14",
+          "log_return_6",
+          "ema_20_dist",
+          "sma_20_dist",
+          "weekday_sin",
+          "minus_di_14",
+          "bb_position"
+        ]
+      }
+    },
+    "calendar_features_used": [
+      "hour_abs_return_mean",
+      "hour_return_mean",
+      "is_us_session",
+      "is_weekend"
+    ]
+  },
+  "data_quality": {
+    "price_rows": 5622,
+    "last_price_timestamp": "2026-07-05 04:00:00",
+    "price_gap_count": 0,
+    "invalid_ohlcv_rows": 0,
+    "fundamental_rows": 5622,
+    "last_fundamental_timestamp": "2026-07-05 04:00:00",
+    "last_fundamental_source_age_hours": 0.0
+  },
+  "validation_metrics": {
+    "mode": "walk-forward",
+    "selected_config_counts": {
+      "h=1,6|conf=0.45|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=hybrid|range=0.15-0.75": 1,
+      "h=1,3,6|conf=0.5|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=hybrid|range=0.15-0.75": 1,
+      "h=1,3,6|conf=0.45|agree=2|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=model|range=0.15-0.75": 1,
+      "h=3,6|conf=0.45|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=hybrid|range=0.15-0.75": 1
+    }
+  },
   "quality_gate": {
-    "passed": true,
-    "failures": [],
+    "passed": false,
+    "failures": [
+      "average_test_return_pct -0.7670 < required 0.0000"
+    ],
     "fold_count": 4,
-    "average_test_return_pct": 2.102293822235726,
+    "average_test_return_pct": -0.7670203836459498,
     "profitable_fold_pct": 50.0,
-    "worst_drawdown_pct": -2.4096087989257886
+    "worst_drawdown_pct": -4.444308106075523
   }
 }
