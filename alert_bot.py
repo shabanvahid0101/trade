@@ -99,7 +99,7 @@ def run_once(args: argparse.Namespace) -> dict:
     horizon_results = []
     for horizon, model_path, artifact in artifacts:
         model = load_model(model_path, compile=False)
-        horizon_results.append(predict_next_price(model, data, artifact))
+        horizon_results.append(predict_next_price(model, data, artifact, min_confidence=args.min_confidence))
 
     final = combine_multi_horizon_predictions(
         horizon_results,

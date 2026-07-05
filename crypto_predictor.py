@@ -1280,7 +1280,7 @@ def load_artifacts(path: str | Path = ARTIFACT_PATH) -> dict:
     return joblib.load(path)
 
 
-def predict_next_price(model, data: pd.DataFrame, artifact: dict) -> dict:
+def predict_next_price(model, data: pd.DataFrame, artifact: dict, min_confidence: float | None = None) -> dict:
     sequence_length = int(artifact["sequence_length"])
     horizon = int(artifact["horizon"])
     timeframe = artifact.get("timeframe", "5m")
@@ -1299,8 +1299,8 @@ def predict_next_price(model, data: pd.DataFrame, artifact: dict) -> dict:
         predicted_class = int(probabilities.argmax())
         class_names = {0: "SHORT", 1: "HOLD", 2: "LONG"}
         confidence = float(probabilities[predicted_class])
-        min_confidence = float(artifact.get("metrics", {}).get("min_confidence", 0.50))
-        signal = class_names[predicted_class] if confidence >= min_confidence else "HOLD"
+        confidence_floor = float(min_confidence if min_confidence is not None else artifact.get("metrics", {}).get("min_confidence", 0.50))
+        signal = class_names[predicted_class] if confidence >= confidence_floor else "HOLD"
         expected_return = 0.0
         if signal == "LONG":
             expected_return = float(artifact.get("target_threshold", 0.0015))
@@ -1312,6 +1312,7 @@ def predict_next_price(model, data: pd.DataFrame, artifact: dict) -> dict:
             "predicted_price": float(current_price * (1 + expected_return)),
             "predicted_return_pct": float(expected_return * 100),
             "confidence": confidence,
+            "min_confidence_used": confidence_floor,
             "signal": signal,
             "class_probabilities": {
                 "SHORT": float(probabilities[0]),
@@ -1472,7 +1473,7 @@ def predict_command(args: argparse.Namespace) -> None:
         update_fundamentals=args.update_fundamentals,
         required=columns_need_fundamentals(artifact["feature_columns"]),
     )
-    result = predict_next_price(model, data, artifact)
+    result = predict_next_price(model, data, artifact, min_confidence=getattr(args, "min_confidence", None))
     print(json.dumps(result, indent=2))
     if args.telegram:
         send_telegram_message(
@@ -1553,7 +1554,7 @@ def predict_multi_command(args: argparse.Namespace) -> None:
     results = []
     for horizon, model_path, artifact_path, artifact in artifacts:
         model = load_model(model_path, compile=False)
-        results.append(predict_next_price(model, data, artifact))
+        results.append(predict_next_price(model, data, artifact, min_confidence=args.min_confidence))
 
     final_signal = combine_multi_horizon_predictions(results, args.min_agree, args.min_confidence)
     output = {"final": final_signal, "horizons": results}
@@ -1626,6 +1627,7 @@ def build_parser() -> argparse.ArgumentParser:
     predict.add_argument("--fundamental-data", default=None, help="Optional Binance Futures fundamentals CSV.")
     predict.add_argument("--update-fundamentals", action="store_true", help="Fetch/update Binance Futures fundamentals before prediction.")
     predict.add_argument("--max-fetch-batches", type=int, default=200)
+    predict.add_argument("--min-confidence", type=float, default=None)
     predict.add_argument("--telegram", action="store_true")
     predict.set_defaults(func=predict_command)
 
