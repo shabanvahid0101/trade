@@ -137,6 +137,22 @@ ADVANCED_FEATURE_COLUMNS = [
     "weekday_big_move_rate",
     "is_us_session",
     "is_weekend",
+    "ema_20_slope_3",
+    "ema_20_slope_6",
+    "ema_50_slope_6",
+    "trend_20_50_accel",
+    "trend_stack",
+    "price_ema_50_dist",
+    "breakout_20_strength",
+    "breakdown_20_strength",
+    "breakout_48_strength",
+    "breakdown_48_strength",
+    "range_position_48",
+    "higher_high_rate_20",
+    "lower_low_rate_20",
+    "market_structure_20",
+    "trend_exhaustion",
+    "reversal_pressure",
 ]
 
 ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS = [
@@ -603,9 +619,11 @@ def add_features(
     sma_20 = close.rolling(20).mean()
     sma_50 = close.rolling(50).mean()
     ema_20 = close.ewm(span=20, adjust=False).mean()
+    ema_50 = close.ewm(span=50, adjust=False).mean()
     df["sma_20_dist"] = close / sma_20 - 1
     df["sma_50_dist"] = close / sma_50 - 1
     df["ema_20_dist"] = close / ema_20 - 1
+    df["price_ema_50_dist"] = close / ema_50 - 1
 
     delta = close.diff()
     gain = delta.clip(lower=0).rolling(14).mean()
@@ -690,6 +708,15 @@ def add_features(
     sma_100 = close.rolling(100).mean()
     df["trend_20_50"] = sma_20 / sma_50 - 1
     df["trend_50_100"] = sma_50 / sma_100 - 1
+    df["ema_20_slope_3"] = ema_20 / ema_20.shift(3) - 1
+    df["ema_20_slope_6"] = ema_20 / ema_20.shift(6) - 1
+    df["ema_50_slope_6"] = ema_50 / ema_50.shift(6) - 1
+    df["trend_20_50_accel"] = df["trend_20_50"] - df["trend_20_50"].shift(6)
+    df["trend_stack"] = (
+        (close > ema_20).astype(float)
+        + (ema_20 > ema_50).astype(float)
+        + (sma_50 > sma_100).astype(float)
+    ) / 3
     df["volatility_ratio"] = df["log_return_1"].rolling(12).std() / df["log_return_1"].rolling(48).std().replace(0, np.nan)
     df["return_skew_20"] = df["log_return_1"].rolling(20).skew()
     df["return_kurt_20"] = df["log_return_1"].rolling(20).kurt()
@@ -717,6 +744,30 @@ def add_features(
     df["weekday_big_move_rate"] = prior_group_mean(big_move, weekday, min_periods=20).fillna(prior_global_big_move_rate).fillna(0)
     df["is_us_session"] = hour.between(13, 18).astype(float)
     df["is_weekend"] = weekday.isin([5, 6]).astype(float)
+
+    prior_high_20 = high.rolling(20).max().shift(1)
+    prior_low_20 = low.rolling(20).min().shift(1)
+    prior_high_48 = high.rolling(48).max().shift(1)
+    prior_low_48 = low.rolling(48).min().shift(1)
+    range_48 = (prior_high_48 - prior_low_48).replace(0, np.nan)
+    df["breakout_20_strength"] = (close / prior_high_20 - 1).clip(lower=0)
+    df["breakdown_20_strength"] = (prior_low_20 / close - 1).clip(lower=0)
+    df["breakout_48_strength"] = (close / prior_high_48 - 1).clip(lower=0)
+    df["breakdown_48_strength"] = (prior_low_48 / close - 1).clip(lower=0)
+    df["range_position_48"] = ((close - prior_low_48) / range_48).clip(lower=0, upper=1)
+
+    higher_high = (high > high.shift(1)).astype(float)
+    lower_low = (low < low.shift(1)).astype(float)
+    df["higher_high_rate_20"] = higher_high.rolling(20).mean()
+    df["lower_low_rate_20"] = lower_low.rolling(20).mean()
+    df["market_structure_20"] = df["higher_high_rate_20"] - df["lower_low_rate_20"]
+
+    trend_sign = np.sign(df["trend_20_50"]).replace(0, np.nan)
+    extension_atr = (close - ema_20).abs() / true_range.rolling(14).mean().replace(0, np.nan)
+    rsi_distance = (df["rsi_14"] - 0.5).abs() * 2
+    df["trend_exhaustion"] = (extension_atr * rsi_distance).clip(lower=0, upper=10)
+    wick_pressure = (df["upper_wick_pct"] - df["lower_wick_pct"]).fillna(0)
+    df["reversal_pressure"] = (-trend_sign * wick_pressure).fillna(0)
 
     swing_high = high.rolling(48).max().shift(1)
     swing_low = low.rolling(48).min().shift(1)
