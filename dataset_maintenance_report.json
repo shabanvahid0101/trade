@@ -1,0 +1,150 @@
+{
+  "symbol": "BTC/USDT",
+  "datasets": {
+    "1h": {
+      "path": "dataset\\1h-btc_history.csv",
+      "timeframe": "1h",
+      "before": {
+        "rows": 5646,
+        "first_timestamp": "2025-11-12 23:00:00",
+        "last_timestamp": "2026-07-06 04:00:00",
+        "bad_timestamps": 0,
+        "duplicate_timestamps": 0,
+        "monotonic": true,
+        "gap_count": 0,
+        "expected_step": "0 days 01:00:00",
+        "invalid_ohlcv_rows": 0,
+        "nulls": {
+          "timestamp": 0,
+          "open": 0,
+          "high": 0,
+          "low": 0,
+          "close": 0,
+          "volume": 0
+        },
+        "max_abs_log_return": 0.04943258021870921
+      },
+      "after": {
+        "rows": 5646,
+        "first_timestamp": "2025-11-12 23:00:00",
+        "last_timestamp": "2026-07-06 04:00:00",
+        "bad_timestamps": 0,
+        "duplicate_timestamps": 0,
+        "monotonic": true,
+        "gap_count": 0,
+        "expected_step": "0 days 01:00:00",
+        "invalid_ohlcv_rows": 0,
+        "nulls": {
+          "timestamp": 0,
+          "open": 0,
+          "high": 0,
+          "low": 0,
+          "close": 0,
+          "volume": 0
+        },
+        "max_abs_log_return": 0.04943258021870921
+      },
+      "actions": {
+        "dropped_rows": 0,
+        "kept_rows": 5646
+      }
+    },
+    "5m": {
+      "path": "dataset\\5m_btc_history.csv",
+      "timeframe": "5m",
+      "before": {
+        "rows": 55436,
+        "first_timestamp": "2025-12-25 16:50:00",
+        "last_timestamp": "2026-07-06 04:25:00",
+        "bad_timestamps": 0,
+        "duplicate_timestamps": 0,
+        "monotonic": true,
+        "gap_count": 0,
+        "expected_step": "0 days 00:05:00",
+        "invalid_ohlcv_rows": 0,
+        "nulls": {
+          "timestamp": 0,
+          "open": 0,
+          "high": 0,
+          "low": 0,
+          "close": 0,
+          "volume": 0
+        },
+        "max_abs_log_return": 0.037808065313792626
+      },
+      "after": {
+        "rows": 55436,
+        "first_timestamp": "2025-12-25 16:50:00",
+        "last_timestamp": "2026-07-06 04:25:00",
+        "bad_timestamps": 0,
+        "duplicate_timestamps": 0,
+        "monotonic": true,
+        "gap_count": 0,
+        "expected_step": "0 days 00:05:00",
+        "invalid_ohlcv_rows": 0,
+        "nulls": {
+          "timestamp": 0,
+          "open": 0,
+          "high": 0,
+          "low": 0,
+          "close": 0,
+          "volume": 0
+        },
+        "max_abs_log_return": 0.037808065313792626
+      },
+      "actions": {
+        "dropped_rows": 0,
+        "kept_rows": 55436
+      }
+    },
+    "15m": {
+      "path": "dataset\\15m_btc_history_5000.csv",
+      "timeframe": "15m",
+      "before": {
+        "rows": 5000,
+        "first_timestamp": "2026-05-15 02:30:00",
+        "last_timestamp": "2026-07-06 04:15:00",
+        "bad_timestamps": 0,
+        "duplicate_timestamps": 0,
+        "monotonic": true,
+        "gap_count": 0,
+        "expected_step": "0 days 00:15:00",
+        "invalid_ohlcv_rows": 0,
+        "nulls": {
+          "timestamp": 0,
+          "open": 0,
+          "high": 0,
+          "low": 0,
+          "close": 0,
+          "volume": 0
+        },
+        "max_abs_log_return": 0.03021008299799841
+      },
+      "after": {
+        "rows": 5000,
+        "first_timestamp": "2026-05-15 02:30:00",
+        "last_timestamp": "2026-07-06 04:15:00",
+        "bad_timestamps": 0,
+        "duplicate_timestamps": 0,
+        "monotonic": true,
+        "gap_count": 0,
+        "expected_step": "0 days 00:15:00",
+        "invalid_ohlcv_rows": 0,
+        "nulls": {
+          "timestamp": 0,
+          "open": 0,
+          "high": 0,
+          "low": 0,
+          "close": 0,
+          "volume": 0
+        },
+        "max_abs_log_return": 0.03021008299799841
+      },
+      "actions": {
+        "dropped_rows": 0,
+        "kept_rows": 5000
+      }
+    }
+  },
+  "fundamentals": {}
+}
