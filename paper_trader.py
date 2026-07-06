@@ -9,6 +9,7 @@ from tensorflow.keras.models import load_model
 
 from crypto_predictor import (
     DATA_DIR,
+    MODELS_DIR,
     attach_fundamentals,
     backtest_predictions,
     class_predictions_to_signal_returns,
@@ -201,12 +202,13 @@ def build_historical_ensemble(
     max_rows: int,
     min_confidence: float,
     min_agree: int,
+    model_dir: str | Path | None = None,
 ) -> tuple[pd.DataFrame, np.ndarray]:
     prediction_frames = []
     base_meta = None
     target_threshold = None
     for horizon in horizons:
-        model_path, artifact_path = horizon_model_paths(symbol, timeframe, horizon)
+        model_path, artifact_path = horizon_model_paths(symbol, timeframe, horizon, model_dir)
         artifact = load_artifacts(artifact_path)
         target_threshold = float(artifact["target_threshold"])
         featured = build_historical_feature_frame(
@@ -282,7 +284,7 @@ def run_backtest(args: argparse.Namespace) -> dict:
     horizons = parse_horizons(args.horizons)
     needs_fundamentals = False
     for horizon in horizons:
-        _, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        _, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon, args.model_dir)
         artifact = load_artifacts(artifact_path)
         needs_fundamentals = needs_fundamentals or columns_need_fundamentals(artifact["feature_columns"])
     data = attach_fundamentals(
@@ -302,6 +304,7 @@ def run_backtest(args: argparse.Namespace) -> dict:
         max_rows=args.max_train_rows,
         min_confidence=args.min_confidence,
         min_agree=args.min_agree,
+        model_dir=args.model_dir,
     )
     rows = args.days * (24 if args.timeframe.endswith("h") else 24 * 12)
     meta_window = meta.tail(rows).reset_index(drop=True)
@@ -347,7 +350,7 @@ def run_single(args: argparse.Namespace) -> dict:
     horizons = parse_horizons(args.horizons)
     artifacts = []
     for horizon in horizons:
-        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon, args.model_dir)
         artifact = load_artifacts(artifact_path)
         artifact.setdefault("timeframe", args.timeframe)
         artifacts.append((horizon, model_path, artifact))
@@ -481,6 +484,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--exchange", default="binance")
     parser.add_argument("--exchange-fallbacks", default="binance,okx,kucoin,bybit")
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
+    parser.add_argument("--model-dir", default=str(MODELS_DIR))
     parser.add_argument("--fundamental-data", default=None)
     parser.add_argument("--update-fundamentals", action="store_true")
     parser.add_argument("--horizons", default="1,3,6")

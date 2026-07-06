@@ -1524,7 +1524,7 @@ def predict_multi_command(args: argparse.Namespace) -> None:
     require_tensorflow()
     artifacts = []
     for horizon in parse_horizons(args.horizons):
-        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon)
+        model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, horizon, args.model_dir)
         if not model_path.exists() or not artifact_path.exists():
             raise FileNotFoundError(f"Missing model/artifact for horizon {horizon}. Run train-multi first.")
         artifact = load_artifacts(artifact_path)
@@ -1640,6 +1640,7 @@ def build_parser() -> argparse.ArgumentParser:
     predict_multi.add_argument("--fundamental-data", default=None, help="Optional Binance Futures fundamentals CSV.")
     predict_multi.add_argument("--update-fundamentals", action="store_true", help="Fetch/update Binance Futures fundamentals before prediction.")
     predict_multi.add_argument("--max-fetch-batches", type=int, default=200)
+    predict_multi.add_argument("--model-dir", default=str(MODELS_DIR))
     predict_multi.add_argument("--horizons", default="1,3,6,12")
     predict_multi.add_argument("--min-agree", type=int, default=2)
     predict_multi.add_argument("--min-confidence", type=float, default=0.50)
