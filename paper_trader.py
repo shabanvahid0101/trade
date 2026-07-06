@@ -24,6 +24,7 @@ from crypto_predictor import (
     parse_exchange_names,
     predict_next_price,
     send_telegram_message,
+    timeframe_to_milliseconds,
 )
 from risk_manager import apply_dynamic_position_sizing, decision_to_dict, evaluate_risk
 from signal_explainer import build_signal_explanation, fa_code, fa_regime, fa_signal, fa_strategy, format_explanation_for_telegram
@@ -32,6 +33,11 @@ from strategy_rules import apply_hybrid_to_latest, apply_hybrid_to_returns
 
 BASE_DIR = Path(__file__).resolve().parent
 DEFAULT_STATE_PATH = BASE_DIR / "paper_state.json"
+
+
+def bars_per_day(timeframe: str) -> int:
+    day_ms = 24 * 60 * 60 * 1000
+    return max(1, int(round(day_ms / timeframe_to_milliseconds(timeframe))))
 
 
 def parse_horizons(value: str) -> list[int]:
@@ -306,7 +312,7 @@ def run_backtest(args: argparse.Namespace) -> dict:
         min_agree=args.min_agree,
         model_dir=args.model_dir,
     )
-    rows = args.days * (24 if args.timeframe.endswith("h") else 24 * 12)
+    rows = args.days * bars_per_day(args.timeframe)
     meta_window = meta.tail(rows).reset_index(drop=True)
     predicted_window = predicted_return[-len(meta_window) :]
     predicted_window = apply_hybrid_to_returns(

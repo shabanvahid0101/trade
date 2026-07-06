@@ -648,7 +648,10 @@ def add_features(
     positive_flow = money_flow.where(typical_price > typical_price.shift(1), 0.0).rolling(14).sum()
     negative_flow = money_flow.where(typical_price < typical_price.shift(1), 0.0).rolling(14).sum()
     money_ratio = positive_flow / negative_flow.replace(0, np.nan)
-    df["mfi_14"] = (100 - (100 / (1 + money_ratio))) / 100
+    mfi = (100 - (100 / (1 + money_ratio))) / 100
+    mfi = mfi.where(~((negative_flow == 0) & (positive_flow > 0)), 1.0)
+    mfi = mfi.where(~((negative_flow == 0) & (positive_flow == 0)), 0.5)
+    df["mfi_14"] = mfi
 
     obv_direction = np.sign(close.diff()).fillna(0)
     obv = (obv_direction * df["volume"]).cumsum()

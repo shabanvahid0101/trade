@@ -16,6 +16,7 @@ from crypto_predictor import (
     horizon_model_paths,
     load_artifacts,
     load_price_csv,
+    timeframe_to_milliseconds,
 )
 
 
@@ -600,7 +601,8 @@ def prepare_prediction_frame(args: argparse.Namespace) -> pd.DataFrame:
 
 
 def bars_per_day(timeframe: str) -> int:
-    return 24 if timeframe.endswith("h") else 24 * 12
+    day_ms = 24 * 60 * 60 * 1000
+    return max(1, int(round(day_ms / timeframe_to_milliseconds(timeframe))))
 
 
 def run_optimizer(args: argparse.Namespace) -> dict:
