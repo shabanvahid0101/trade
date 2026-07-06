@@ -2,7 +2,7 @@
   "symbol": "BTC/USDT",
   "datasets": {
     "1h": {
-      "path": "dataset\\1h-btc_history.csv",
+      "path": "dataset/1h-btc_history.csv",
       "timeframe": "1h",
       "before": {
         "rows": 5646,
@@ -50,7 +50,7 @@
       }
     },
     "5m": {
-      "path": "dataset\\5m_btc_history.csv",
+      "path": "dataset/5m_btc_history.csv",
       "timeframe": "5m",
       "before": {
         "rows": 55436,
@@ -98,7 +98,7 @@
       }
     },
     "15m": {
-      "path": "dataset\\15m_btc_history_5000.csv",
+      "path": "dataset/15m_btc_history_5000.csv",
       "timeframe": "15m",
       "before": {
         "rows": 5000,
@@ -146,5 +146,12 @@
       }
     }
   },
-  "fundamentals": {}
+  "fundamentals": {
+    "1h": {
+      "path": "dataset/1h-btc_fundamentals.csv",
+      "rows": 5646,
+      "first_timestamp": "2025-11-12 23:00:00",
+      "last_timestamp": "2026-07-06 04:00:00"
+    }
+  }
 }
