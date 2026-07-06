@@ -2,6 +2,8 @@ import argparse
 import json
 import logging
 import os
+import random
+import shutil
 import time
 from dataclasses import dataclass
 from logging.handlers import RotatingFileHandler
@@ -33,12 +35,14 @@ except ImportError:  # Allows offline evaluation on an existing CSV.
     ccxt = None
 
 try:
+    import tensorflow as tf
     from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
     from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
     from tensorflow.keras.losses import Huber
     from tensorflow.keras.models import Sequential, load_model
     from tensorflow.keras.optimizers import Adam
 except ImportError:
+    tf = None
     EarlyStopping = None
     ReduceLROnPlateau = None
     LSTM = None
@@ -58,6 +62,20 @@ ARTIFACT_PATH = BASE_DIR / "model_artifacts.pkl"
 LEGACY_SCALER_PATH = BASE_DIR / "scaler.pkl"
 LOG_PATH = BASE_DIR / "logging.log"
 MODELS_DIR = BASE_DIR / "models"
+
+
+def set_global_seed(seed: int | None) -> None:
+    if seed is None or seed < 0:
+        return
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    if tf is not None:
+        tf.keras.utils.set_random_seed(seed)
+        try:
+            tf.config.experimental.enable_op_determinism()
+        except Exception:
+            pass
 
 CORE_FEATURE_COLUMNS = [
     "log_return_1",
@@ -1351,6 +1369,8 @@ def run_training_pipeline(
     model_path: str | Path,
     artifact_path: str | Path,
 ) -> dict:
+    base_seed = getattr(args, "seed", None)
+    set_global_seed(None if base_seed is None else int(base_seed) + int(horizon))
     split = prepare_datasets(
         data,
         sequence_length=args.sequence_length,
@@ -1434,11 +1454,16 @@ def load_training_data(args: argparse.Namespace) -> pd.DataFrame:
 
 def train_command(args: argparse.Namespace) -> None:
     data = load_training_data(args)
-    result = run_training_pipeline(args, data, args.horizon, MODEL_PATH, ARTIFACT_PATH)
+    model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, args.horizon, args.model_dir)
+    result = run_training_pipeline(args, data, args.horizon, model_path, artifact_path)
+    shutil.copy2(model_path, MODEL_PATH)
+    shutil.copy2(artifact_path, ARTIFACT_PATH)
 
     print(json.dumps({"metrics": result["metrics"], "backtest": result["backtest"]}, indent=2))
-    print(f"Saved model: {MODEL_PATH}")
-    print(f"Saved artifacts: {ARTIFACT_PATH}")
+    print(f"Saved model: {model_path}")
+    print(f"Saved artifacts: {artifact_path}")
+    print(f"Updated legacy model: {MODEL_PATH}")
+    print(f"Updated legacy artifacts: {ARTIFACT_PATH}")
 
 
 def train_multi_command(args: argparse.Namespace) -> None:
@@ -1593,6 +1618,7 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--epochs", type=int, default=80)
         command_parser.add_argument("--batch-size", type=int, default=32)
         command_parser.add_argument("--training-verbose", type=int, choices=[0, 1, 2], default=2)
+        command_parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducible training. Use -1 to disable.")
         command_parser.add_argument("--threshold", type=float, default=0.0015)
         command_parser.add_argument("--fee-rate", type=float, default=0.001)
         command_parser.add_argument("--spread-bps", type=float, default=0.0)

@@ -1,0 +1,432 @@
+{
+  "mode": "walk-forward",
+  "fold_count": 7,
+  "train_days": 7,
+  "test_days": 2,
+  "step_days": 2,
+  "walkforward_days": 21,
+  "average_test_return_pct": -0.30795362654015357,
+  "median_test_return_pct": 0.0,
+  "profitable_fold_pct": 14.285714285714285,
+  "average_final_capital": 99.69204637345986,
+  "worst_drawdown_pct": -3.594043938418112,
+  "selected_config_counts": {
+    "h=3|conf=0.45|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=model|range=0.2-0.8": 2,
+    "h=3|conf=0.5|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=model|range=0.2-0.8": 3,
+    "h=3|conf=0.45|agree=1|sl=0.0|tp=1.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=model|range=0.2-0.8": 2
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "train_start": "2026-06-15 03:45:00",
+      "train_end": "2026-06-22 03:30:00",
+      "test_start": "2026-06-22 03:45:00",
+      "test_end": "2026-06-24 03:30:00",
+      "selected_config": {
+        "horizons": [
+          3
+        ],
+        "min_confidence": 0.45,
+        "min_agree": 1,
+        "stop_loss_pct": 0.0,
+        "take_profit_pct": 0.0,
+        "atr_min_pct": 0.0,
+        "trend_min_pct": 0.0,
+        "volatility_min_pct": 0.0,
+        "trend_filter": "off",
+        "strategy": "model",
+        "range_lower": 0.2,
+        "range_upper": 0.8,
+        "range_atr_max_pct": 0.8,
+        "range_trend_max_pct": 0.3,
+        "range_width_min_pct": 0.5,
+        "range_width_max_pct": 6.0,
+        "train_final_capital": 101.16849584015894,
+        "train_return_pct": 1.1684958401589451,
+        "train_drawdown_pct": -0.6113832182540024
+      },
+      "test": {
+        "initial_capital": 100.0,
+        "final_capital": 100.39784884488313,
+        "total_return_pct": 0.39784884488311967,
+        "max_drawdown_pct": -0.3303687956636048,
+        "trade_count": 2,
+        "closed_trade_count": 1,
+        "win_rate_pct": 100.0,
+        "spread_bps": 2.0,
+        "slippage_bps": 2.0,
+        "sharpe_like": 3.822532594051903,
+        "last_trades": [
+          {
+            "timestamp": "2026-06-22 13:30:00",
+            "side": "OPEN_SHORT",
+            "price": 65382.379400000005,
+            "mid_price": 65402.0,
+            "notional": 100.0,
+            "fee": 0.1,
+            "capital": 99.9
+          },
+          {
+            "timestamp": "2026-06-22 14:15:00",
+            "side": "CLOSE_SHORT",
+            "price": 64991.4916,
+            "mid_price": 64972.0,
+            "pnl": 0.49784884488312764,
+            "reason": "signal_hold",
+            "capital": 100.39784884488313
+          }
+        ]
+      }
+    },
+    {
+      "fold": 2,
+      "train_start": "2026-06-17 03:45:00",
+      "train_end": "2026-06-24 03:30:00",
+      "test_start": "2026-06-24 03:45:00",
+      "test_end": "2026-06-26 03:30:00",
+      "selected_config": {
+        "horizons": [
+          3
+        ],
+        "min_confidence": 0.45,
+        "min_agree": 1,
+        "stop_loss_pct": 0.0,
+        "take_profit_pct": 0.0,
+        "atr_min_pct": 0.0,
+        "trend_min_pct": 0.0,
+        "volatility_min_pct": 0.0,
+        "trend_filter": "off",
+        "strategy": "model",
+        "range_lower": 0.2,
+        "range_upper": 0.8,
+        "range_atr_max_pct": 0.8,
+        "range_trend_max_pct": 0.3,
+        "range_width_min_pct": 0.5,
+        "range_width_max_pct": 6.0,
+        "train_final_capital": 101.46353506996279,
+        "train_return_pct": 1.4635350699627958,
+        "train_drawdown_pct": -0.6113832182539913
+      },
+      "test": {
+        "initial_capital": 100.0,
+        "final_capital": 97.90996662626975,
+        "total_return_pct": -2.090033373730249,
+        "max_drawdown_pct": -3.594043938418112,
+        "trade_count": 10,
+        "closed_trade_count": 5,
+        "win_rate_pct": 60.0,
+        "spread_bps": 2.0,
+        "slippage_bps": 2.0,
+        "sharpe_like": -5.732998949319313,
+        "last_trades": [
+          {
+            "timestamp": "2026-06-24 21:30:00",
+            "side": "OPEN_SHORT",
+            "price": 61067.6742,
+            "mid_price": 61086.0,
+            "notional": 97.22197537992078,
+            "fee": 0.09722197537992078,
+            "capital": 97.12475340454085
+          },
+          {
+            "timestamp": "2026-06-25 03:45:00",
+            "side": "CLOSE_SHORT",
+            "price": 60877.257699999995,
+            "mid_price": 60859.0,
+            "pnl": 0.20592807114553424,
+            "reason": "signal_hold",
+            "capital": 97.33068147568639
+          },
+          {
+            "timestamp": "2026-06-25 05:00:00",
+            "side": "OPEN_SHORT",
+            "price": 61629.10572,
+            "mid_price": 61647.6,
+            "notional": 97.33068147568639,
+            "fee": 0.0973306814756864,
+            "capital": 97.23335079421071
+          },
+          {
+            "timestamp": "2026-06-25 08:45:00",
+            "side": "CLOSE_SHORT",
+            "price": 61730.863704999996,
+            "mid_price": 61712.35,
+            "pnl": -0.25803679443861094,
+            "reason": "signal_hold",
+            "capital": 96.9753139997721
+          },
+          {
+            "timestamp": "2026-06-25 14:15:00",
+            "side": "OPEN_LONG",
+            "price": 59346.958748000005,
+            "mid_price": 59329.16,
+            "notional": 96.9753139997721,
+            "fee": 0.0969753139997721,
+            "capital": 96.87833868577232
+          },
+          {
+            "timestamp": "2026-06-25 18:15:00",
+            "side": "CLOSE_LONG",
+            "price": 59700.104594,
+            "mid_price": 59718.02,
+            "pnl": 0.480079180889884,
+            "reason": "signal_hold",
+            "capital": 97.35841786666221
+          },
+          {
+            "timestamp": "2026-06-25 22:15:00",
+            "side": "OPEN_SHORT",
+            "price": 59776.071797000004,
+            "mid_price": 59794.01,
+            "notional": 97.35841786666221,
+            "fee": 0.09735841786666222,
+            "capital": 97.26105944879555
+          },
+          {
+            "timestamp": "2026-06-26 01:15:00",
+            "side": "CLOSE_SHORT",
+            "price": 59317.88002699999,
+            "mid_price": 59300.09,
+            "pnl": 0.6489071774742072,
+            "reason": "signal_hold",
+            "capital": 97.90996662626975
+          }
+        ]
+      }
+    },
+    {
+      "fold": 3,
+      "train_start": "2026-06-19 03:45:00",
+      "train_end": "2026-06-26 03:30:00",
+      "test_start": "2026-06-26 03:45:00",
+      "test_end": "2026-06-28 03:30:00",
+      "selected_config": {
+        "horizons": [
+          3
+        ],
+        "min_confidence": 0.5,
+        "min_agree": 1,
+        "stop_loss_pct": 0.0,
+        "take_profit_pct": 0.0,
+        "atr_min_pct": 0.0,
+        "trend_min_pct": 0.0,
+        "volatility_min_pct": 0.0,
+        "trend_filter": "off",
+        "strategy": "model",
+        "range_lower": 0.2,
+        "range_upper": 0.8,
+        "range_atr_max_pct": 0.8,
+        "range_trend_max_pct": 0.3,
+        "range_width_min_pct": 0.5,
+        "range_width_max_pct": 6.0,
+        "train_final_capital": 99.42651429809632,
+        "train_return_pct": -0.5734857019036754,
+        "train_drawdown_pct": -0.7724500939713774
+      },
+      "test": {
+        "initial_capital": 100.0,
+        "final_capital": 99.53650914306606,
+        "total_return_pct": -0.46349085693394576,
+        "max_drawdown_pct": -1.4591544550140778,
+        "trade_count": 2,
+        "closed_trade_count": 1,
+        "win_rate_pct": 0.0,
+        "spread_bps": 2.0,
+        "slippage_bps": 2.0,
+        "sharpe_like": -2.7169200395531066,
+        "last_trades": [
+          {
+            "timestamp": "2026-06-26 05:30:00",
+            "side": "OPEN_SHORT",
+            "price": 59863.775478,
+            "mid_price": 59881.74,
+            "notional": 100.0,
+            "fee": 0.1,
+            "capital": 99.9
+          },
+          {
+            "timestamp": "2026-06-26 09:30:00",
+            "side": "CLOSE_SHORT",
+            "price": 60021.511053,
+            "mid_price": 60003.51,
+            "pnl": -0.3634908569339512,
+            "reason": "signal_hold",
+            "capital": 99.53650914306606
+          }
+        ]
+      }
+    },
+    {
+      "fold": 4,
+      "train_start": "2026-06-21 03:45:00",
+      "train_end": "2026-06-28 03:30:00",
+      "test_start": "2026-06-28 03:45:00",
+      "test_end": "2026-06-30 03:30:00",
+      "selected_config": {
+        "horizons": [
+          3
+        ],
+        "min_confidence": 0.5,
+        "min_agree": 1,
+        "stop_loss_pct": 0.0,
+        "take_profit_pct": 0.0,
+        "atr_min_pct": 0.0,
+        "trend_min_pct": 0.0,
+        "volatility_min_pct": 0.0,
+        "trend_filter": "off",
+        "strategy": "model",
+        "range_lower": 0.2,
+        "range_upper": 0.8,
+        "range_atr_max_pct": 0.8,
+        "range_trend_max_pct": 0.3,
+        "range_width_min_pct": 0.5,
+        "range_width_max_pct": 6.0,
+        "train_final_capital": 98.96568149495651,
+        "train_return_pct": -1.0343185050434855,
+        "train_drawdown_pct": -2.0234634370031146
+      },
+      "test": {
+        "initial_capital": 100.0,
+        "final_capital": 100.0,
+        "total_return_pct": 0.0,
+        "max_drawdown_pct": 0.0,
+        "trade_count": 0,
+        "closed_trade_count": 0,
+        "win_rate_pct": 0.0,
+        "spread_bps": 2.0,
+        "slippage_bps": 2.0,
+        "sharpe_like": 0.0,
+        "last_trades": []
+      }
+    },
+    {
+      "fold": 5,
+      "train_start": "2026-06-23 03:45:00",
+      "train_end": "2026-06-30 03:30:00",
+      "test_start": "2026-06-30 03:45:00",
+      "test_end": "2026-07-02 03:30:00",
+      "selected_config": {
+        "horizons": [
+          3
+        ],
+        "min_confidence": 0.5,
+        "min_agree": 1,
+        "stop_loss_pct": 0.0,
+        "take_profit_pct": 0.0,
+        "atr_min_pct": 0.0,
+        "trend_min_pct": 0.0,
+        "volatility_min_pct": 0.0,
+        "trend_filter": "off",
+        "strategy": "model",
+        "range_lower": 0.2,
+        "range_upper": 0.8,
+        "range_atr_max_pct": 0.8,
+        "range_trend_max_pct": 0.3,
+        "range_width_min_pct": 0.5,
+        "range_width_max_pct": 6.0,
+        "train_final_capital": 98.96568149495651,
+        "train_return_pct": -1.0343185050434855,
+        "train_drawdown_pct": -2.0234634370031146
+      },
+      "test": {
+        "initial_capital": 100.0,
+        "final_capital": 100.0,
+        "total_return_pct": 0.0,
+        "max_drawdown_pct": 0.0,
+        "trade_count": 0,
+        "closed_trade_count": 0,
+        "win_rate_pct": 0.0,
+        "spread_bps": 2.0,
+        "slippage_bps": 2.0,
+        "sharpe_like": 0.0,
+        "last_trades": []
+      }
+    },
+    {
+      "fold": 6,
+      "train_start": "2026-06-25 03:45:00",
+      "train_end": "2026-07-02 03:30:00",
+      "test_start": "2026-07-02 03:45:00",
+      "test_end": "2026-07-04 03:30:00",
+      "selected_config": {
+        "horizons": [
+          3
+        ],
+        "min_confidence": 0.45,
+        "min_agree": 1,
+        "stop_loss_pct": 0.0,
+        "take_profit_pct": 1.0,
+        "atr_min_pct": 0.0,
+        "trend_min_pct": 0.0,
+        "volatility_min_pct": 0.0,
+        "trend_filter": "off",
+        "strategy": "model",
+        "range_lower": 0.2,
+        "range_upper": 0.8,
+        "range_atr_max_pct": 0.8,
+        "range_trend_max_pct": 0.3,
+        "range_width_min_pct": 0.5,
+        "range_width_max_pct": 6.0,
+        "train_final_capital": 101.66717285882542,
+        "train_return_pct": 1.6671728588254275,
+        "train_drawdown_pct": -1.4545838786369392
+      },
+      "test": {
+        "initial_capital": 100.0,
+        "final_capital": 100.0,
+        "total_return_pct": 0.0,
+        "max_drawdown_pct": 0.0,
+        "trade_count": 0,
+        "closed_trade_count": 0,
+        "win_rate_pct": 0.0,
+        "spread_bps": 2.0,
+        "slippage_bps": 2.0,
+        "sharpe_like": 0.0,
+        "last_trades": []
+      }
+    },
+    {
+      "fold": 7,
+      "train_start": "2026-06-27 03:45:00",
+      "train_end": "2026-07-04 03:30:00",
+      "test_start": "2026-07-04 03:45:00",
+      "test_end": "2026-07-06 03:30:00",
+      "selected_config": {
+        "horizons": [
+          3
+        ],
+        "min_confidence": 0.45,
+        "min_agree": 1,
+        "stop_loss_pct": 0.0,
+        "take_profit_pct": 1.0,
+        "atr_min_pct": 0.0,
+        "trend_min_pct": 0.0,
+        "volatility_min_pct": 0.0,
+        "trend_filter": "off",
+        "strategy": "model",
+        "range_lower": 0.2,
+        "range_upper": 0.8,
+        "range_atr_max_pct": 0.8,
+        "range_trend_max_pct": 0.3,
+        "range_width_min_pct": 0.5,
+        "range_width_max_pct": 6.0,
+        "train_final_capital": 100.40370151571987,
+        "train_return_pct": 0.40370151571986757,
+        "train_drawdown_pct": -1.3256161203285655
+      },
+      "test": {
+        "initial_capital": 100.0,
+        "final_capital": 100.0,
+        "total_return_pct": 0.0,
+        "max_drawdown_pct": 0.0,
+        "trade_count": 0,
+        "closed_trade_count": 0,
+        "win_rate_pct": 0.0,
+        "spread_bps": 2.0,
+        "slippage_bps": 2.0,
+        "sharpe_like": 0.0,
+        "last_trades": []
+      }
+    }
+  ]
+}
