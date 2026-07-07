@@ -67,7 +67,7 @@ def evaluate_risk(
     if drawdown_pct <= -abs(max_drawdown_pct):
         return RiskDecision(False, "blocked", 0.0, "max_drawdown_exceeded", drawdown_pct, loss_streak)
     if loss_streak >= max_loss_streak:
-        return RiskDecision(False, "blocked", 0.0, "loss_streak_exceeded", drawdown_pct, loss_streak)
+        return RiskDecision(True, "reduced", reduced_position_size_pct, "loss_streak_reduced_size", drawdown_pct, loss_streak)
     if drawdown_pct <= -abs(reduce_drawdown_pct):
         return RiskDecision(True, "reduced", reduced_position_size_pct, "drawdown_reduced_size", drawdown_pct, loss_streak)
 

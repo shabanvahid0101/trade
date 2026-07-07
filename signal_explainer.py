@@ -34,6 +34,7 @@ def fa_code(value: str | None) -> str:
         "equity_below_minimum": "سرمایه کمتر از حداقل مجاز است",
         "max_drawdown_exceeded": "حداکثر افت سرمایه رد شده",
         "loss_streak_exceeded": "تعداد ضررهای پشت‌سرهم زیاد شده",
+        "loss_streak_reduced_size": "به خاطر ضررهای پشت‌سرهم، حجم کمتر شد",
         "drawdown_reduced_size": "به خاطر افت سرمایه، حجم کمتر شد",
         "risk_blocked": "ورود به خاطر ریسک مسدود شد",
         "no_trade_signal": "سیگنال قابل معامله وجود ندارد",
