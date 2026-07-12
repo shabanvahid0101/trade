@@ -128,6 +128,20 @@ def run(args: argparse.Namespace) -> dict:
         atomic_write_csv(fifteen_minute, Path(args.fifteen_minute_data))
         report["datasets"]["15m"] = audit_price_file(args.fifteen_minute_data, "15m", write=True)
 
+    if args.update_fundamentals and Path(args.fifteen_minute_data).exists():
+        fundamentals = update_fundamental_file(
+            market_data=args.fifteen_minute_data,
+            output=args.fifteen_minute_fundamentals,
+            symbol=args.symbol,
+            timeframe="15m",
+        )
+        report["fundamentals"]["15m"] = {
+            "path": str(args.fifteen_minute_fundamentals),
+            "rows": int(len(fundamentals)),
+            "first_timestamp": str(fundamentals["timestamp"].min()) if not fundamentals.empty else None,
+            "last_timestamp": str(fundamentals["timestamp"].max()) if not fundamentals.empty else None,
+        }
+
     if args.report:
         report_path = Path(args.report)
         report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -143,6 +157,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--one-hour-fundamentals", default=str(DATA_DIR / "1h-btc_fundamentals.csv"))
     parser.add_argument("--five-minute-data", default=str(DATA_DIR / "5m_btc_history.csv"))
     parser.add_argument("--fifteen-minute-data", default=str(DATA_DIR / "15m_btc_history_5000.csv"))
+    parser.add_argument("--fifteen-minute-fundamentals", default=str(DATA_DIR / "15m_btc_fundamentals.csv"))
     parser.add_argument("--fifteen-minute-rows", type=int, default=5000)
     parser.add_argument("--one-hour-fetch-batches", type=int, default=5)
     parser.add_argument("--five-minute-fetch-batches", type=int, default=20)

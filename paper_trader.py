@@ -467,7 +467,7 @@ def run_single(args: argparse.Namespace) -> dict:
         quality = risk.get("signal_quality_score")
         quality_text = f"{float(quality):.2f}" if quality is not None else "n/a"
         send_telegram_message(
-            f"<b>Paper Trading - {args.symbol}</b>\n"
+            f"<b>{args.telegram_label} - {args.symbol} {args.timeframe}</b>\n"
             f"سیگنال: {fa_signal(final['signal'])} ({final['signal']})\n"
             f"استراتژی: {fa_strategy(final.get('strategy', 'model'))} | وضعیت بازار: {fa_regime(final.get('market_regime', 'model'))}\n"
             f"ریسک: {fa_code(risk['risk_level'])} | حجم معامله: {risk['position_size_pct']:.2f} | دلیل: {fa_code(risk['reason'])}\n"
@@ -480,6 +480,7 @@ def run_single(args: argparse.Namespace) -> dict:
             f"اطمینان مدل: {final['confidence']:.2f}\n\n"
             f"{format_explanation_for_telegram(signal_explanation)}"
         )
+        return output
     return output
 
 
@@ -528,6 +529,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mode", choices=["backtest", "single"], default="backtest")
     parser.add_argument("--update", action="store_true")
     parser.add_argument("--telegram", action="store_true")
+    parser.add_argument("--telegram-label", default="Paper Trading")
     return parser
 
 

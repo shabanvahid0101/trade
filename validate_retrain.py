@@ -16,12 +16,14 @@ def validate_metrics(
     min_profitable_fold_pct: float,
     max_worst_drawdown_pct: float,
     min_fold_count: int,
+    min_average_closed_trades: float,
 ) -> tuple[bool, list[str]]:
     failures = []
     fold_count = int(metrics.get("fold_count", 0))
     average_return = float(metrics.get("average_test_return_pct", 0.0))
     profitable_fold_pct = float(metrics.get("profitable_fold_pct", 0.0))
     worst_drawdown = float(metrics.get("worst_drawdown_pct", 0.0))
+    average_closed_trades = float(metrics.get("average_test_closed_trade_count", 0.0))
 
     if fold_count < min_fold_count:
         failures.append(f"fold_count {fold_count} < required {min_fold_count}")
@@ -29,8 +31,13 @@ def validate_metrics(
         failures.append(f"average_test_return_pct {average_return:.4f} < required {min_average_return_pct:.4f}")
     if profitable_fold_pct < min_profitable_fold_pct:
         failures.append(f"profitable_fold_pct {profitable_fold_pct:.2f} < required {min_profitable_fold_pct:.2f}")
-    if worst_drawdown < max_worst_drawdown_pct:
-        failures.append(f"worst_drawdown_pct {worst_drawdown:.2f} < allowed {max_worst_drawdown_pct:.2f}")
+    allowed_worst_drawdown = -abs(max_worst_drawdown_pct)
+    if worst_drawdown < allowed_worst_drawdown:
+        failures.append(f"worst_drawdown_pct {worst_drawdown:.2f} < allowed {allowed_worst_drawdown:.2f}")
+    if average_closed_trades < min_average_closed_trades:
+        failures.append(
+            f"average_test_closed_trade_count {average_closed_trades:.2f} < required {min_average_closed_trades:.2f}"
+        )
 
     return not failures, failures
 
@@ -42,6 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-profitable-fold-pct", type=float, default=50.0)
     parser.add_argument("--max-worst-drawdown-pct", type=float, default=-5.0)
     parser.add_argument("--min-fold-count", type=int, default=3)
+    parser.add_argument("--min-average-closed-trades", type=float, default=2.0)
     return parser
 
 
@@ -53,6 +61,7 @@ def main(args: argparse.Namespace) -> None:
         min_profitable_fold_pct=args.min_profitable_fold_pct,
         max_worst_drawdown_pct=args.max_worst_drawdown_pct,
         min_fold_count=args.min_fold_count,
+        min_average_closed_trades=args.min_average_closed_trades,
     )
     summary = {
         "passed": passed,
@@ -60,6 +69,7 @@ def main(args: argparse.Namespace) -> None:
         "average_test_return_pct": metrics.get("average_test_return_pct"),
         "profitable_fold_pct": metrics.get("profitable_fold_pct"),
         "worst_drawdown_pct": metrics.get("worst_drawdown_pct"),
+        "average_test_closed_trade_count": metrics.get("average_test_closed_trade_count"),
         "failures": failures,
     }
     print(json.dumps(summary, indent=2))

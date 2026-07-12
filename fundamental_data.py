@@ -117,7 +117,30 @@ def fetch_paginated(
     limit: int = 500,
     period: str | None = None,
     max_window_ms: int | None = None,
+    backward: bool = False,
 ) -> list[dict]:
+    if backward:
+        rows = []
+        window_start = max(start_ms, end_ms - max_window_ms) if max_window_ms else start_ms
+        cursor_end = end_ms
+        while cursor_end >= window_start:
+            params = {"symbol": symbol, "startTime": window_start, "endTime": cursor_end, "limit": limit}
+            if period:
+                params["period"] = period
+            batch = request_json(url, params=params)
+            if not batch:
+                break
+            rows.extend(batch)
+            earliest = min(int(item[time_key]) for item in batch)
+            next_end = earliest - 1
+            if next_end >= cursor_end:
+                break
+            cursor_end = next_end
+            if earliest <= window_start:
+                break
+            time.sleep(0.2)
+        return rows
+
     rows = []
     cursor = start_ms
     while cursor <= end_ms:
@@ -233,6 +256,7 @@ def fetch_binance_fundamentals(
         limit=500,
         period=period,
         max_window_ms=futures_data_window_ms,
+        backward=True,
     )
     long_short_rows = safe_fetch(
         "global_long_short_ratio",
@@ -244,6 +268,7 @@ def fetch_binance_fundamentals(
         limit=500,
         period=period,
         max_window_ms=futures_data_window_ms,
+        backward=True,
     )
     taker_rows = safe_fetch(
         "taker_buy_sell_ratio",
@@ -255,6 +280,7 @@ def fetch_binance_fundamentals(
         limit=500,
         period=period,
         max_window_ms=futures_data_window_ms,
+        backward=True,
     )
 
     frames = [

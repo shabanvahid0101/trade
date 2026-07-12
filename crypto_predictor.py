@@ -918,13 +918,20 @@ def prepare_datasets(
     val_end = int(n_samples * (train_ratio + val_ratio))
     if train_end <= 0 or val_end <= train_end or val_end >= n_samples:
         raise ValueError("Invalid split sizes. Adjust train_ratio/val_ratio.")
+    # Purge samples whose forward-looking target crosses a split boundary.
+    # Without this gap, the final train/validation labels use prices from the
+    # following partition and leak future information into model selection.
+    train_stop = train_end - horizon
+    val_stop = val_end - horizon
+    if train_stop <= 0 or val_stop <= train_end:
+        raise ValueError("Not enough samples to purge horizon overlap between time splits.")
 
     if feature_selection == "correlation":
         feature_columns, feature_selection_report = select_features_by_correlation(
             featured=featured,
             candidate_columns=feature_columns,
             sequence_length=sequence_length,
-            train_end=train_end,
+            train_end=train_stop,
             max_features=max_selected_features,
             min_abs_corr=min_feature_correlation,
             max_pair_corr=max_feature_pair_correlation,
@@ -952,8 +959,8 @@ def prepare_datasets(
     y = np.asarray(y, dtype=np.float32)
     meta_all = pd.DataFrame(rows).reset_index(drop=True)
 
-    X_train_raw, X_val_raw, X_test_raw = X[:train_end], X[train_end:val_end], X[val_end:]
-    y_train_raw, y_val_raw, y_test_raw = y[:train_end], y[train_end:val_end], y[val_end:]
+    X_train_raw, X_val_raw, X_test_raw = X[:train_stop], X[train_end:val_stop], X[val_end:]
+    y_train_raw, y_val_raw, y_test_raw = y[:train_stop], y[train_end:val_stop], y[val_end:]
 
     feature_scaler = RobustScaler()
     feature_scaler.fit(X_train_raw.reshape(-1, X.shape[-1]))
@@ -984,8 +991,8 @@ def prepare_datasets(
         y_val=y_val,
         X_test=X_test,
         y_test=y_test,
-        meta_train=meta_all.iloc[:train_end].reset_index(drop=True),
-        meta_val=meta_all.iloc[train_end:val_end].reset_index(drop=True),
+        meta_train=meta_all.iloc[:train_stop].reset_index(drop=True),
+        meta_val=meta_all.iloc[train_end:val_stop].reset_index(drop=True),
         meta_test=meta_all.iloc[val_end:].reset_index(drop=True),
         feature_scaler=feature_scaler,
         target_scaler=target_scaler,
@@ -1025,7 +1032,28 @@ def build_model(sequence_length: int, n_features: int, target_mode: str = "regre
     return model
 
 
-def train_model(split: SplitData, epochs: int = 80, batch_size: int = 32, verbose: int = 1):
+def classification_weights(y_train: np.ndarray, power: float = 0.5) -> dict[int, float]:
+    if not 0.0 <= power <= 1.0:
+        raise ValueError("class_weight_power must be between 0 and 1.")
+    present_classes = np.unique(y_train)
+    balanced = compute_class_weight(class_weight="balanced", classes=present_classes, y=y_train)
+    softened = np.power(balanced, power)
+    counts = np.array([(y_train == label).sum() for label in present_classes], dtype=float)
+    normalization = float(np.sum((counts / counts.sum()) * softened))
+    weights = softened / normalization
+    result = {int(label): float(weight) for label, weight in zip(present_classes, weights)}
+    for label in (0, 1, 2):
+        result.setdefault(label, 1.0)
+    return result
+
+
+def train_model(
+    split: SplitData,
+    epochs: int = 80,
+    batch_size: int = 32,
+    verbose: int = 1,
+    class_weight_power: float = 0.5,
+):
     model = build_model(split.sequence_length, split.X_train.shape[-1], split.target_mode)
     callbacks = [
         EarlyStopping(monitor="val_loss", patience=12, restore_best_weights=True, verbose=verbose),
@@ -1033,13 +1061,7 @@ def train_model(split: SplitData, epochs: int = 80, batch_size: int = 32, verbos
     ]
     fit_kwargs = {}
     if split.target_mode == "classification":
-        classes = np.array([0, 1, 2])
-        present_classes = np.unique(split.y_train)
-        weights = compute_class_weight(class_weight="balanced", classes=present_classes, y=split.y_train)
-        class_weight = {int(label): float(weight) for label, weight in zip(present_classes, weights)}
-        for label in classes:
-            class_weight.setdefault(int(label), 1.0)
-        fit_kwargs["class_weight"] = class_weight
+        fit_kwargs["class_weight"] = classification_weights(split.y_train, power=class_weight_power)
     history = model.fit(
         split.X_train,
         split.y_train,
@@ -1321,7 +1343,12 @@ def backtest_futures_long_short(
     }
 
 
-def save_artifacts(split: SplitData, metrics: dict, path: str | Path = ARTIFACT_PATH) -> None:
+def save_artifacts(
+    split: SplitData,
+    metrics: dict,
+    path: str | Path = ARTIFACT_PATH,
+    update_legacy_scaler: bool = False,
+) -> None:
     if split.feature_columns == ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS:
         feature_set = "advanced-fundamental"
     elif split.feature_columns == ADVANCED_FEATURE_COLUMNS:
@@ -1330,6 +1357,19 @@ def save_artifacts(split: SplitData, metrics: dict, path: str | Path = ARTIFACT_
         feature_set = "core"
     else:
         feature_set = "selected"
+    training_window = {
+        "train_start": split.meta_train["timestamp"].iloc[0].isoformat(),
+        "train_end": split.meta_train["timestamp"].iloc[-1].isoformat(),
+        "validation_start": split.meta_val["timestamp"].iloc[0].isoformat(),
+        "validation_end": split.meta_val["timestamp"].iloc[-1].isoformat(),
+        "test_start": split.meta_test["timestamp"].iloc[0].isoformat(),
+        "test_end": split.meta_test["timestamp"].iloc[-1].isoformat(),
+        "train_samples": len(split.meta_train),
+        "validation_samples": len(split.meta_val),
+        "test_samples": len(split.meta_test),
+        "purge_bars": split.horizon,
+        "purged": True,
+    }
     artifact = {
         "feature_scaler": split.feature_scaler,
         "target_scaler": split.target_scaler,
@@ -1342,10 +1382,12 @@ def save_artifacts(split: SplitData, metrics: dict, path: str | Path = ARTIFACT_
         "target_mode": split.target_mode,
         "target_threshold": split.target_threshold,
         "metrics": metrics,
+        "training_window": training_window,
         "created_at": pd.Timestamp.now("UTC").isoformat(),
     }
     joblib.dump(artifact, path)
-    joblib.dump(split.feature_scaler, LEGACY_SCALER_PATH)
+    if update_legacy_scaler:
+        joblib.dump(split.feature_scaler, LEGACY_SCALER_PATH)
 
 
 def load_artifacts(path: str | Path = ARTIFACT_PATH) -> dict:
@@ -1438,8 +1480,18 @@ def run_training_pipeline(
         min_selected_features=args.min_selected_features,
         feature_correlation_method=args.feature_correlation_method,
     )
-    model, _ = train_model(split, epochs=args.epochs, batch_size=args.batch_size, verbose=args.training_verbose)
+    class_weight_power = float(getattr(args, "class_weight_power", 0.5))
+    model, _ = train_model(
+        split,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        verbose=args.training_verbose,
+        class_weight_power=class_weight_power,
+    )
     metrics = evaluate_model(model, split)
+    if split.target_mode == "classification":
+        metrics["class_weight_power"] = class_weight_power
+        metrics["class_weights"] = classification_weights(split.y_train, power=class_weight_power)
     metrics["min_confidence"] = args.min_confidence
     metrics["selected_feature_count"] = len(split.feature_columns)
     metrics["selected_features"] = split.feature_columns
@@ -1469,7 +1521,12 @@ def run_training_pipeline(
     model_path.parent.mkdir(parents=True, exist_ok=True)
     artifact_path.parent.mkdir(parents=True, exist_ok=True)
     model.save(model_path)
-    save_artifacts(split, {**metrics, "backtest": backtest}, path=artifact_path)
+    save_artifacts(
+        split,
+        {**metrics, "backtest": backtest},
+        path=artifact_path,
+        update_legacy_scaler=bool(getattr(args, "update_legacy", False)),
+    )
 
     return {
         "horizon": horizon,
@@ -1507,14 +1564,16 @@ def train_command(args: argparse.Namespace) -> None:
     data = load_training_data(args)
     model_path, artifact_path = horizon_model_paths(args.symbol, args.timeframe, args.horizon, args.model_dir)
     result = run_training_pipeline(args, data, args.horizon, model_path, artifact_path)
-    shutil.copy2(model_path, MODEL_PATH)
-    shutil.copy2(artifact_path, ARTIFACT_PATH)
+    if args.update_legacy:
+        shutil.copy2(model_path, MODEL_PATH)
+        shutil.copy2(artifact_path, ARTIFACT_PATH)
 
     print(json.dumps({"metrics": result["metrics"], "backtest": result["backtest"]}, indent=2))
     print(f"Saved model: {model_path}")
     print(f"Saved artifacts: {artifact_path}")
-    print(f"Updated legacy model: {MODEL_PATH}")
-    print(f"Updated legacy artifacts: {ARTIFACT_PATH}")
+    if args.update_legacy:
+        print(f"Updated legacy model: {MODEL_PATH}")
+        print(f"Updated legacy artifacts: {ARTIFACT_PATH}")
 
 
 def train_multi_command(args: argparse.Namespace) -> None:
@@ -1662,6 +1721,11 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--timeframe", default="5m")
         command_parser.add_argument("--exchange", default="binance")
         command_parser.add_argument("--model-dir", default=str(MODELS_DIR))
+        command_parser.add_argument(
+            "--update-legacy",
+            action="store_true",
+            help="Also replace the root legacy model and artifact files after training.",
+        )
         command_parser.add_argument("--update", action="store_true", help="Fetch fresh candles before training.")
         command_parser.add_argument("--fundamental-data", default=None, help="Optional Binance Futures fundamentals CSV.")
         command_parser.add_argument("--update-fundamentals", action="store_true", help="Fetch/update Binance Futures fundamentals before training.")
@@ -1669,6 +1733,12 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--epochs", type=int, default=80)
         command_parser.add_argument("--batch-size", type=int, default=32)
         command_parser.add_argument("--training-verbose", type=int, choices=[0, 1, 2], default=2)
+        command_parser.add_argument(
+            "--class-weight-power",
+            type=float,
+            default=0.5,
+            help="Classification balancing strength: 0 disables balancing, 1 uses fully balanced weights.",
+        )
         command_parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducible training. Use -1 to disable.")
         command_parser.add_argument("--threshold", type=float, default=0.0015)
         command_parser.add_argument("--fee-rate", type=float, default=0.001)

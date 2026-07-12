@@ -95,6 +95,29 @@ def collect_feature_summary(symbol: str, timeframe: str, horizons: list[int], ar
     }
 
 
+def validate_artifact_lineage(symbol: str, timeframe: str, horizons: list[int], artifact_dir: Path) -> list[str]:
+    failures = []
+    for horizon in horizons:
+        _, artifact_path = horizon_model_paths(symbol, timeframe, horizon, artifact_dir)
+        if not artifact_path.exists():
+            failures.append(f"h{horizon}: staging artifact is missing")
+            continue
+        artifact = joblib.load(artifact_path)
+        window = artifact.get("training_window") or {}
+        required = ["train_start", "train_end", "validation_start", "validation_end", "test_start", "test_end"]
+        missing = [field for field in required if not window.get(field)]
+        if missing:
+            failures.append(f"h{horizon}: artifact lineage missing {','.join(missing)}")
+            continue
+        if not window.get("purged") or int(window.get("purge_bars", 0)) < horizon:
+            failures.append(f"h{horizon}: time splits are not purged by the prediction horizon")
+            continue
+        boundaries = [datetime.fromisoformat(window[field]) for field in required]
+        if boundaries != sorted(boundaries) or len(set(boundaries)) != len(boundaries):
+            failures.append(f"h{horizon}: artifact training-window boundaries are not strictly ordered")
+    return failures
+
+
 def data_quality_summary(report: dict) -> dict:
     price_after = report.get("price_data", {}).get("after", {})
     fundamentals = report.get("fundamental_data", {})
@@ -148,6 +171,7 @@ def build_registry(
             "average_test_return_pct": metrics.get("average_test_return_pct"),
             "profitable_fold_pct": metrics.get("profitable_fold_pct"),
             "worst_drawdown_pct": metrics.get("worst_drawdown_pct"),
+            "average_test_closed_trade_count": metrics.get("average_test_closed_trade_count"),
         },
     }
 
@@ -247,6 +271,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-profitable-fold-pct", type=float, default=50.0)
     parser.add_argument("--max-worst-drawdown-pct", type=float, default=-5.0)
     parser.add_argument("--min-fold-count", type=int, default=3)
+    parser.add_argument("--min-average-closed-trades", type=float, default=2.0)
+    parser.add_argument("--require-artifact-lineage", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--telegram", action="store_true")
     parser.add_argument("--fail-on-reject", action=argparse.BooleanOptionalAction, default=True)
     return parser
@@ -260,10 +286,15 @@ def main(args: argparse.Namespace) -> dict:
         min_profitable_fold_pct=args.min_profitable_fold_pct,
         max_worst_drawdown_pct=args.max_worst_drawdown_pct,
         min_fold_count=args.min_fold_count,
+        min_average_closed_trades=args.min_average_closed_trades,
     )
     horizons = parse_horizons(args.horizons)
     staging_dir = Path(args.staging_dir)
     production_dir = Path(args.production_dir)
+    if args.require_artifact_lineage:
+        lineage_failures = validate_artifact_lineage(args.symbol, args.timeframe, horizons, staging_dir)
+        failures.extend(lineage_failures)
+        passed = passed and not lineage_failures
     promoted_files = promote_models(args.symbol, args.timeframe, horizons, staging_dir, production_dir) if passed else []
     feature_artifact_dir = production_dir if passed else staging_dir
     feature_summary = collect_feature_summary(args.symbol, args.timeframe, horizons, feature_artifact_dir)

@@ -715,6 +715,7 @@ def run_walk_forward(args: argparse.Namespace) -> dict:
     returns = [fold["test"]["total_return_pct"] for fold in folds]
     final_capitals = [fold["test"]["final_capital"] for fold in folds]
     drawdowns = [fold["test"]["max_drawdown_pct"] for fold in folds]
+    closed_trade_counts = [fold["test"]["closed_trade_count"] for fold in folds]
     config_counts = {}
     for fold in folds:
         key = config_key(fold["selected_config"])
@@ -730,6 +731,8 @@ def run_walk_forward(args: argparse.Namespace) -> dict:
         "average_test_return_pct": float(np.mean(returns)),
         "median_test_return_pct": float(np.median(returns)),
         "profitable_fold_pct": float(np.mean([value > 0 for value in returns]) * 100),
+        "average_test_closed_trade_count": float(np.mean(closed_trade_counts)),
+        "total_test_closed_trade_count": int(sum(closed_trade_counts)),
         "average_final_capital": float(np.mean(final_capitals)),
         "worst_drawdown_pct": float(min(drawdowns)),
         "selected_config_counts": config_counts,
