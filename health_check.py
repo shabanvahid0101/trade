@@ -109,14 +109,15 @@ def fundamentals_health(path: str | Path, max_age_hours: float) -> dict:
     }
 
 
-def model_health(symbol: str, timeframe: str, horizons: list[int]) -> dict:
+def model_health(symbol: str, timeframe: str, horizons: list[int], model_dir: str | Path = MODELS_DIR) -> dict:
     safe_symbol = "".join(char for char in symbol.upper() if char.isalnum())
+    model_base = Path(model_dir)
     files = {}
     ok = True
     for horizon in horizons:
         prefix = f"{safe_symbol}_{timeframe}_h{horizon}"
-        model_path = MODELS_DIR / f"{prefix}.keras"
-        artifact_path = MODELS_DIR / f"{prefix}_artifact.pkl"
+        model_path = model_base / f"{prefix}.keras"
+        artifact_path = model_base / f"{prefix}_artifact.pkl"
         files[f"h{horizon}_model"] = file_status(model_path)
         files[f"h{horizon}_artifact"] = file_status(artifact_path)
         ok = ok and files[f"h{horizon}_model"]["exists"] and files[f"h{horizon}_artifact"]["exists"]
@@ -212,8 +213,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--timeframe", default="1h")
     parser.add_argument("--data", default=str(DATA_DIR / "1h-btc_history.csv"))
     parser.add_argument("--fundamental-data", default=str(DATA_DIR / "1h-btc_fundamentals.csv"))
+    parser.add_argument("--model-dir", default=str(MODELS_DIR))
     parser.add_argument("--paper-state", default=str(BASE_DIR / "paper_state.json"))
     parser.add_argument("--alert-state", default=str(BASE_DIR / "alert_state.json"))
+    parser.add_argument("--skip-alert-state", action="store_true")
     parser.add_argument("--horizons", default="1,3,6")
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--max-data-age-hours", type=float, default=4.0)
@@ -227,11 +230,15 @@ def main(args: argparse.Namespace) -> dict:
     horizons = [int(part.strip()) for part in args.horizons.split(",") if part.strip()]
     market = dataset_health(args.data, args.timeframe, args.max_data_age_hours)
     fundamentals = fundamentals_health(args.fundamental_data, args.max_fundamental_age_hours)
-    models = model_health(args.symbol, args.timeframe, horizons)
+    models = model_health(args.symbol, args.timeframe, horizons, args.model_dir)
     paper_state_raw = read_json(args.paper_state)
-    alert_state_raw = read_json(args.alert_state)
+    alert_state_raw = {} if args.skip_alert_state else read_json(args.alert_state)
     paper_state = state_health(paper_state_raw, market.get("last_timestamp"), "paper")
-    alert_state = state_health(alert_state_raw, market.get("last_timestamp"), "alert")
+    alert_state = (
+        {"ok": True, "last_timestamp": None, "matches_market_last": None, "name": "alert", "skipped": True}
+        if args.skip_alert_state
+        else state_health(alert_state_raw, market.get("last_timestamp"), "alert")
+    )
 
     mark_price = float(pd.read_csv(args.data).dropna(subset=["close"]).iloc[-1]["close"]) if market.get("ok") or market.get("last_timestamp") else 0.0
     equity = paper_equity(paper_state_raw, mark_price, args.initial_capital)
@@ -244,9 +251,9 @@ def main(args: argparse.Namespace) -> dict:
         warnings.append("model_files_missing")
     if not paper_state.get("ok"):
         warnings.append("paper_state_missing_or_invalid")
-    if not alert_state.get("ok"):
+    if not args.skip_alert_state and not alert_state.get("ok"):
         warnings.append("alert_state_missing_or_invalid")
-    if alert_state.get("last_timestamp") and market.get("last_timestamp") and alert_state["last_timestamp"] != market["last_timestamp"]:
+    if not args.skip_alert_state and alert_state.get("last_timestamp") and market.get("last_timestamp") and alert_state["last_timestamp"] != market["last_timestamp"]:
         warnings.append("alert_state_not_on_latest_market_candle")
     if paper_state.get("last_timestamp") and market.get("last_timestamp") and paper_state["last_timestamp"] != market["last_timestamp"]:
         warnings.append("paper_state_not_on_latest_market_candle")

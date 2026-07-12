@@ -481,6 +481,21 @@ def run_single(args: argparse.Namespace) -> dict:
             f"{format_explanation_for_telegram(signal_explanation)}"
         )
         return output
+        send_telegram_message(
+            f"<b>{args.telegram_label} - {args.symbol} {args.timeframe}</b>\n"
+            f"سیگنال: {fa_signal(final['signal'])} ({final['signal']})\n"
+            f"استراتژی: {fa_strategy(final.get('strategy', 'model'))} | وضعیت بازار: {fa_regime(final.get('market_regime', 'model'))}\n"
+            f"ریسک: {fa_code(risk['risk_level'])} | حجم معامله: {risk['position_size_pct']:.2f} | دلیل: {fa_code(risk['reason'])}\n"
+            f"دلیل حجم: {fa_code(risk.get('position_size_reason'))} | کیفیت سیگنال: {quality_text}\n"
+            f"هزینه‌ها: کارمزد {args.fee_rate:.4f} | اسپرد {args.spread_bps:.2f} bps | اسلیپیج {args.slippage_bps:.2f} bps\n"
+            f"پوزیشن فعلی: {fa_signal(position_name)} ({position_name})\n"
+            f"قیمت: ${final['current_price']:.2f}\n"
+            f"ارزش حساب: ${trade_result['equity']:.2f}\n"
+            f"سرمایه آزاد: ${float(state['capital']):.2f}\n"
+            f"اطمینان مدل: {final['confidence']:.2f}\n\n"
+            f"{format_explanation_for_telegram(signal_explanation)}"
+        )
+        return output
     return output
 
 

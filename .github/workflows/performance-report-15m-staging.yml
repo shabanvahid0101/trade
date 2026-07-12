@@ -1,0 +1,38 @@
+name: 15m Staging Performance Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 3 * * *"
+
+jobs:
+  report-15m-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Send 15m staging performance report
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_STRICT: "1"
+        run: |
+          python -c "import os; assert os.getenv('TELEGRAM_TOKEN'), 'Missing TELEGRAM_TOKEN secret'; assert os.getenv('TELEGRAM_CHAT_ID'), 'Missing TELEGRAM_CHAT_ID secret'"
+          python performance_report.py --telegram --telegram-label "Paper Trading 15m Staging" --symbol BTC/USDT --data dataset/15m_btc_history_5000.csv --state-file paper_state_15m_staging.json --initial-capital 100 --drawdown-alert-pct 5

@@ -182,8 +182,36 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--symbol", default="BTC/USDT")
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--drawdown-alert-pct", type=float, default=5.0)
+    parser.add_argument("--telegram-label", default="Paper Trading")
     parser.add_argument("--telegram", action="store_true")
     return parser
+
+
+def build_message_fa(report: dict, symbol: str, drawdown_alert_pct: float, label: str) -> str:
+    alert_line = ""
+    if report["max_drawdown_pct"] <= -abs(drawdown_alert_pct):
+        alert_line = f"\nهشدار ریسک: افت سرمایه {report['max_drawdown_pct']:.2f}%"
+
+    best = report.get("best_trade") or {}
+    worst = report.get("worst_trade") or {}
+    best_line = f"بهترین معامله: {format_money(float(best.get('pnl', 0) or 0))}" if best else "بهترین معامله: n/a"
+    worst_line = f"بدترین معامله: {format_money(float(worst.get('pnl', 0) or 0))}" if worst else "بدترین معامله: n/a"
+
+    return (
+        f"<b>گزارش عملکرد {label} - {symbol}</b>\n"
+        f"زمان: {report['mark_timestamp']} UTC\n"
+        f"قیمت: ${report['mark_price']:.2f}\n"
+        f"ارزش حساب: ${report['equity']:.2f} ({report['total_return_pct']:+.2f}%)\n"
+        f"سرمایه آزاد: ${report['capital']:.2f}\n"
+        f"سود/ضرر قطعی‌شده: {format_money(report['realized_pnl'])}\n"
+        f"سود/ضرر باز: {format_money(report['unrealized_pnl'])}\n"
+        f"پوزیشن: {report['position']}\n"
+        f"معاملات: {report['closed_trade_count']} بسته‌شده / {report['trade_count']} رویداد\n"
+        f"نرخ برد: {report['win_rate_pct']:.1f}%\n"
+        f"بیشترین افت سرمایه: {report['max_drawdown_pct']:.2f}%\n"
+        f"{best_line} | {worst_line}"
+        f"{alert_line}"
+    )
 
 
 def main(args: argparse.Namespace) -> dict:
@@ -193,7 +221,7 @@ def main(args: argparse.Namespace) -> dict:
     output = {"report": report}
     print(json.dumps(output, indent=2))
     if args.telegram:
-        send_telegram_message(build_message(report, args.symbol, args.drawdown_alert_pct))
+        send_telegram_message(build_message_fa(report, args.symbol, args.drawdown_alert_pct, args.telegram_label))
     return output
 
 

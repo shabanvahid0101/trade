@@ -1,0 +1,38 @@
+name: 15m Staging Health Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "12 */6 * * *"
+
+jobs:
+  health-15m-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run 15m staging health check
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_STRICT: "1"
+        run: |
+          python -c "import os; assert os.getenv('TELEGRAM_TOKEN'), 'Missing TELEGRAM_TOKEN secret'; assert os.getenv('TELEGRAM_CHAT_ID'), 'Missing TELEGRAM_CHAT_ID secret'"
+          python health_check.py --telegram --symbol BTC/USDT --timeframe 15m --data dataset/15m_btc_history_5000.csv --fundamental-data dataset/15m_btc_fundamentals.csv --model-dir models/15m_fundamental_staging --paper-state paper_state_15m_staging.json --horizons 3 --initial-capital 100 --max-data-age-hours 2 --max-fundamental-age-hours 6 --skip-alert-state
