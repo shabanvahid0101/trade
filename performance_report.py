@@ -221,8 +221,35 @@ def main(args: argparse.Namespace) -> dict:
     output = {"report": report}
     print(json.dumps(output, indent=2))
     if args.telegram:
-        send_telegram_message(build_message_fa(report, args.symbol, args.drawdown_alert_pct, args.telegram_label))
+        send_telegram_message(build_message_clean(report, args.symbol, args.drawdown_alert_pct, args.telegram_label))
     return output
+
+
+def build_message_clean(report: dict, symbol: str, drawdown_alert_pct: float, label: str) -> str:
+    alert_line = ""
+    if report["max_drawdown_pct"] <= -abs(drawdown_alert_pct):
+        alert_line = f"\nRisk alert: drawdown {report['max_drawdown_pct']:.2f}%"
+
+    best = report.get("best_trade") or {}
+    worst = report.get("worst_trade") or {}
+    best_line = f"Best trade: {format_money(float(best.get('pnl', 0) or 0))}" if best else "Best trade: n/a"
+    worst_line = f"Worst trade: {format_money(float(worst.get('pnl', 0) or 0))}" if worst else "Worst trade: n/a"
+
+    return (
+        f"<b>{label} Performance - {symbol}</b>\n"
+        f"Time: {report['mark_timestamp']} UTC\n"
+        f"Price: ${report['mark_price']:.2f}\n"
+        f"Equity: ${report['equity']:.2f} ({report['total_return_pct']:+.2f}%)\n"
+        f"Free capital: ${report['capital']:.2f}\n"
+        f"Realized PnL: {format_money(report['realized_pnl'])}\n"
+        f"Open PnL: {format_money(report['unrealized_pnl'])}\n"
+        f"Position: {report['position']}\n"
+        f"Trades: {report['closed_trade_count']} closed / {report['trade_count']} events\n"
+        f"Win rate: {report['win_rate_pct']:.1f}%\n"
+        f"Max drawdown: {report['max_drawdown_pct']:.2f}%\n"
+        f"{best_line} | {worst_line}"
+        f"{alert_line}"
+    )
 
 
 if __name__ == "__main__":

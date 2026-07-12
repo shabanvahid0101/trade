@@ -207,6 +207,28 @@ def build_message(report: dict) -> str:
     return "\n".join(lines)
 
 
+def build_message_clean(report: dict) -> str:
+    status = report["status"]
+    market = report["market_data"]
+    fundamentals = report["fundamentals"]
+    paper = report["paper_equity"]
+    source_age = fundamentals.get("source_age_hours")
+    source_age_text = f"{source_age:.2f}h" if source_age is not None else "n/a"
+    lines = [
+        f"<b>Trading Bot Health: {status}</b>",
+        f"Market candle: {market.get('last_timestamp')} ({market.get('age_hours', 0):.2f}h old)",
+        f"Fundamentals: {fundamentals.get('last_timestamp')} ({fundamentals.get('age_hours', 0):.2f}h file, {source_age_text} source)",
+        f"Models: {'OK' if report['models']['ok'] else 'WARNING'}",
+        f"Paper state: {report['paper_state'].get('last_timestamp')}",
+        f"Alert state: {report['alert_state'].get('last_timestamp') if not report['alert_state'].get('skipped') else 'skipped'}",
+        f"Position: {paper['position']} | Equity: ${paper['equity']:.2f} ({paper['return_pct']:+.2f}%)",
+    ]
+    if report["warnings"]:
+        lines.append("Warnings:")
+        lines.extend(f"- {warning}" for warning in report["warnings"])
+    return "\n".join(lines)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Health check for the crypto trading bot.")
     parser.add_argument("--symbol", default="BTC/USDT")
@@ -270,7 +292,7 @@ def main(args: argparse.Namespace) -> dict:
     }
     print(json.dumps(report, indent=2))
     if args.telegram:
-        send_telegram_message(build_message(report))
+        send_telegram_message(build_message_clean(report))
     if warnings and args.fail_on_warning:
         raise SystemExit("Health check warnings found.")
     return report

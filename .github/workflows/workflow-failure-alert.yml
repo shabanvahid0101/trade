@@ -1,0 +1,55 @@
+name: Workflow Failure Alert
+
+on:
+  workflow_run:
+    workflows:
+      - Dataset Maintenance
+      - Health Check
+      - 15m Staging Health Check
+      - Model Retrain
+      - Paper Trading
+      - Paper Trading 15m Staging
+      - Performance Report
+      - 15m Staging Performance Report
+      - Signal Report
+      - Telegram Trade Alert
+    types:
+      - completed
+
+jobs:
+  notify:
+    if: ${{ github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send Telegram failure alert
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          python - <<'PY'
+          import os
+          import requests
+
+          token = os.environ["TELEGRAM_TOKEN"]
+          chat_id = os.environ["TELEGRAM_CHAT_ID"]
+          message = (
+              "<b>GitHub Actions Alert</b>\n"
+              f"Workflow: {os.environ['WORKFLOW_NAME']}\n"
+              f"Status: {os.environ['CONCLUSION']}\n"
+              f"Branch: {os.environ['BRANCH']}\n"
+              f"Run: {os.environ['RUN_URL']}\n"
+              f"Run ID: {os.environ['RUN_ID']}"
+          )
+          response = requests.post(
+              f"https://api.telegram.org/bot{token}/sendMessage",
+              data={"chat_id": chat_id, "text": message, "parse_mode": "HTML"},
+              timeout=10,
+          )
+          response.raise_for_status()
+          PY

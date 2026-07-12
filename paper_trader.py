@@ -200,6 +200,78 @@ def apply_signal(
     return {"changed": True, "equity": equity, "reason": reason}
 
 
+def protective_exit_reason(state: dict, mark_price: float, stop_loss_pct: float, take_profit_pct: float) -> str | None:
+    position = int(state.get("position", 0) or 0)
+    if position == 0:
+        return None
+    entry_price = float(state.get("entry_price", 0) or 0)
+    if entry_price <= 0:
+        return None
+
+    if position == 1:
+        if stop_loss_pct > 0 and mark_price <= entry_price * (1 - stop_loss_pct):
+            return "stop_loss"
+        if take_profit_pct > 0 and mark_price >= entry_price * (1 + take_profit_pct):
+            return "take_profit"
+    if position == -1:
+        if stop_loss_pct > 0 and mark_price >= entry_price * (1 + stop_loss_pct):
+            return "stop_loss"
+        if take_profit_pct > 0 and mark_price <= entry_price * (1 - take_profit_pct):
+            return "take_profit"
+    return None
+
+
+def apply_protective_exit(
+    state: dict,
+    timestamp: str,
+    price: float,
+    fee_rate: float,
+    stop_loss_pct: float,
+    take_profit_pct: float,
+    spread_bps: float = 0.0,
+    slippage_bps: float = 0.0,
+    signal_explanation: dict | None = None,
+) -> dict | None:
+    if state.get("last_timestamp") == timestamp:
+        return None
+    reason = protective_exit_reason(state, price, stop_loss_pct, take_profit_pct)
+    if not reason:
+        return None
+    close_position(state, timestamp, price, fee_rate, reason, spread_bps, slippage_bps, signal_explanation)
+    state["last_timestamp"] = timestamp
+    state["last_signal_reason"] = f"protective_exit:{reason}"
+    state["last_signal_reasons"] = [f"Protective exit triggered: {reason}"]
+    equity = float(state["capital"]) + unrealized_pnl(state, price)
+    return {"changed": True, "equity": equity, "reason": f"protective_exit:{reason}"}
+
+
+def build_paper_telegram_message(
+    args: argparse.Namespace,
+    final: dict,
+    risk: dict,
+    state: dict,
+    trade_result: dict,
+    position_name: str,
+    quality_text: str,
+    signal_explanation: dict,
+) -> str:
+    return (
+        f"<b>{args.telegram_label} - {args.symbol} {args.timeframe}</b>\n"
+        f"Signal: {fa_signal(final['signal'])} ({final['signal']})\n"
+        f"Strategy: {fa_strategy(final.get('strategy', 'model'))} | Regime: {fa_regime(final.get('market_regime', 'model'))}\n"
+        f"Risk: {fa_code(risk['risk_level'])} | Size: {risk['position_size_pct']:.2f} | Reason: {fa_code(risk['reason'])}\n"
+        f"Size reason: {fa_code(risk.get('position_size_reason'))} | Signal quality: {quality_text}\n"
+        f"Costs: fee {args.fee_rate:.4f} | spread {args.spread_bps:.2f} bps | slippage {args.slippage_bps:.2f} bps\n"
+        f"Protective exits: SL {args.stop_loss_pct:.4f} | TP {args.take_profit_pct:.4f}\n"
+        f"Position: {fa_signal(position_name)} ({position_name})\n"
+        f"Price: ${final['current_price']:.2f}\n"
+        f"Equity: ${trade_result['equity']:.2f}\n"
+        f"Free capital: ${float(state['capital']):.2f}\n"
+        f"Model confidence: {final['confidence']:.2f}\n\n"
+        f"{format_explanation_for_telegram(signal_explanation)}"
+    )
+
+
 def build_historical_ensemble(
     data: pd.DataFrame,
     symbol: str,
@@ -438,18 +510,30 @@ def run_single(args: argparse.Namespace) -> dict:
         risk["signal_quality_score"] = None
         risk["position_size_reason"] = "dynamic_position_sizing_disabled"
     signal_explanation = build_signal_explanation(final, horizon_results, risk=risk)
-    trade_result = apply_signal(
-        state,
-        signal=final["signal"],
+    trade_result = apply_protective_exit(
+        state=state,
         timestamp=final["timestamp"],
         price=float(final["current_price"]),
         fee_rate=args.fee_rate,
-        leverage=args.leverage,
-        risk=risk,
+        stop_loss_pct=args.stop_loss_pct,
+        take_profit_pct=args.take_profit_pct,
         spread_bps=args.spread_bps,
         slippage_bps=args.slippage_bps,
         signal_explanation=signal_explanation,
     )
+    if trade_result is None:
+        trade_result = apply_signal(
+            state,
+            signal=final["signal"],
+            timestamp=final["timestamp"],
+            price=float(final["current_price"]),
+            fee_rate=args.fee_rate,
+            leverage=args.leverage,
+            risk=risk,
+            spread_bps=args.spread_bps,
+            slippage_bps=args.slippage_bps,
+            signal_explanation=signal_explanation,
+        )
     save_state(state_path, state)
     output = {
         "data_last_timestamp": dataset_last_timestamp,
@@ -466,6 +550,8 @@ def run_single(args: argparse.Namespace) -> dict:
         position_name = "LONG" if position == 1 else "SHORT" if position == -1 else "FLAT"
         quality = risk.get("signal_quality_score")
         quality_text = f"{float(quality):.2f}" if quality is not None else "n/a"
+        send_telegram_message(build_paper_telegram_message(args, final, risk, state, trade_result, position_name, quality_text, signal_explanation))
+        return output
         send_telegram_message(
             f"<b>{args.telegram_label} - {args.symbol} {args.timeframe}</b>\n"
             f"سیگنال: {fa_signal(final['signal'])} ({final['signal']})\n"
@@ -524,6 +610,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fee-rate", type=float, default=0.001)
     parser.add_argument("--spread-bps", type=float, default=0.0)
     parser.add_argument("--slippage-bps", type=float, default=0.0)
+    parser.add_argument("--stop-loss-pct", type=float, default=0.0)
+    parser.add_argument("--take-profit-pct", type=float, default=0.0)
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--risk-enabled", action=argparse.BooleanOptionalAction, default=True)
