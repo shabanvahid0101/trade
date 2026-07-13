@@ -503,6 +503,10 @@ def run_single(args: argparse.Namespace) -> dict:
             horizon_results=horizon_results,
             min_position_size_pct=args.dynamic_min_position_size_pct,
             max_position_size_pct=args.dynamic_max_position_size_pct,
+            recovery_enabled=args.risk_recovery_enabled,
+            recovery_position_size_pct=args.risk_recovery_position_size_pct,
+            recovery_min_signal_quality=args.risk_recovery_min_signal_quality,
+            recovery_max_loss_streak=args.risk_recovery_max_loss_streak,
         )
     else:
         risk["dynamic_position_sizing"] = False
@@ -621,6 +625,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--risk-max-drawdown-pct", type=float, default=5.0)
     parser.add_argument("--risk-max-loss-streak", type=int, default=3)
     parser.add_argument("--risk-min-equity", type=float, default=50.0)
+    parser.add_argument("--risk-recovery-enabled", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--risk-recovery-position-size-pct", type=float, default=0.25)
+    parser.add_argument("--risk-recovery-min-signal-quality", type=float, default=0.55)
+    parser.add_argument("--risk-recovery-max-loss-streak", type=int, default=3)
     parser.add_argument("--dynamic-position-sizing", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--dynamic-min-position-size-pct", type=float, default=0.25)
     parser.add_argument("--dynamic-max-position-size-pct", type=float, default=1.0)

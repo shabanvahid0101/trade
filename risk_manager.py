@@ -130,25 +130,59 @@ def apply_dynamic_position_sizing(
     horizon_results: list[dict],
     min_position_size_pct: float,
     max_position_size_pct: float,
+    recovery_enabled: bool = False,
+    recovery_position_size_pct: float = 0.25,
+    recovery_min_signal_quality: float = 0.55,
+    recovery_max_loss_streak: int = 3,
 ) -> dict:
     updated = dict(risk)
     original_cap = _clamp(float(risk.get("position_size_pct", 0.0) or 0.0), 0.0, 1.0)
     min_size = _clamp(min_position_size_pct, 0.0, 1.0)
     max_size = _clamp(max_position_size_pct, min_size, 1.0)
+    score, quality_reasons = signal_quality_score(final, horizon_results)
 
     if not risk.get("allow_new_position", False):
+        can_recover = (
+            recovery_enabled
+            and risk.get("reason") == "max_drawdown_exceeded"
+            and final.get("signal") in {"LONG", "SHORT"}
+            and score >= _clamp(recovery_min_signal_quality, 0.0, 1.0)
+            and int(risk.get("loss_streak", 0) or 0) <= max(0, recovery_max_loss_streak)
+        )
+        if can_recover:
+            recovery_cap = _clamp(recovery_position_size_pct, 0.0, max_size)
+            dynamic_size = min(recovery_cap, min_size + (max_size - min_size) * score)
+            updated.update(
+                {
+                    "allow_new_position": True,
+                    "risk_level": "recovery",
+                    "reason": "max_drawdown_recovery_probe",
+                    "dynamic_position_sizing": True,
+                    "base_position_size_pct": original_cap,
+                    "signal_quality_score": float(score),
+                    "position_size_pct": float(_clamp(dynamic_size, 0.0, recovery_cap)),
+                    "position_size_reason": "recovery_signal_quality_probe",
+                    "position_size_inputs": quality_reasons
+                    + [
+                        f"recovery_min_signal_quality={_clamp(recovery_min_signal_quality, 0.0, 1.0):.2f}",
+                        f"recovery_position_cap={recovery_cap:.2f}",
+                    ],
+                }
+            )
+            return updated
+
         updated.update(
             {
                 "dynamic_position_sizing": True,
                 "base_position_size_pct": original_cap,
-                "signal_quality_score": 0.0,
+                "signal_quality_score": float(score),
                 "position_size_pct": 0.0,
                 "position_size_reason": "risk_blocked",
+                "position_size_inputs": quality_reasons,
             }
         )
         return updated
 
-    score, quality_reasons = signal_quality_score(final, horizon_results)
     if final.get("signal") not in {"LONG", "SHORT"}:
         dynamic_size = 0.0
         reason = "no_trade_signal"

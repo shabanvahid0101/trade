@@ -245,7 +245,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - `LONG`, `SHORT`, and `HOLD` signals
 - Paper trading with a virtual 100 USD account
 - Hybrid strategy: model-driven trend trades plus range-market mean reversion
-- Risk controls that reduce size or block new entries after drawdown or loss streaks
+- Risk controls that reduce size, block entries, or allow small recovery probes after drawdown based on signal quality
 - Dynamic position sizing based on signal quality
 - More realistic execution simulation with spread and slippage
 - Telegram alerts, including `HOLD` messages
