@@ -6,11 +6,14 @@ on:
       - Dataset Maintenance
       - Health Check
       - 15m Staging Health Check
+      - 5m Staging Health Check
       - Model Retrain
       - Paper Trading
       - Paper Trading 15m Staging
+      - Paper Trading 5m Staging
       - Performance Report
       - 15m Staging Performance Report
+      - 5m Staging Performance Report
       - Signal Report
       - Telegram Trade Alert
     types:

@@ -22,7 +22,18 @@ def parse_systems(value: str) -> list[dict]:
 
 
 def system_report(system: dict, initial_capital: float) -> dict:
-    state = load_state(system["state_path"])
+    state_path = Path(system["state_path"])
+    if state_path.exists():
+        state = load_state(state_path)
+    else:
+        state = {
+            "capital": initial_capital,
+            "position": 0,
+            "entry_price": 0.0,
+            "notional": 0.0,
+            "trades": [],
+            "last_timestamp": None,
+        }
     mark_price, mark_timestamp = current_mark_price(system["data_path"])
     report = build_report(state, initial_capital, mark_price, mark_timestamp)
     return {**system, "report": report}
@@ -60,7 +71,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--systems",
         default=(
             "1h Production|BTC/USDT|dataset/1h-btc_history.csv|paper_state.json;"
-            "15m Staging|BTC/USDT|dataset/15m_btc_history_5000.csv|paper_state_15m_staging.json"
+            "15m Staging|BTC/USDT|dataset/15m_btc_history_5000.csv|paper_state_15m_staging.json;"
+            "5m Staging|BTC/USDT|dataset/5m_btc_history.csv|paper_state_5m_staging.json"
         ),
     )
     parser.add_argument("--initial-capital", type=float, default=100.0)

@@ -78,6 +78,8 @@ def dataset_health(path: str | Path, timeframe: str, max_age_hours: float) -> di
 
 
 def fundamentals_health(path: str | Path, max_age_hours: float) -> dict:
+    if path is None or str(path).strip().lower() in {"", "none", "skip"}:
+        return {"exists": False, "ok": True, "skipped": True}
     path = Path(path)
     status = file_status(path)
     if not status["exists"]:

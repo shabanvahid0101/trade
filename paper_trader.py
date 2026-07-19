@@ -221,6 +221,27 @@ def protective_exit_reason(state: dict, mark_price: float, stop_loss_pct: float,
     return None
 
 
+def holding_candles(state: dict, timestamp: str, timeframe: str) -> float | None:
+    position = int(state.get("position", 0) or 0)
+    if position == 0:
+        return None
+    open_prefix = "OPEN_LONG" if position == 1 else "OPEN_SHORT"
+    open_trade = next(
+        (trade for trade in reversed(state.get("trades", [])) if trade.get("side") == open_prefix),
+        None,
+    )
+    if not open_trade or not open_trade.get("timestamp"):
+        return None
+    try:
+        elapsed_ms = pd.Timestamp(timestamp).value // 1_000_000 - pd.Timestamp(open_trade["timestamp"]).value // 1_000_000
+        step_ms = timeframe_to_milliseconds(timeframe)
+    except Exception:
+        return None
+    if step_ms <= 0 or elapsed_ms < 0:
+        return None
+    return elapsed_ms / step_ms
+
+
 def apply_protective_exit(
     state: dict,
     timestamp: str,
@@ -228,6 +249,8 @@ def apply_protective_exit(
     fee_rate: float,
     stop_loss_pct: float,
     take_profit_pct: float,
+    max_holding_candles: int,
+    timeframe: str,
     spread_bps: float = 0.0,
     slippage_bps: float = 0.0,
     signal_explanation: dict | None = None,
@@ -235,6 +258,10 @@ def apply_protective_exit(
     if state.get("last_timestamp") == timestamp:
         return None
     reason = protective_exit_reason(state, price, stop_loss_pct, take_profit_pct)
+    if not reason and max_holding_candles > 0:
+        candles = holding_candles(state, timestamp, timeframe)
+        if candles is not None and candles >= max_holding_candles:
+            reason = "max_holding_candles"
     if not reason:
         return None
     close_position(state, timestamp, price, fee_rate, reason, spread_bps, slippage_bps, signal_explanation)
@@ -262,7 +289,7 @@ def build_paper_telegram_message(
         f"Risk: {fa_code(risk['risk_level'])} | Size: {risk['position_size_pct']:.2f} | Reason: {fa_code(risk['reason'])}\n"
         f"Size reason: {fa_code(risk.get('position_size_reason'))} | Signal quality: {quality_text}\n"
         f"Costs: fee {args.fee_rate:.4f} | spread {args.spread_bps:.2f} bps | slippage {args.slippage_bps:.2f} bps\n"
-        f"Protective exits: SL {args.stop_loss_pct:.4f} | TP {args.take_profit_pct:.4f}\n"
+        f"Protective exits: SL {args.stop_loss_pct:.4f} | TP {args.take_profit_pct:.4f} | Max hold {args.max_holding_candles} candles\n"
         f"Position: {fa_signal(position_name)} ({position_name})\n"
         f"Price: ${final['current_price']:.2f}\n"
         f"Equity: ${trade_result['equity']:.2f}\n"
@@ -521,6 +548,8 @@ def run_single(args: argparse.Namespace) -> dict:
         fee_rate=args.fee_rate,
         stop_loss_pct=args.stop_loss_pct,
         take_profit_pct=args.take_profit_pct,
+        max_holding_candles=args.max_holding_candles,
+        timeframe=args.timeframe,
         spread_bps=args.spread_bps,
         slippage_bps=args.slippage_bps,
         signal_explanation=signal_explanation,
@@ -616,6 +645,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--slippage-bps", type=float, default=0.0)
     parser.add_argument("--stop-loss-pct", type=float, default=0.0)
     parser.add_argument("--take-profit-pct", type=float, default=0.0)
+    parser.add_argument("--max-holding-candles", type=int, default=0)
     parser.add_argument("--leverage", type=float, default=1.0)
     parser.add_argument("--initial-capital", type=float, default=100.0)
     parser.add_argument("--risk-enabled", action=argparse.BooleanOptionalAction, default=True)

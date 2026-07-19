@@ -1,0 +1,12 @@
+{
+  "capital": 100.0,
+  "position": 0,
+  "entry_price": 0.0,
+  "notional": 0.0,
+  "trades": [],
+  "last_timestamp": "2026-07-18 14:25:00",
+  "last_signal_reason": "Initial 5m staging paper state.",
+  "last_signal_reasons": [
+    "Initial 5m staging paper state; GitHub Actions will update this on the next 5m paper run."
+  ]
+}

@@ -255,6 +255,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Nightly retraining at `02:00 UTC`
 - Safe staging retraining with quality gate and Telegram report
 - Daily performance report and scheduled health checks
+- Separate 5m staging paper trading with its own Telegram report and paper state
 - Signal-performance report grouped by model decision reasons
 
 ### Setup

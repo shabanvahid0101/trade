@@ -40,6 +40,7 @@ def fa_code(value: str | None) -> str:
         "drawdown_reduced_size": "به خاطر افت سرمایه، حجم کمتر شد",
         "risk_blocked": "ورود به خاطر ریسک مسدود شد",
         "recovery_signal_quality_probe": "حجم کم برای بازیابی بر اساس کیفیت سیگنال",
+        "max_holding_candles": "پوزیشن بیش از حد مجاز باز مانده بود",
         "no_trade_signal": "سیگنال قابل معامله وجود ندارد",
         "dynamic_signal_quality": "حجم بر اساس کیفیت سیگنال تنظیم شد",
         "range_regime_size_discount": "به خاطر بازار رنج، حجم کمتر شد",

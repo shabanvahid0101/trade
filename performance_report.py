@@ -215,7 +215,18 @@ def build_message_fa(report: dict, symbol: str, drawdown_alert_pct: float, label
 
 
 def main(args: argparse.Namespace) -> dict:
-    state = load_state(args.state_file)
+    state_path = Path(args.state_file)
+    if state_path.exists():
+        state = load_state(state_path)
+    else:
+        state = {
+            "capital": args.initial_capital,
+            "position": 0,
+            "entry_price": 0.0,
+            "notional": 0.0,
+            "trades": [],
+            "last_timestamp": None,
+        }
     mark_price, mark_timestamp = current_mark_price(args.data)
     report = build_report(state, args.initial_capital, mark_price, mark_timestamp)
     output = {"report": report}
