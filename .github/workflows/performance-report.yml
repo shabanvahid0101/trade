@@ -2,8 +2,6 @@ name: Paper Performance Report
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 3 * * *"
 
 jobs:
   report:

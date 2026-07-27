@@ -2,8 +2,6 @@ name: Paper Trading 15m Staging
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "3,18,33,48 * * * *"
 
 permissions:
   contents: write

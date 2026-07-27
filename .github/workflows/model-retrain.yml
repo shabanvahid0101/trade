@@ -2,9 +2,6 @@ name: Nightly Model Retrain
 
 on:
   workflow_dispatch:
-  schedule:
-    # GitHub cron is UTC. This runs every night at 02:00 UTC.
-    - cron: "0 2 * * *"
 
 permissions:
   contents: write

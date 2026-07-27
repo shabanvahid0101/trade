@@ -534,5 +534,14 @@
   "last_signal_reason": "protective_exit:stop_loss",
   "last_signal_reasons": [
     "Protective exit triggered: stop_loss"
-  ]
+  ],
+  "trading_paused": true,
+  "trading_pause_reason": "drawdown -2.26% <= -2.00%",
+  "trading_pause_report": {
+    "closed_trade_count": 25,
+    "total_return_pct": -2.2572164869093303,
+    "max_drawdown_pct": -2.2572164869093303,
+    "profit_factor": 0.23754721208351423,
+    "last_timestamp": "2026-08-03 04:45:00"
+  }
 }
