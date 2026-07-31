@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-30T05:00:58+00:00",
+  "updated_at": "2026-07-31T05:37:46+00:00",
   "active_status": "production_unchanged",
   "last_retrain_status": "failed",
   "symbol": "BTC/USDT",
@@ -9,7 +9,7 @@
     3,
     6
   ],
-  "git_sha": "7e44412",
+  "git_sha": "5f7a2b5",
   "staging_dir": "models/staging",
   "production_dir": "models",
   "promoted_files": [],
@@ -22,13 +22,13 @@
         ],
         "top_features": [
           "momentum_10",
-          "sma_20_dist",
-          "bb_position",
           "stoch_k",
           "williams_r",
-          "weekday_cos",
-          "ema_20_dist",
-          "close_position"
+          "sma_20_dist",
+          "log_return_6",
+          "bb_position",
+          "log_return_3",
+          "ema_20_dist"
         ]
       },
       "3": {
@@ -38,24 +38,23 @@
           "return_kurt_20",
           "weekday_cos",
           "sma_20_dist",
-          "momentum_10",
-          "mfi_14",
           "log_return_3",
+          "momentum_10",
           "ema_20_dist",
-          "bb_position"
+          "mfi_14",
+          "log_return_6"
         ]
       },
       "6": {
         "feature_count": 32,
         "calendar_features": [
-          "weekday_big_move_rate",
           "weekday_return_mean"
         ],
         "top_features": [
           "return_kurt_20",
           "open_interest_zscore",
-          "weekday_cos",
           "trend_50_100",
+          "weekday_cos",
           "futures_pain_risk",
           "log_return_12",
           "roc_12",
@@ -65,38 +64,34 @@
     },
     "calendar_features_used": [
       "hour_return_mean",
-      "weekday_big_move_rate",
       "weekday_return_mean"
     ]
   },
   "data_quality": {
-    "price_rows": 6221,
-    "last_price_timestamp": "2026-07-30 03:00:00",
+    "price_rows": 6245,
+    "last_price_timestamp": "2026-07-31 03:00:00",
     "price_gap_count": 0,
     "invalid_ohlcv_rows": 0,
-    "fundamental_rows": 6221,
-    "last_fundamental_timestamp": "2026-07-30 03:00:00",
+    "fundamental_rows": 6245,
+    "last_fundamental_timestamp": "2026-07-31 03:00:00",
     "last_fundamental_source_age_hours": 0.0
   },
   "validation_metrics": {
     "mode": "walk-forward",
     "selected_config_counts": {
-      "h=1,3,6|conf=0.45|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=hybrid|range=0.15-0.75": 2,
-      "h=1,3,6|conf=0.45|agree=2|sl=0.0|tp=2.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=hybrid|range=0.15-0.75": 1,
-      "h=1,3,6|conf=0.45|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=range|range=0.15-0.75": 1
+      "h=1,3,6|conf=0.45|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=hybrid|range=0.15-0.85": 3,
+      "h=1,3,6|conf=0.45|agree=1|sl=0.0|tp=0.0|atr=0.0|trend=0.0|vol=0.0|trend_filter=off|strategy=hybrid|range=0.15-0.75": 1
     }
   },
   "quality_gate": {
     "passed": false,
     "failures": [
-      "average_test_return_pct -0.3679 < required 0.0000",
-      "profitable_fold_pct 0.00 < required 50.00",
-      "average_test_closed_trade_count 1.00 < required 2.00"
+      "average_test_closed_trade_count 1.75 < required 2.00"
     ],
     "fold_count": 4,
-    "average_test_return_pct": -0.36790072286528586,
-    "profitable_fold_pct": 0.0,
-    "worst_drawdown_pct": -1.2997262215227345,
-    "average_test_closed_trade_count": 1.0
+    "average_test_return_pct": 0.3377822768580674,
+    "profitable_fold_pct": 75.0,
+    "worst_drawdown_pct": -0.8269087793630558,
+    "average_test_closed_trade_count": 1.75
   }
 }
