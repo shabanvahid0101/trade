@@ -5,9 +5,9 @@
       "path": "dataset/1h-btc_history.csv",
       "timeframe": "1h",
       "before": {
-        "rows": 6496,
+        "rows": 6509,
         "first_timestamp": "2025-11-12 23:00:00",
-        "last_timestamp": "2026-08-10 14:00:00",
+        "last_timestamp": "2026-08-11 03:00:00",
         "bad_timestamps": 0,
         "duplicate_timestamps": 0,
         "monotonic": true,
@@ -25,9 +25,9 @@
         "max_abs_log_return": 0.04943258021870921
       },
       "after": {
-        "rows": 6496,
+        "rows": 6509,
         "first_timestamp": "2025-11-12 23:00:00",
-        "last_timestamp": "2026-08-10 14:00:00",
+        "last_timestamp": "2026-08-11 03:00:00",
         "bad_timestamps": 0,
         "duplicate_timestamps": 0,
         "monotonic": true,
@@ -46,16 +46,16 @@
       },
       "actions": {
         "dropped_rows": 0,
-        "kept_rows": 6496
+        "kept_rows": 6509
       }
     },
     "5m": {
       "path": "dataset/5m_btc_history.csv",
       "timeframe": "5m",
       "before": {
-        "rows": 65637,
+        "rows": 65789,
         "first_timestamp": "2025-12-25 16:50:00",
-        "last_timestamp": "2026-08-10 14:30:00",
+        "last_timestamp": "2026-08-11 03:10:00",
         "bad_timestamps": 0,
         "duplicate_timestamps": 0,
         "monotonic": true,
@@ -73,9 +73,9 @@
         "max_abs_log_return": 0.037808065313792626
       },
       "after": {
-        "rows": 65637,
+        "rows": 65789,
         "first_timestamp": "2025-12-25 16:50:00",
-        "last_timestamp": "2026-08-10 14:30:00",
+        "last_timestamp": "2026-08-11 03:10:00",
         "bad_timestamps": 0,
         "duplicate_timestamps": 0,
         "monotonic": true,
@@ -94,7 +94,7 @@
       },
       "actions": {
         "dropped_rows": 0,
-        "kept_rows": 65637
+        "kept_rows": 65789
       }
     },
     "15m": {
@@ -102,8 +102,8 @@
       "timeframe": "15m",
       "before": {
         "rows": 5000,
-        "first_timestamp": "2026-06-19 12:45:00",
-        "last_timestamp": "2026-08-10 14:30:00",
+        "first_timestamp": "2026-06-20 01:15:00",
+        "last_timestamp": "2026-08-11 03:00:00",
         "bad_timestamps": 0,
         "duplicate_timestamps": 0,
         "monotonic": true,
@@ -122,8 +122,8 @@
       },
       "after": {
         "rows": 5000,
-        "first_timestamp": "2026-06-19 12:45:00",
-        "last_timestamp": "2026-08-10 14:30:00",
+        "first_timestamp": "2026-06-20 01:15:00",
+        "last_timestamp": "2026-08-11 03:00:00",
         "bad_timestamps": 0,
         "duplicate_timestamps": 0,
         "monotonic": true,
@@ -149,15 +149,15 @@
   "fundamentals": {
     "1h": {
       "path": "dataset/1h-btc_fundamentals.csv",
-      "rows": 6496,
+      "rows": 6509,
       "first_timestamp": "2025-11-12 23:00:00",
-      "last_timestamp": "2026-08-10 14:00:00"
+      "last_timestamp": "2026-08-11 03:00:00"
     },
     "15m": {
       "path": "dataset/15m_btc_fundamentals.csv",
       "rows": 5000,
-      "first_timestamp": "2026-06-19 12:45:00",
-      "last_timestamp": "2026-08-10 14:30:00"
+      "first_timestamp": "2026-06-20 01:15:00",
+      "last_timestamp": "2026-08-11 03:00:00"
     }
   }
 }
