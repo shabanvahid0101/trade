@@ -32,6 +32,10 @@ def send_telegram_message(message):
     """
     Send a message to your Telegram bot (ارسال پیام به ربات تلگرام)
     """
+    if os.getenv("TELEGRAM_DISABLED", "1").strip().lower() not in {"0", "false", "no", "off"}:
+        logging.info("Telegram notifications are disabled by TELEGRAM_DISABLED kill switch.")
+        return
+
     token = os.getenv('TELEGRAM_TOKEN')
     chat_id = os.getenv('TELEGRAM_CHAT_ID')
     

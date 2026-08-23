@@ -40,6 +40,9 @@ def send_telegram_message(message):
     """
     token = os.getenv('ٖTELEGRAM_TOKEN')
     chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    if os.getenv("TELEGRAM_DISABLED", "1").strip().lower() not in {"0", "false", "no", "off"}:
+        logging.info("Telegram notifications are disabled by TELEGRAM_DISABLED kill switch.")
+        return
     
     if not token or not chat_id:
         logging.warning("Telegram TOKEN or CHAT_ID not set in .env - message not sent")

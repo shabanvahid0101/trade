@@ -7,6 +7,8 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 
+from telegram_utils import print_telegram_disabled, telegram_disabled
+
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "dataset"
@@ -32,6 +34,10 @@ def current_mark_price(data_path: str | Path) -> tuple[float, str]:
 
 
 def send_telegram_message(message: str) -> bool:
+    if telegram_disabled():
+        print_telegram_disabled()
+        return False
+
     token = os.getenv("TELEGRAM_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     strict = os.getenv("TELEGRAM_STRICT", "0") == "1"

@@ -28,6 +28,8 @@ from fundamental_data import (
     merge_fundamentals_asof,
     update_fundamental_file,
 )
+from technical_feature_bank import TA_WIDE_FEATURE_COLUMNS, add_ta_wide_features
+from telegram_utils import print_telegram_disabled, telegram_disabled
 
 try:
     import ccxt
@@ -160,11 +162,23 @@ ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS = [
     *FUNDAMENTAL_FEATURE_COLUMNS,
 ]
 
+TA_WIDE_FULL_FEATURE_COLUMNS = [
+    *ADVANCED_FEATURE_COLUMNS,
+    *TA_WIDE_FEATURE_COLUMNS,
+]
+
+TA_WIDE_FUNDAMENTAL_FEATURE_COLUMNS = [
+    *TA_WIDE_FULL_FEATURE_COLUMNS,
+    *FUNDAMENTAL_FEATURE_COLUMNS,
+]
+
 FEATURE_COLUMNS = ADVANCED_FEATURE_COLUMNS
 FEATURE_SETS = {
     "core": CORE_FEATURE_COLUMNS,
     "advanced": ADVANCED_FEATURE_COLUMNS,
     "advanced-fundamental": ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS,
+    "ta-wide": TA_WIDE_FULL_FEATURE_COLUMNS,
+    "ta-wide-fundamental": TA_WIDE_FUNDAMENTAL_FEATURE_COLUMNS,
 }
 
 
@@ -278,6 +292,10 @@ load_dotenv(BASE_DIR / ".env")
 
 
 def send_telegram_message(message: str) -> bool:
+    if telegram_disabled():
+        print_telegram_disabled()
+        return False
+
     token = os.getenv("TELEGRAM_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     strict = os.getenv("TELEGRAM_STRICT", "0") == "1"
@@ -600,6 +618,7 @@ def add_features(
     require_target: bool = True,
     feature_columns: list[str] | None = None,
 ) -> pd.DataFrame:
+    requested_feature_columns = feature_columns or FEATURE_COLUMNS
     df = df.copy().sort_values("timestamp").reset_index(drop=True)
     close = df["close"].replace(0, np.nan)
     high = df["high"]
@@ -704,6 +723,9 @@ def add_features(
     df["upper_wick_pct"] = (high - pd.concat([open_, close], axis=1).max(axis=1)) / candle_range
     df["lower_wick_pct"] = (pd.concat([open_, close], axis=1).min(axis=1) - low) / candle_range
     df["close_position"] = (close - low) / candle_range
+    df["upper_wick_pct"] = df["upper_wick_pct"].replace([np.inf, -np.inf], np.nan).fillna(0)
+    df["lower_wick_pct"] = df["lower_wick_pct"].replace([np.inf, -np.inf], np.nan).fillna(0)
+    df["close_position"] = df["close_position"].replace([np.inf, -np.inf], np.nan).fillna(0.5)
 
     sma_100 = close.rolling(100).mean()
     df["trend_20_50"] = sma_20 / sma_50 - 1
@@ -780,12 +802,14 @@ def add_features(
     nearest_fib_distance[valid_fib_rows] = np.nanmin(fib_distance[valid_fib_rows], axis=1)
     df["fib_reaction"] = nearest_fib_distance / close
 
+    if any(column in TA_WIDE_FEATURE_COLUMNS for column in requested_feature_columns):
+        df = add_ta_wide_features(df)
     df = add_fundamental_features(df)
 
     df["future_close"] = close.shift(-horizon)
     df["target_return"] = df["future_close"] / close - 1
     df = df.replace([np.inf, -np.inf], np.nan)
-    required_columns = (feature_columns or FEATURE_COLUMNS) + (["target_return", "future_close"] if require_target else [])
+    required_columns = requested_feature_columns + (["target_return", "future_close"] if require_target else [])
     return df.dropna(subset=required_columns).reset_index(drop=True)
 
 
@@ -1349,14 +1373,10 @@ def save_artifacts(
     path: str | Path = ARTIFACT_PATH,
     update_legacy_scaler: bool = False,
 ) -> None:
-    if split.feature_columns == ADVANCED_FUNDAMENTAL_FEATURE_COLUMNS:
-        feature_set = "advanced-fundamental"
-    elif split.feature_columns == ADVANCED_FEATURE_COLUMNS:
-        feature_set = "advanced"
-    elif split.feature_columns == CORE_FEATURE_COLUMNS:
-        feature_set = "core"
-    else:
-        feature_set = "selected"
+    feature_set = next(
+        (name for name, columns in FEATURE_SETS.items() if split.feature_columns == columns),
+        "selected",
+    )
     training_window = {
         "train_start": split.meta_train["timestamp"].iloc[0].isoformat(),
         "train_end": split.meta_train["timestamp"].iloc[-1].isoformat(),
@@ -1556,7 +1576,7 @@ def load_training_data(args: argparse.Namespace) -> pd.DataFrame:
         timeframe=args.timeframe,
         fundamental_data=args.fundamental_data,
         update_fundamentals=args.update_fundamentals,
-        required=args.feature_set == "advanced-fundamental",
+        required=any(column in FUNDAMENTAL_FEATURE_COLUMNS for column in FEATURE_SETS[args.feature_set]),
     )
 
 

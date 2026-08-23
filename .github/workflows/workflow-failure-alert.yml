@@ -14,6 +14,7 @@ on:
       - Performance Report
       - 15m Staging Performance Report
       - 5m Staging Performance Report
+      - Trading Edge Report
       - Signal Report
       - Telegram Trade Alert
     types:
@@ -27,6 +28,7 @@ jobs:
     steps:
       - name: Send Telegram failure alert
         env:
+          TELEGRAM_DISABLED: "1"
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
@@ -38,6 +40,11 @@ jobs:
           python - <<'PY'
           import os
           import requests
+
+          disabled = os.getenv("TELEGRAM_DISABLED", "1").strip().lower() not in {"0", "false", "no", "off"}
+          if disabled:
+              print("Telegram notifications are disabled by TELEGRAM_DISABLED kill switch.")
+              raise SystemExit(0)
 
           token = os.environ["TELEGRAM_TOKEN"]
           chat_id = os.environ["TELEGRAM_CHAT_ID"]
