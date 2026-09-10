@@ -8,6 +8,8 @@
 
 وضعیت فعلی اتوماسیون: `1h` و `15m` فقط دستی اجرا می‌شوند. `5m staging` تنها paper trading زمان‌بندی‌شده است و با kill switch اجرا می‌شود: بعد از حداقل 50 معامله بسته‌شده، اگر بازده مثبت نباشد، profit factor حداقل `1.10` نباشد، یا drawdown به `2%` برسد، paper trading به حالت paused می‌رود.
 
+بعد از مرور چند پروژه جدی متن‌باز مثل Freqtrade/FreqAI، Jesse، Hummingbot و FinRL، مسیر پروژه از «ادامه دادن یک مدل ضعیف» به «آزمایشگاه کشف edge» تغییر کرده است. معیار اصلی از این به بعد فقط سود خام نیست؛ هر ایده باید در `edge_report.py` نسبت به buy-and-hold، profit factor، expectancy، drawdown و حداقل نمونه معامله ارزیابی شود.
+
 ### امکانات اصلی
 
 - دریافت و به‌روزرسانی کندل‌های جدید بازار
@@ -76,6 +78,14 @@ TELEGRAM_CHAT_ID
 ```powershell
 python crypto_predictor.py train --data dataset/5m_btc_history.csv --sequence-length 96 --horizon 1 --epochs 40 --max-train-rows 5000 --feature-set advanced --feature-selection correlation --max-selected-features 18 --target-mode classification --threshold 0.0002 --min-confidence 0.50
 ```
+
+Technical-analysis wide feature bank:
+
+```powershell
+python crypto_predictor.py train --data dataset/5m_btc_history.csv --sequence-length 96 --horizon 1 --epochs 40 --max-train-rows 5000 --feature-set ta-wide --feature-selection correlation --max-selected-features 24 --min-selected-features 10 --target-mode classification --threshold 0.0002 --min-confidence 0.50
+```
+
+`ta-wide` adds a broad technical feature bank on top of the existing advanced features: EMA/HMA trend structure, Aroon, Ichimoku, Donchian/Keltner/Bollinger squeeze, Supertrend, Chandelier exits, PPO/StochRSI/TSI/Fisher, CMF/Chaikin/VPT/force-index volume features, candlestick patterns, gaps, and liquidity sweeps. Use it with walk-forward/edge reports before enabling any scheduled paper trading.
 
 برای دریافت کندل‌های جدید قبل از آموزش:
 
@@ -257,6 +267,7 @@ This project is a research, alerting, and paper-trading tool for short-horizon c
 - Manual 1h/15m workflows kept for research, with scheduled runs disabled after poor paper performance
 - Safe staging retraining with quality gate and Telegram report
 - Scheduled 5m staging paper trading with its own Telegram report, health check, performance report, paper state, and kill switch
+- Edge report that benchmarks every paper system against buy-and-hold and rejects weak strategies before more automation
 - Signal-performance report grouped by model decision reasons
 
 ### Setup
