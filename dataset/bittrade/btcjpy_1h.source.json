@@ -1,0 +1,22 @@
+{
+  "source": {
+    "provider": "bittrade",
+    "market_type": "spot",
+    "symbol": "btcjpy",
+    "timeframe": "1h",
+    "timezone": "UTC"
+  },
+  "endpoint": "https://api-cloud.bittrade.co.jp/market/history/kline",
+  "sha256": "b9c17ca08cc5b5a688bb0a8a440d7dbdb7d17016b1b0c515dc6d55218af96f6b",
+  "server_timestamp_ms": 1790746988451,
+  "api_trading": "enabled",
+  "quality": {
+    "rows": 1999,
+    "first": "2026-07-08T22:00:00+00:00",
+    "last": "2026-09-30T04:00:00+00:00",
+    "missing_candles": 0,
+    "gaps": [],
+    "zero_volume_candles": 19,
+    "last_close_age_seconds": 2588.4509999752045
+  }
+}

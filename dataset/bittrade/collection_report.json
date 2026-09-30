@@ -1,0 +1,90 @@
+{
+  "provider": "bittrade",
+  "market_type": "spot",
+  "updated_at": "2026-09-30T05:43:06.889974+00:00",
+  "datasets": {
+    "btcjpy_5m": {
+      "rows": 1999,
+      "first": "2026-09-23T07:05:00+00:00",
+      "last": "2026-09-30T05:35:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 69,
+      "last_close_age_seconds": 187.21199989318848
+    },
+    "btcjpy_15m": {
+      "rows": 1999,
+      "first": "2026-09-09T09:45:00+00:00",
+      "last": "2026-09-30T05:15:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 6,
+      "last_close_age_seconds": 787.680999994278
+    },
+    "btcjpy_1h": {
+      "rows": 1999,
+      "first": "2026-07-08T22:00:00+00:00",
+      "last": "2026-09-30T04:00:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 19,
+      "last_close_age_seconds": 2588.4509999752045
+    },
+    "ethjpy_5m": {
+      "rows": 1999,
+      "first": "2026-09-23T07:05:00+00:00",
+      "last": "2026-09-30T05:35:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 1510,
+      "last_close_age_seconds": 189.02800011634827
+    },
+    "ethjpy_15m": {
+      "rows": 1999,
+      "first": "2026-09-09T09:45:00+00:00",
+      "last": "2026-09-30T05:15:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 991,
+      "last_close_age_seconds": 789.5280001163483
+    },
+    "ethjpy_1h": {
+      "rows": 1999,
+      "first": "2026-07-08T22:00:00+00:00",
+      "last": "2026-09-30T04:00:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 313,
+      "last_close_age_seconds": 2590.063999891281
+    },
+    "xrpjpy_5m": {
+      "rows": 1999,
+      "first": "2026-09-23T07:05:00+00:00",
+      "last": "2026-09-30T05:35:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 864,
+      "last_close_age_seconds": 190.54500007629395
+    },
+    "xrpjpy_15m": {
+      "rows": 1999,
+      "first": "2026-09-09T09:45:00+00:00",
+      "last": "2026-09-30T05:15:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 248,
+      "last_close_age_seconds": 791.0220000743866
+    },
+    "xrpjpy_1h": {
+      "rows": 1999,
+      "first": "2026-07-08T22:00:00+00:00",
+      "last": "2026-09-30T04:00:00+00:00",
+      "missing_candles": 0,
+      "gaps": [],
+      "zero_volume_candles": 13,
+      "last_close_age_seconds": 2591.473000049591
+    }
+  },
+  "errors": {},
+  "history": "Latest 2000 candles per REST request; accumulated locally"
+}
