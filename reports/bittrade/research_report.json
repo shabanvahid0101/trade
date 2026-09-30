@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-09-30T17:00:35.557062+00:00",
+  "created_at": "2026-09-30T21:25:50.691292+00:00",
   "protocol": "60/20/20 chronological split; horizon-purged train/validation; next-open long-only fills; confidence selected on validation only",
   "limitation": "Exploratory daily expanding-window research, not independent repeated tests. Costs assumed, not reconstructed from historical order books.",
   "live_trading_enabled": false,
@@ -12,9 +12,9 @@
         "timeframe": "15m",
         "timezone": "UTC"
       },
-      "sha256": "532468732a62a1aed72353cc2348d83e49af889c78dfe515aa741aec5c88eae5",
-      "history_days": 21.291666666666668,
-      "contiguous_rows": 2045,
+      "sha256": "bcbbaf420bdf0fcd1c7ddd82acf236d277d60378a3459fef46639a3f51623147",
+      "history_days": 21.46875,
+      "contiguous_rows": 2062,
       "discarded_rows_before_last_gap": 0,
       "model": "HistGradientBoostingClassifier",
       "features": [
@@ -40,42 +40,42 @@
       "windows": {
         "train": {
           "start": "2026-09-09 21:45:00+00:00",
-          "end": "2026-09-22 07:30:00+00:00",
-          "rows": 1192
+          "end": "2026-09-22 10:00:00+00:00",
+          "rows": 1202
         },
         "validation": {
-          "start": "2026-09-22 09:15:00+00:00",
-          "end": "2026-09-26 11:15:00+00:00",
-          "rows": 393
+          "start": "2026-09-22 11:45:00+00:00",
+          "end": "2026-09-26 14:45:00+00:00",
+          "rows": 397
         },
         "test": {
-          "start": "2026-09-26 13:00:00+00:00",
-          "end": "2026-09-30 15:15:00+00:00",
-          "rows": 394
+          "start": "2026-09-26 16:30:00+00:00",
+          "end": "2026-09-30 19:30:00+00:00",
+          "rows": 397
         }
       },
       "validation_options": [
         {
           "confidence": 0.5,
-          "return_pct": -0.14657401110329538,
-          "closed_trades": 2,
-          "profit_factor": 0.573663306690979,
-          "win_rate_pct": 50.0,
-          "max_drawdown_pct": -1.6225385259831526,
-          "buy_hold_net_return_pct": -2.145348166788019,
+          "return_pct": -0.10917089913281552,
+          "closed_trades": 1,
+          "profit_factor": 0.0,
+          "win_rate_pct": 0.0,
+          "max_drawdown_pct": -0.7844099771815327,
+          "buy_hold_net_return_pct": -2.3541956518767115,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 1.9987741556847238
+          "alpha_vs_buy_hold_pct": 2.245024752743896
         },
         {
           "confidence": 0.55,
-          "return_pct": 0.19722471277772158,
+          "return_pct": -0.10917089913281552,
           "closed_trades": 1,
-          "profit_factor": null,
-          "win_rate_pct": 100.0,
-          "max_drawdown_pct": -0.3493883084190408,
-          "buy_hold_net_return_pct": -2.145348166788019,
+          "profit_factor": 0.0,
+          "win_rate_pct": 0.0,
+          "max_drawdown_pct": -0.7844099771815327,
+          "buy_hold_net_return_pct": -2.3541956518767115,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 2.342572879565741
+          "alpha_vs_buy_hold_pct": 2.245024752743896
         },
         {
           "confidence": 0.6,
@@ -84,9 +84,9 @@
           "profit_factor": null,
           "win_rate_pct": 100.0,
           "max_drawdown_pct": -0.3493883084190408,
-          "buy_hold_net_return_pct": -2.145348166788019,
+          "buy_hold_net_return_pct": -2.3541956518767115,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 2.342572879565741
+          "alpha_vs_buy_hold_pct": 2.551420364654433
         },
         {
           "confidence": 0.65,
@@ -95,9 +95,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -2.145348166788019,
+          "buy_hold_net_return_pct": -2.3541956518767115,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 2.145348166788019
+          "alpha_vs_buy_hold_pct": 2.3541956518767115
         },
         {
           "confidence": 0.7,
@@ -106,25 +106,25 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -2.145348166788019,
+          "buy_hold_net_return_pct": -2.3541956518767115,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 2.145348166788019
+          "alpha_vs_buy_hold_pct": 2.3541956518767115
         }
       ],
       "selected_confidence": 0.6,
       "validation_passed": false,
-      "test_accuracy_pct": 83.24873096446701,
-      "test_balanced_accuracy_pct": 50.35163167214773,
-      "train_majority_test_accuracy_pct": 85.0253807106599,
+      "test_accuracy_pct": 83.37531486146096,
+      "test_balanced_accuracy_pct": 48.96449704142012,
+      "train_majority_test_accuracy_pct": 85.13853904282117,
       "test_candidate": {
         "return_pct": -0.6392837390562622,
         "closed_trades": 1,
         "profit_factor": 0.0,
         "win_rate_pct": 0.0,
         "max_drawdown_pct": -0.6887206978341665,
-        "buy_hold_net_return_pct": -0.14599519316440546,
+        "buy_hold_net_return_pct": -0.813391129162222,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": -0.4932885458918568
+        "alpha_vs_buy_hold_pct": 0.17410739010595977
       },
       "test_gated_policy": {
         "return_pct": 0.0,
@@ -132,9 +132,9 @@
         "profit_factor": null,
         "win_rate_pct": null,
         "max_drawdown_pct": 0.0,
-        "buy_hold_net_return_pct": -0.14599519316440546,
+        "buy_hold_net_return_pct": -0.813391129162222,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": 0.14599519316440546
+        "alpha_vs_buy_hold_pct": 0.813391129162222
       },
       "gate_reasons": [
         "less_than_30_days_of_history",
@@ -145,11 +145,11 @@
       ],
       "eligible_for_further_paper_evaluation": false,
       "latest": {
-        "candle": "2026-09-30 16:45:00+00:00",
-        "probability_positive_net_return": 0.11728362764749525,
+        "candle": "2026-09-30 21:00:00+00:00",
+        "probability_positive_net_return": 0.04590467821135035,
         "signal": "HOLD",
-        "observed_spread_bps": 0.8579335216112927,
-        "volume_24h_jpy": 1828685605.02704
+        "observed_spread_bps": 2.40583053143097,
+        "volume_24h_jpy": 1833388583.90232
       },
       "live_trading_enabled": false
     },
@@ -161,9 +161,9 @@
         "timeframe": "1h",
         "timezone": "UTC"
       },
-      "sha256": "672995a8ccc693966f3161753c00e51eb076883cc08cd755c5988883af808c32",
-      "history_days": 83.75,
-      "contiguous_rows": 2011,
+      "sha256": "4320a77296013bd8e5764966d52812beb63c108b69d58795025585b88cf3687e",
+      "history_days": 83.91666666666667,
+      "contiguous_rows": 2015,
       "discarded_rows_before_last_gap": 0,
       "model": "HistGradientBoostingClassifier",
       "features": [
@@ -189,91 +189,91 @@
       "windows": {
         "train": {
           "start": "2026-07-10 22:00:00+00:00",
-          "end": "2026-08-28 16:00:00+00:00",
-          "rows": 1171
+          "end": "2026-08-28 19:00:00+00:00",
+          "rows": 1174
         },
         "validation": {
-          "start": "2026-08-28 23:00:00+00:00",
-          "end": "2026-09-14 01:00:00+00:00",
+          "start": "2026-08-29 02:00:00+00:00",
+          "end": "2026-09-14 04:00:00+00:00",
           "rows": 387
         },
         "test": {
-          "start": "2026-09-14 08:00:00+00:00",
-          "end": "2026-09-30 10:00:00+00:00",
-          "rows": 387
+          "start": "2026-09-14 11:00:00+00:00",
+          "end": "2026-09-30 14:00:00+00:00",
+          "rows": 388
         }
       },
       "validation_options": [
         {
           "confidence": 0.5,
-          "return_pct": -7.940314784511571,
-          "closed_trades": 23,
-          "profit_factor": 0.20730080012469596,
-          "win_rate_pct": 26.08695652173913,
-          "max_drawdown_pct": -9.081897424731423,
-          "buy_hold_net_return_pct": -3.9894412844627913,
+          "return_pct": -9.907136570859798,
+          "closed_trades": 24,
+          "profit_factor": 0.17641160321121105,
+          "win_rate_pct": 25.0,
+          "max_drawdown_pct": -11.02432971200148,
+          "buy_hold_net_return_pct": -3.532612396590018,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": -3.95087350004878
+          "alpha_vs_buy_hold_pct": -6.37452417426978
         },
         {
           "confidence": 0.55,
-          "return_pct": -6.163841286007754,
-          "closed_trades": 17,
-          "profit_factor": 0.13571975507942616,
-          "win_rate_pct": 23.52941176470588,
-          "max_drawdown_pct": -7.327453018570839,
-          "buy_hold_net_return_pct": -3.9894412844627913,
+          "return_pct": -3.005753000205902,
+          "closed_trades": 14,
+          "profit_factor": 0.5088362565331885,
+          "win_rate_pct": 28.57142857142857,
+          "max_drawdown_pct": -4.280757501466203,
+          "buy_hold_net_return_pct": -3.532612396590018,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": -2.1744000015449627
+          "alpha_vs_buy_hold_pct": 0.5268593963841162
         },
         {
           "confidence": 0.6,
-          "return_pct": -0.18507140680955603,
-          "closed_trades": 10,
-          "profit_factor": 0.9477387455767994,
-          "win_rate_pct": 40.0,
-          "max_drawdown_pct": -3.8685135343317856,
-          "buy_hold_net_return_pct": -3.9894412844627913,
+          "return_pct": -3.116749302069166,
+          "closed_trades": 11,
+          "profit_factor": 0.4708999864177815,
+          "win_rate_pct": 36.36363636363637,
+          "max_drawdown_pct": -4.219269737561559,
+          "buy_hold_net_return_pct": -3.532612396590018,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 3.8043698776532353
+          "alpha_vs_buy_hold_pct": 0.4158630945208519
         },
         {
           "confidence": 0.65,
-          "return_pct": 1.1903457021747332,
-          "closed_trades": 5,
-          "profit_factor": 1.7612919694241256,
-          "win_rate_pct": 40.0,
-          "max_drawdown_pct": -1.9350805157910878,
-          "buy_hold_net_return_pct": -3.9894412844627913,
+          "return_pct": 0.5628494738387779,
+          "closed_trades": 4,
+          "profit_factor": 1.324663732961211,
+          "win_rate_pct": 25.0,
+          "max_drawdown_pct": -1.7102641780353034,
+          "buy_hold_net_return_pct": -3.532612396590018,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 5.179786986637525
+          "alpha_vs_buy_hold_pct": 4.095461870428796
         },
         {
           "confidence": 0.7,
-          "return_pct": 0.9980588869030527,
-          "closed_trades": 3,
-          "profit_factor": 1.7644916746301456,
-          "win_rate_pct": 33.33333333333333,
-          "max_drawdown_pct": -2.0234552450342447,
-          "buy_hold_net_return_pct": -3.9894412844627913,
+          "return_pct": -1.4429045806127694,
+          "closed_trades": 2,
+          "profit_factor": 0.0,
+          "win_rate_pct": 0.0,
+          "max_drawdown_pct": -2.188974172910585,
+          "buy_hold_net_return_pct": -3.532612396590018,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 4.987500171365844
+          "alpha_vs_buy_hold_pct": 2.0897078159772486
         }
       ],
       "selected_confidence": 0.6,
       "validation_passed": false,
-      "test_accuracy_pct": 65.11627906976744,
-      "test_balanced_accuracy_pct": 51.32022471910113,
-      "train_majority_test_accuracy_pct": 68.9922480620155,
+      "test_accuracy_pct": 65.4639175257732,
+      "test_balanced_accuracy_pct": 51.23474311666194,
+      "train_majority_test_accuracy_pct": 69.84536082474226,
       "test_candidate": {
-        "return_pct": 0.409425098698013,
-        "closed_trades": 8,
-        "profit_factor": 1.1371570225812837,
-        "win_rate_pct": 37.5,
+        "return_pct": -0.3814620736162899,
+        "closed_trades": 9,
+        "profit_factor": 0.8989764075075093,
+        "win_rate_pct": 33.33333333333333,
         "max_drawdown_pct": -2.932724716242119,
-        "buy_hold_net_return_pct": 9.984121236514554,
+        "buy_hold_net_return_pct": 9.105755122137982,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": -9.574696137816542
+        "alpha_vs_buy_hold_pct": -9.487217195754273
       },
       "test_gated_policy": {
         "return_pct": 0.0,
@@ -281,23 +281,24 @@
         "profit_factor": null,
         "win_rate_pct": null,
         "max_drawdown_pct": 0.0,
-        "buy_hold_net_return_pct": 9.984121236514554,
+        "buy_hold_net_return_pct": 9.105755122137982,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": -9.984121236514554
+        "alpha_vs_buy_hold_pct": -9.105755122137982
       },
       "gate_reasons": [
         "no_validation_candidate_passed",
         "fewer_than_50_test_trades",
         "no_positive_net_edge_on_test",
+        "test_profit_factor_below_1_1_or_undefined",
         "test_drawdown_exceeds_2_percent"
       ],
       "eligible_for_further_paper_evaluation": false,
       "latest": {
-        "candle": "2026-09-30 16:00:00+00:00",
-        "probability_positive_net_return": 0.5028920179199043,
+        "candle": "2026-09-30 20:00:00+00:00",
+        "probability_positive_net_return": 0.6384788341918196,
         "signal": "HOLD",
-        "observed_spread_bps": 0.8579335216112927,
-        "volume_24h_jpy": 1828685605.02704
+        "observed_spread_bps": 2.40583053143097,
+        "volume_24h_jpy": 1833388583.90232
       },
       "live_trading_enabled": false
     },
@@ -309,9 +310,9 @@
         "timeframe": "5m",
         "timezone": "UTC"
       },
-      "sha256": "930a0a6cd2d2dc315604c8da47bd64472d11df28f1c5966e765b07c5a1012900",
-      "history_days": 7.409722222222222,
-      "contiguous_rows": 2135,
+      "sha256": "aa7b9ac8c94551b0d907810a02d48179cdb19bbb3ff7f8016fe8e3a78948b6b1",
+      "history_days": 7.59375,
+      "contiguous_rows": 2188,
       "discarded_rows_before_last_gap": 0,
       "model": "HistGradientBoostingClassifier",
       "features": [
@@ -337,18 +338,18 @@
       "windows": {
         "train": {
           "start": "2026-09-23 11:05:00+00:00",
-          "end": "2026-09-27 18:50:00+00:00",
-          "rows": 1246
+          "end": "2026-09-27 21:30:00+00:00",
+          "rows": 1278
         },
         "validation": {
-          "start": "2026-09-27 19:25:00+00:00",
-          "end": "2026-09-29 05:35:00+00:00",
-          "rows": 411
+          "start": "2026-09-27 22:05:00+00:00",
+          "end": "2026-09-29 09:10:00+00:00",
+          "rows": 422
         },
         "test": {
-          "start": "2026-09-29 06:10:00+00:00",
-          "end": "2026-09-30 16:25:00+00:00",
-          "rows": 412
+          "start": "2026-09-29 09:45:00+00:00",
+          "end": "2026-09-30 20:50:00+00:00",
+          "rows": 422
         }
       },
       "validation_options": [
@@ -359,9 +360,9 @@
           "profit_factor": null,
           "win_rate_pct": 100.0,
           "max_drawdown_pct": -0.3493883084190186,
-          "buy_hold_net_return_pct": -1.387452590824867,
+          "buy_hold_net_return_pct": -0.8832856700903502,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 1.7352026675086174
+          "alpha_vs_buy_hold_pct": 1.2310357467741007
         },
         {
           "confidence": 0.55,
@@ -370,9 +371,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -1.387452590824867,
+          "buy_hold_net_return_pct": -0.8832856700903502,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 1.387452590824867
+          "alpha_vs_buy_hold_pct": 0.8832856700903502
         },
         {
           "confidence": 0.6,
@@ -381,9 +382,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -1.387452590824867,
+          "buy_hold_net_return_pct": -0.8832856700903502,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 1.387452590824867
+          "alpha_vs_buy_hold_pct": 0.8832856700903502
         },
         {
           "confidence": 0.65,
@@ -392,9 +393,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -1.387452590824867,
+          "buy_hold_net_return_pct": -0.8832856700903502,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 1.387452590824867
+          "alpha_vs_buy_hold_pct": 0.8832856700903502
         },
         {
           "confidence": 0.7,
@@ -403,25 +404,25 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -1.387452590824867,
+          "buy_hold_net_return_pct": -0.8832856700903502,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 1.387452590824867
+          "alpha_vs_buy_hold_pct": 0.8832856700903502
         }
       ],
       "selected_confidence": 0.6,
       "validation_passed": false,
-      "test_accuracy_pct": 90.53398058252428,
-      "test_balanced_accuracy_pct": 49.601063829787236,
-      "train_majority_test_accuracy_pct": 91.2621359223301,
+      "test_accuracy_pct": 92.18009478672985,
+      "test_balanced_accuracy_pct": 49.61734693877551,
+      "train_majority_test_accuracy_pct": 92.89099526066352,
       "test_candidate": {
         "return_pct": -0.5063343593450842,
         "closed_trades": 1,
         "profit_factor": 0.0,
         "win_rate_pct": 0.0,
         "max_drawdown_pct": -0.7584347823392346,
-        "buy_hold_net_return_pct": 0.03333932406512918,
+        "buy_hold_net_return_pct": -0.9005007228509831,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": -0.5396736834102134
+        "alpha_vs_buy_hold_pct": 0.39416636350589895
       },
       "test_gated_policy": {
         "return_pct": 0.0,
@@ -429,9 +430,9 @@
         "profit_factor": null,
         "win_rate_pct": null,
         "max_drawdown_pct": 0.0,
-        "buy_hold_net_return_pct": 0.03333932406512918,
+        "buy_hold_net_return_pct": -0.9005007228509831,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": -0.03333932406512918
+        "alpha_vs_buy_hold_pct": 0.9005007228509831
       },
       "gate_reasons": [
         "less_than_30_days_of_history",
@@ -442,11 +443,11 @@
       ],
       "eligible_for_further_paper_evaluation": false,
       "latest": {
-        "candle": "2026-09-30 16:55:00+00:00",
-        "probability_positive_net_return": 0.1730383842200559,
+        "candle": "2026-09-30 21:20:00+00:00",
+        "probability_positive_net_return": 0.015704435832195364,
         "signal": "HOLD",
-        "observed_spread_bps": 0.8579335216112927,
-        "volume_24h_jpy": 1828685605.02704
+        "observed_spread_bps": 2.40583053143097,
+        "volume_24h_jpy": 1833388583.90232
       },
       "live_trading_enabled": false
     },
@@ -458,9 +459,9 @@
         "timeframe": "1h",
         "timezone": "UTC"
       },
-      "sha256": "b90983b28895fb50b93dc21d58ef19132ebb216a238d97c7317cfa4c787fc5f6",
-      "history_days": 83.75,
-      "contiguous_rows": 2011,
+      "sha256": "a0784c8f3c8b0e2e2e2e51ca787fe83adcd1662b20e01ab823741c931aa7f494",
+      "history_days": 83.91666666666667,
+      "contiguous_rows": 2015,
       "discarded_rows_before_last_gap": 0,
       "model": "HistGradientBoostingClassifier",
       "features": [
@@ -486,64 +487,64 @@
       "windows": {
         "train": {
           "start": "2026-07-10 22:00:00+00:00",
-          "end": "2026-08-28 16:00:00+00:00",
-          "rows": 1171
+          "end": "2026-08-28 19:00:00+00:00",
+          "rows": 1174
         },
         "validation": {
-          "start": "2026-08-28 23:00:00+00:00",
-          "end": "2026-09-14 01:00:00+00:00",
+          "start": "2026-08-29 02:00:00+00:00",
+          "end": "2026-09-14 04:00:00+00:00",
           "rows": 387
         },
         "test": {
-          "start": "2026-09-14 08:00:00+00:00",
-          "end": "2026-09-30 10:00:00+00:00",
-          "rows": 387
+          "start": "2026-09-14 11:00:00+00:00",
+          "end": "2026-09-30 14:00:00+00:00",
+          "rows": 388
         }
       },
       "validation_options": [
         {
           "confidence": 0.5,
-          "return_pct": -15.869902466644314,
+          "return_pct": -15.022190387098478,
           "closed_trades": 19,
-          "profit_factor": 0.061179191535948016,
-          "win_rate_pct": 26.31578947368421,
-          "max_drawdown_pct": -17.539719060325453,
-          "buy_hold_net_return_pct": -4.184392938983672,
+          "profit_factor": 0.09899606182751788,
+          "win_rate_pct": 31.57894736842105,
+          "max_drawdown_pct": -16.683296802653736,
+          "buy_hold_net_return_pct": -2.8365691557374784,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": -11.685509527660642
+          "alpha_vs_buy_hold_pct": -12.185621231360999
         },
         {
           "confidence": 0.55,
-          "return_pct": -11.219971630034243,
-          "closed_trades": 11,
-          "profit_factor": 0.04469179058268076,
-          "win_rate_pct": 18.181818181818183,
-          "max_drawdown_pct": -12.437995602016027,
-          "buy_hold_net_return_pct": -4.184392938983672,
+          "return_pct": -11.816321645352835,
+          "closed_trades": 15,
+          "profit_factor": 0.0798716137728816,
+          "win_rate_pct": 26.666666666666668,
+          "max_drawdown_pct": -13.814012132232712,
+          "buy_hold_net_return_pct": -2.8365691557374784,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": -7.035578691050571
+          "alpha_vs_buy_hold_pct": -8.979752489615356
         },
         {
           "confidence": 0.6,
-          "return_pct": -10.934775355804927,
-          "closed_trades": 8,
-          "profit_factor": 0.030018186108087496,
-          "win_rate_pct": 12.5,
-          "max_drawdown_pct": -12.415566909315622,
-          "buy_hold_net_return_pct": -4.184392938983672,
+          "return_pct": -10.020428286965554,
+          "closed_trades": 9,
+          "profit_factor": 0.04952451786567366,
+          "win_rate_pct": 22.22222222222222,
+          "max_drawdown_pct": -11.749553181956852,
+          "buy_hold_net_return_pct": -2.8365691557374784,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": -6.750382416821255
+          "alpha_vs_buy_hold_pct": -7.1838591312280755
         },
         {
           "confidence": 0.65,
-          "return_pct": -4.76143061755705,
+          "return_pct": -7.524619019713219,
           "closed_trades": 4,
           "profit_factor": 0.0,
           "win_rate_pct": 0.0,
-          "max_drawdown_pct": -6.647319267714902,
-          "buy_hold_net_return_pct": -4.184392938983672,
+          "max_drawdown_pct": -8.43886664989335,
+          "buy_hold_net_return_pct": -2.8365691557374784,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": -0.5770376785733777
+          "alpha_vs_buy_hold_pct": -4.68804986397574
         },
         {
           "confidence": 0.7,
@@ -552,25 +553,25 @@
           "profit_factor": 0.0,
           "win_rate_pct": 0.0,
           "max_drawdown_pct": -5.168265150252904,
-          "buy_hold_net_return_pct": -4.184392938983672,
+          "buy_hold_net_return_pct": -2.8365691557374784,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 0.03276302511313567
+          "alpha_vs_buy_hold_pct": -1.315060758133058
         }
       ],
       "selected_confidence": 0.6,
       "validation_passed": false,
-      "test_accuracy_pct": 55.297157622739014,
-      "test_balanced_accuracy_pct": 48.81856540084388,
-      "train_majority_test_accuracy_pct": 61.240310077519375,
+      "test_accuracy_pct": 54.38144329896907,
+      "test_balanced_accuracy_pct": 49.138513513513516,
+      "train_majority_test_accuracy_pct": 61.855670103092784,
       "test_candidate": {
-        "return_pct": -5.255419829840391,
-        "closed_trades": 15,
-        "profit_factor": 0.6859446707998198,
-        "win_rate_pct": 33.33333333333333,
-        "max_drawdown_pct": -11.463655510326232,
-        "buy_hold_net_return_pct": 10.120071638873561,
+        "return_pct": -14.05470128632328,
+        "closed_trades": 16,
+        "profit_factor": 0.3072969209102307,
+        "win_rate_pct": 25.0,
+        "max_drawdown_pct": -14.866889628810586,
+        "buy_hold_net_return_pct": 8.155430812300501,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": -15.375491468713953
+        "alpha_vs_buy_hold_pct": -22.21013209862378
       },
       "test_gated_policy": {
         "return_pct": 0.0,
@@ -578,9 +579,9 @@
         "profit_factor": null,
         "win_rate_pct": null,
         "max_drawdown_pct": 0.0,
-        "buy_hold_net_return_pct": 10.120071638873561,
+        "buy_hold_net_return_pct": 8.155430812300501,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": -10.120071638873561
+        "alpha_vs_buy_hold_pct": -8.155430812300501
       },
       "gate_reasons": [
         "no_validation_candidate_passed",
@@ -591,11 +592,11 @@
       ],
       "eligible_for_further_paper_evaluation": false,
       "latest": {
-        "candle": "2026-09-30 16:00:00+00:00",
-        "probability_positive_net_return": 0.08982828255825522,
+        "candle": "2026-09-30 20:00:00+00:00",
+        "probability_positive_net_return": 0.12584206598715117,
         "signal": "HOLD",
-        "observed_spread_bps": 16.736964722010626,
-        "volume_24h_jpy": 25176098.62968
+        "observed_spread_bps": 18.612337381622485,
+        "volume_24h_jpy": 27352828.55204
       },
       "live_trading_enabled": false
     },
@@ -607,9 +608,9 @@
         "timeframe": "5m",
         "timezone": "UTC"
       },
-      "sha256": "3b1797fc4503572058b625f05f53a88b78bbb889f67fdbab10d39a584fde7af9",
-      "history_days": 7.409722222222222,
-      "contiguous_rows": 2135,
+      "sha256": "6b727f22496199e02471db2d96db579c3926c5b9c546937c9ae064b55524d5c1",
+      "history_days": 7.59375,
+      "contiguous_rows": 2188,
       "discarded_rows_before_last_gap": 0,
       "model": "HistGradientBoostingClassifier",
       "features": [
@@ -635,18 +636,18 @@
       "windows": {
         "train": {
           "start": "2026-09-23 11:05:00+00:00",
-          "end": "2026-09-27 18:50:00+00:00",
-          "rows": 1246
+          "end": "2026-09-27 21:30:00+00:00",
+          "rows": 1278
         },
         "validation": {
-          "start": "2026-09-27 19:25:00+00:00",
-          "end": "2026-09-29 05:35:00+00:00",
-          "rows": 411
+          "start": "2026-09-27 22:05:00+00:00",
+          "end": "2026-09-29 09:10:00+00:00",
+          "rows": 422
         },
         "test": {
-          "start": "2026-09-29 06:10:00+00:00",
-          "end": "2026-09-30 16:25:00+00:00",
-          "rows": 412
+          "start": "2026-09-29 09:45:00+00:00",
+          "end": "2026-09-30 20:50:00+00:00",
+          "rows": 422
         }
       },
       "validation_options": [
@@ -657,9 +658,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -3.012551147414244,
+          "buy_hold_net_return_pct": -0.9171725417967291,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 3.012551147414244
+          "alpha_vs_buy_hold_pct": 0.9171725417967291
         },
         {
           "confidence": 0.55,
@@ -668,9 +669,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -3.012551147414244,
+          "buy_hold_net_return_pct": -0.9171725417967291,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 3.012551147414244
+          "alpha_vs_buy_hold_pct": 0.9171725417967291
         },
         {
           "confidence": 0.6,
@@ -679,9 +680,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -3.012551147414244,
+          "buy_hold_net_return_pct": -0.9171725417967291,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 3.012551147414244
+          "alpha_vs_buy_hold_pct": 0.9171725417967291
         },
         {
           "confidence": 0.65,
@@ -690,9 +691,9 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -3.012551147414244,
+          "buy_hold_net_return_pct": -0.9171725417967291,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 3.012551147414244
+          "alpha_vs_buy_hold_pct": 0.9171725417967291
         },
         {
           "confidence": 0.7,
@@ -701,25 +702,25 @@
           "profit_factor": null,
           "win_rate_pct": null,
           "max_drawdown_pct": 0.0,
-          "buy_hold_net_return_pct": -3.012551147414244,
+          "buy_hold_net_return_pct": -0.9171725417967291,
           "cash_return_pct": 0.0,
-          "alpha_vs_buy_hold_pct": 3.012551147414244
+          "alpha_vs_buy_hold_pct": 0.9171725417967291
         }
       ],
       "selected_confidence": 0.6,
       "validation_passed": false,
-      "test_accuracy_pct": 93.93203883495146,
+      "test_accuracy_pct": 94.3127962085308,
       "test_balanced_accuracy_pct": 50.0,
-      "train_majority_test_accuracy_pct": 93.93203883495146,
+      "train_majority_test_accuracy_pct": 94.3127962085308,
       "test_candidate": {
         "return_pct": 0.0,
         "closed_trades": 0,
         "profit_factor": null,
         "win_rate_pct": null,
         "max_drawdown_pct": 0.0,
-        "buy_hold_net_return_pct": -0.06778107765309516,
+        "buy_hold_net_return_pct": -2.0073340511031046,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": 0.06778107765309516
+        "alpha_vs_buy_hold_pct": 2.0073340511031046
       },
       "test_gated_policy": {
         "return_pct": 0.0,
@@ -727,9 +728,9 @@
         "profit_factor": null,
         "win_rate_pct": null,
         "max_drawdown_pct": 0.0,
-        "buy_hold_net_return_pct": -0.06778107765309516,
+        "buy_hold_net_return_pct": -2.0073340511031046,
         "cash_return_pct": 0.0,
-        "alpha_vs_buy_hold_pct": 0.06778107765309516
+        "alpha_vs_buy_hold_pct": 2.0073340511031046
       },
       "gate_reasons": [
         "less_than_30_days_of_history",
@@ -741,11 +742,11 @@
       ],
       "eligible_for_further_paper_evaluation": false,
       "latest": {
-        "candle": "2026-09-30 16:55:00+00:00",
-        "probability_positive_net_return": 0.07723496728007823,
+        "candle": "2026-09-30 21:20:00+00:00",
+        "probability_positive_net_return": 0.09496885939859064,
         "signal": "HOLD",
-        "observed_spread_bps": 16.736964722010626,
-        "volume_24h_jpy": 25176098.62968
+        "observed_spread_bps": 18.612337381622485,
+        "volume_24h_jpy": 27352828.55204
       },
       "live_trading_enabled": false
     }
