@@ -150,7 +150,8 @@ def validate_state(state, now):
     for name, value in DEFAULTS.items():
         if name != "mode" and config.get(name) != value:
             raise ValueError("Paper configuration changed; create an explicitly separate experiment")
-    if now < epoch(state.get("updated_at", state["created_at"])):
+    # datetime ISO serialization rounds fractional timestamps to microseconds.
+    if now + 0.000001 < epoch(state.get("updated_at", state["created_at"])):
         raise ValueError("Cannot run paper ledger backwards in time")
     cash = state["cash_jpy"]
     if not math.isfinite(cash) or cash < -1e-7:

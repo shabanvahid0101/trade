@@ -34,6 +34,13 @@ def step(state=None, now=NOW, **kwargs):
 
 
 class PortfolioTests(unittest.TestCase):
+    def test_fractional_clock_survives_iso_rounding_and_reload(self):
+        for fraction in (.1234567, .0000007, .9999997):
+            with self.subTest(fraction=fraction):
+                now = NOW + fraction
+                state = step(now=now)
+                validate_state(json.loads(json.dumps(state)), now)
+
     def test_live_book_entry_and_cash_reconciliation(self):
         state = step()
         p = state['positions']['btcjpy_5m']
