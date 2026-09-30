@@ -1,88 +1,88 @@
 {
   "provider": "bittrade",
   "market_type": "spot",
-  "updated_at": "2026-09-30T11:22:55.868683+00:00",
+  "updated_at": "2026-09-30T15:45:21.946714+00:00",
   "datasets": {
     "btcjpy_5m": {
-      "rows": 2067,
+      "rows": 2120,
       "first": "2026-09-23T07:05:00+00:00",
-      "last": "2026-09-30T11:15:00+00:00",
+      "last": "2026-09-30T15:40:00+00:00",
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 73,
-      "last_close_age_seconds": 176.20700001716614
+      "last_close_age_seconds": 22.713000059127808
     },
     "btcjpy_15m": {
-      "rows": 2022,
+      "rows": 2040,
       "first": "2026-09-09T09:45:00+00:00",
-      "last": "2026-09-30T11:00:00+00:00",
+      "last": "2026-09-30T15:30:00+00:00",
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 6,
-      "last_close_age_seconds": 477.41799998283386
+      "last_close_age_seconds": 23.878999948501587
     },
     "btcjpy_1h": {
-      "rows": 2005,
+      "rows": 2009,
       "first": "2026-07-08T22:00:00+00:00",
-      "last": "2026-09-30T10:00:00+00:00",
+      "last": "2026-09-30T14:00:00+00:00",
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 19,
-      "last_close_age_seconds": 1378.6110000610352
+      "last_close_age_seconds": 2725.0629999637604
     },
     "ethjpy_5m": {
-      "rows": 2067,
+      "rows": 2120,
       "first": "2026-09-23T07:05:00+00:00",
-      "last": "2026-09-30T11:15:00+00:00",
+      "last": "2026-09-30T15:40:00+00:00",
       "missing_candles": 0,
       "gaps": [],
-      "zero_volume_candles": 1561,
-      "last_close_age_seconds": 179.8420000076294
+      "zero_volume_candles": 1589,
+      "last_close_age_seconds": 26.250999927520752
     },
     "ethjpy_15m": {
-      "rows": 2022,
+      "rows": 2040,
       "first": "2026-09-09T09:45:00+00:00",
-      "last": "2026-09-30T11:00:00+00:00",
+      "last": "2026-09-30T15:30:00+00:00",
       "missing_candles": 0,
       "gaps": [],
-      "zero_volume_candles": 1001,
-      "last_close_age_seconds": 480.93300008773804
+      "zero_volume_candles": 1005,
+      "last_close_age_seconds": 27.33400011062622
     },
     "ethjpy_1h": {
-      "rows": 2005,
+      "rows": 2009,
       "first": "2026-07-08T22:00:00+00:00",
-      "last": "2026-09-30T10:00:00+00:00",
+      "last": "2026-09-30T14:00:00+00:00",
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 313,
-      "last_close_age_seconds": 1381.6849999427795
+      "last_close_age_seconds": 2728.0629999637604
     },
     "xrpjpy_5m": {
-      "rows": 2067,
+      "rows": 2120,
       "first": "2026-09-23T07:05:00+00:00",
-      "last": "2026-09-30T11:15:00+00:00",
+      "last": "2026-09-30T15:40:00+00:00",
       "missing_candles": 0,
       "gaps": [],
-      "zero_volume_candles": 889,
-      "last_close_age_seconds": 182.44000005722046
+      "zero_volume_candles": 914,
+      "last_close_age_seconds": 28.81599998474121
     },
     "xrpjpy_15m": {
-      "rows": 2022,
+      "rows": 2040,
       "first": "2026-09-09T09:45:00+00:00",
-      "last": "2026-09-30T11:00:00+00:00",
+      "last": "2026-09-30T15:30:00+00:00",
       "missing_candles": 0,
       "gaps": [],
-      "zero_volume_candles": 249,
-      "last_close_age_seconds": 483.2420001029968
+      "zero_volume_candles": 251,
+      "last_close_age_seconds": 29.52900004386902
     },
     "xrpjpy_1h": {
-      "rows": 2005,
+      "rows": 2009,
       "first": "2026-07-08T22:00:00+00:00",
-      "last": "2026-09-30T10:00:00+00:00",
+      "last": "2026-09-30T14:00:00+00:00",
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 13,
-      "last_close_age_seconds": 1384.0169999599457
+      "last_close_age_seconds": 2730.2850000858307
     }
   },
   "errors": {},
