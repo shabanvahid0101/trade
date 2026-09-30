@@ -1,7 +1,7 @@
 {
   "provider": "bittrade",
   "market_type": "spot",
-  "updated_at": "2026-09-30T05:43:06.889974+00:00",
+  "updated_at": "2026-09-30T05:44:35.696328+00:00",
   "datasets": {
     "btcjpy_5m": {
       "rows": 1999,
@@ -10,7 +10,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 69,
-      "last_close_age_seconds": 187.21199989318848
+      "last_close_age_seconds": 276.0380001068115
     },
     "btcjpy_15m": {
       "rows": 1999,
@@ -19,7 +19,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 6,
-      "last_close_age_seconds": 787.680999994278
+      "last_close_age_seconds": 876.8610000610352
     },
     "btcjpy_1h": {
       "rows": 1999,
@@ -28,7 +28,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 19,
-      "last_close_age_seconds": 2588.4509999752045
+      "last_close_age_seconds": 2677.7219998836517
     },
     "ethjpy_5m": {
       "rows": 1999,
@@ -37,7 +37,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 1510,
-      "last_close_age_seconds": 189.02800011634827
+      "last_close_age_seconds": 278.5829999446869
     },
     "ethjpy_15m": {
       "rows": 1999,
@@ -46,7 +46,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 991,
-      "last_close_age_seconds": 789.5280001163483
+      "last_close_age_seconds": 879.2139999866486
     },
     "ethjpy_1h": {
       "rows": 1999,
@@ -55,7 +55,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 313,
-      "last_close_age_seconds": 2590.063999891281
+      "last_close_age_seconds": 2680.0339999198914
     },
     "xrpjpy_5m": {
       "rows": 1999,
@@ -64,7 +64,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 864,
-      "last_close_age_seconds": 190.54500007629395
+      "last_close_age_seconds": 281.4760000705719
     },
     "xrpjpy_15m": {
       "rows": 1999,
@@ -73,7 +73,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 248,
-      "last_close_age_seconds": 791.0220000743866
+      "last_close_age_seconds": 882.345999956131
     },
     "xrpjpy_1h": {
       "rows": 1999,
@@ -82,7 +82,7 @@
       "missing_candles": 0,
       "gaps": [],
       "zero_volume_candles": 13,
-      "last_close_age_seconds": 2591.473000049591
+      "last_close_age_seconds": 2683.197000026703
     }
   },
   "errors": {},

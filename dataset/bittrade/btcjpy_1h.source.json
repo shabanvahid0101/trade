@@ -8,7 +8,7 @@
   },
   "endpoint": "https://api-cloud.bittrade.co.jp/market/history/kline",
   "sha256": "b9c17ca08cc5b5a688bb0a8a440d7dbdb7d17016b1b0c515dc6d55218af96f6b",
-  "server_timestamp_ms": 1790746988451,
+  "server_timestamp_ms": 1790747077722,
   "api_trading": "enabled",
   "quality": {
     "rows": 1999,
@@ -17,6 +17,6 @@
     "missing_candles": 0,
     "gaps": [],
     "zero_volume_candles": 19,
-    "last_close_age_seconds": 2588.4509999752045
+    "last_close_age_seconds": 2677.7219998836517
   }
 }

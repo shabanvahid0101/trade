@@ -9,10 +9,10 @@
       "amount": 6.24,
       "vol": 1129.42681,
       "count": 97,
-      "bid": 180.662,
-      "bidSize": 3.05,
-      "ask": 181.567,
-      "askSize": 3.06
+      "bid": 180.366,
+      "bidSize": 7.0,
+      "ask": 182.179,
+      "askSize": 6.99
     },
     {
       "symbol": "gramjpy",
@@ -24,9 +24,9 @@
       "vol": 0.0,
       "count": 0,
       "bid": 237.77,
-      "bidSize": 0.96,
+      "bidSize": 0.97,
       "ask": 238.73,
-      "askSize": 0.95
+      "askSize": 0.97
     },
     {
       "symbol": "trxjpy",
@@ -37,8 +37,8 @@
       "amount": 44106.4330093655,
       "vol": 2330322.5685,
       "count": 118,
-      "bid": 52.868,
-      "bidSize": 246.45,
+      "bid": 52.877,
+      "bidSize": 246.43,
       "ask": 53.499,
       "askSize": 438.56
     },
@@ -51,10 +51,10 @@
       "amount": 9.262702008233758,
       "vol": 441994.4769,
       "count": 10,
-      "bid": 48176.0,
+      "bid": 48059.0,
       "bidSize": 0.0001,
-      "ask": 48517.0,
-      "askSize": 0.1
+      "ask": 49243.0,
+      "askSize": 0.3
     },
     {
       "symbol": "suijpy",
@@ -65,24 +65,24 @@
       "amount": 9.6,
       "vol": 1747.977,
       "count": 96,
-      "bid": 180.43,
-      "bidSize": 3.35,
-      "ask": 185.92,
-      "askSize": 3.36
+      "bid": 183.13,
+      "bidSize": 3.81,
+      "ask": 184.51,
+      "askSize": 3.82
     },
     {
       "symbol": "dogejpy",
       "open": 14.8415,
       "high": 14.9394,
       "low": 14.6589,
-      "close": 14.7693,
-      "amount": 99.9668,
-      "vol": 1490.21992084,
-      "count": 95,
-      "bid": 14.7859,
-      "bidSize": 38.0128,
-      "ask": 14.86,
-      "askSize": 38.0214
+      "close": 14.8277,
+      "amount": 100.9668,
+      "vol": 1505.04762084,
+      "count": 96,
+      "bid": 14.7771,
+      "bidSize": 87.3265,
+      "ask": 14.8885,
+      "askSize": 38.0132
     },
     {
       "symbol": "adajpy",
@@ -93,10 +93,10 @@
       "amount": 1355.01,
       "vol": 51053.1668,
       "count": 91,
-      "bid": 38.512,
-      "bidSize": 0.25,
-      "ask": 38.715,
-      "askSize": 379.12
+      "bid": 38.396,
+      "bidSize": 0.45,
+      "ask": 38.772,
+      "askSize": 100.0
     },
     {
       "symbol": "opjpy",
@@ -107,10 +107,10 @@
       "amount": 61.39,
       "vol": 1270.5208,
       "count": 95,
-      "bid": 20.25,
-      "bidSize": 13.09,
-      "ask": 20.79,
-      "askSize": 10.9
+      "bid": 20.55,
+      "bidSize": 7.61,
+      "ask": 20.63,
+      "askSize": 7.6
     },
     {
       "symbol": "hbarjpy",
@@ -121,10 +121,10 @@
       "amount": 0.0,
       "vol": 0.0,
       "count": 0,
-      "bid": 16.24,
-      "bidSize": 98.0,
-      "ask": 16.64,
-      "askSize": 66.0
+      "bid": 16.37,
+      "bidSize": 50.0,
+      "ask": 16.63,
+      "askSize": 50.0
     },
     {
       "symbol": "cotjpy",
@@ -149,10 +149,10 @@
       "amount": 0.0,
       "vol": 0.0,
       "count": 0,
-      "bid": 0.01024,
-      "bidSize": 19003.028,
+      "bid": 0.01025,
+      "bidSize": 19003.0269,
       "ask": 0.01029,
-      "askSize": 19003.0146
+      "askSize": 19003.0237
     },
     {
       "symbol": "qtumjpy",
@@ -163,10 +163,10 @@
       "amount": 6.7754,
       "vol": 1049.9532662,
       "count": 96,
-      "bid": 155.479,
-      "bidSize": 0.1424,
-      "ask": 156.259,
-      "askSize": 0.1278
+      "bid": 157.643,
+      "bidSize": 2.0218,
+      "ask": 158.669,
+      "askSize": 1.3091
     },
     {
       "symbol": "xlmjpy",
@@ -177,9 +177,9 @@
       "amount": 18544.044010822327,
       "vol": 675831.32406,
       "count": 179,
-      "bid": 35.044,
+      "bid": 35.08,
       "bidSize": 2.54,
-      "ask": 35.22,
+      "ask": 35.256,
       "askSize": 2.55
     },
     {
@@ -188,13 +188,13 @@
       "high": 33.9,
       "low": 22.7,
       "close": 32.58,
-      "amount": 728.41,
-      "vol": 18616.3922,
-      "count": 1360,
-      "bid": 32.44,
+      "amount": 729.0,
+      "vol": 18635.6144,
+      "count": 1362,
+      "bid": 32.43,
       "bidSize": 0.14,
-      "ask": 32.73,
-      "askSize": 0.13
+      "ask": 32.72,
+      "askSize": 0.14
     },
     {
       "symbol": "etcjpy",
@@ -205,10 +205,10 @@
       "amount": 0.7931,
       "vol": 1144.926208,
       "count": 96,
-      "bid": 1435.03,
-      "bidSize": 0.0719,
-      "ask": 1442.22,
-      "askSize": 0.0712
+      "bid": 1438.13,
+      "bidSize": 0.0715,
+      "ask": 1445.34,
+      "askSize": 0.0817
     },
     {
       "symbol": "linkjpy",
@@ -219,10 +219,10 @@
       "amount": 0.0,
       "vol": 0.0,
       "count": 0,
-      "bid": 2241.85,
-      "bidSize": 0.54,
-      "ask": 2278.38,
-      "askSize": 0.31
+      "bid": 2245.27,
+      "bidSize": 0.53,
+      "ask": 2295.37,
+      "askSize": 0.27
     },
     {
       "symbol": "xrpjpy",
@@ -230,13 +230,13 @@
       "high": 240.179,
       "low": 233.687,
       "close": 236.22,
-      "amount": 159516.55565556322,
-      "vol": 38253521.88722,
-      "count": 689,
-      "bid": 236.161,
-      "bidSize": 125.4,
-      "ask": 236.596,
-      "askSize": 200.0
+      "amount": 159460.18357998077,
+      "vol": 38240274.88722,
+      "count": 687,
+      "bid": 236.516,
+      "bidSize": 125.2,
+      "ask": 236.854,
+      "askSize": 95.99
     },
     {
       "symbol": "maticjpy",
@@ -247,10 +247,10 @@
       "amount": 56.6,
       "vol": 1053.825,
       "count": 96,
-      "bid": 18.42,
-      "bidSize": 5.7,
-      "ask": 18.52,
-      "askSize": 5.7
+      "bid": 18.26,
+      "bidSize": 6.6,
+      "ask": 18.73,
+      "askSize": 6.6
     },
     {
       "symbol": "sandjpy",
@@ -261,9 +261,9 @@
       "amount": 161.9,
       "vol": 1114.6198,
       "count": 95,
-      "bid": 7.003,
+      "bid": 7.019,
       "bidSize": 11.4,
-      "ask": 7.038,
+      "ask": 7.055,
       "askSize": 11.4
     },
     {
@@ -275,10 +275,10 @@
       "amount": 667461.9468561962,
       "vol": 552412.97253868,
       "count": 62,
-      "bid": 0.8078,
-      "bidSize": 461068.9448,
-      "ask": 0.8364,
-      "askSize": 31943.3237
+      "bid": 0.8216,
+      "bidSize": 126.6943,
+      "ask": 0.834,
+      "askSize": 126.705
     },
     {
       "symbol": "xymjpy",
@@ -289,10 +289,10 @@
       "amount": 110692.2827852998,
       "vol": 55111.42354,
       "count": 87,
-      "bid": 0.487,
-      "bidSize": 56.92,
-      "ask": 0.498,
-      "askSize": 26.18
+      "bid": 0.485,
+      "bidSize": 121502.49,
+      "ask": 0.501,
+      "askSize": 499.78
     },
     {
       "symbol": "bsvjpy",
@@ -303,10 +303,10 @@
       "amount": 0.0,
       "vol": 0.0,
       "count": 0,
-      "bid": 3135.45,
-      "bidSize": 0.0756,
-      "ask": 3151.17,
-      "askSize": 0.0779
+      "bid": 3128.02,
+      "bidSize": 0.0656,
+      "ask": 3140.8,
+      "askSize": 0.0699
     },
     {
       "symbol": "aptjpy",
@@ -317,10 +317,10 @@
       "amount": 8.82,
       "vol": 1131.4277,
       "count": 96,
-      "bid": 125.0,
-      "bidSize": 1.71,
-      "ask": 126.51,
-      "askSize": 1.71
+      "bid": 125.02,
+      "bidSize": 0.41,
+      "ask": 127.29,
+      "askSize": 0.53
     },
     {
       "symbol": "daijpy",
@@ -341,14 +341,14 @@
       "open": 13093520.0,
       "high": 13198315.0,
       "low": 13040634.0,
-      "close": 13122356.0,
-      "amount": 181.58285678045644,
-      "vol": 2391381946.1562,
-      "count": 412081,
-      "bid": 13122225.0,
-      "bidSize": 0.0006,
-      "ask": 13122429.0,
-      "askSize": 0.06614
+      "close": 13123818.0,
+      "amount": 181.61027678045645,
+      "vol": 2391741758.19902,
+      "count": 412177,
+      "bid": 13123818.0,
+      "bidSize": 0.02535,
+      "ask": 13123819.0,
+      "askSize": 0.00972
     },
     {
       "symbol": "astrjpy",
@@ -359,8 +359,8 @@
       "amount": 56896.29,
       "vol": 67167.56145,
       "count": 4,
-      "bid": 1.155,
-      "bidSize": 334.33,
+      "bid": 1.164,
+      "bidSize": 380.08,
       "ask": 1.17,
       "askSize": 48789.81
     },
@@ -373,8 +373,8 @@
       "amount": 87.64892530761222,
       "vol": 37222615.64472116,
       "count": 289,
-      "bid": 421000.0,
-      "bidSize": 0.7175,
+      "bid": 421001.0,
+      "bidSize": 0.09,
       "ask": 421305.0,
       "askSize": 0.0499
     },
@@ -401,10 +401,10 @@
       "amount": 1145904.0,
       "vol": 1044.99885618,
       "count": 95,
-      "bid": 0.00090935,
+      "bid": 0.00091092,
       "bidSize": 1420358.0,
-      "ask": 0.0009231,
-      "askSize": 1420358.0
+      "ask": 0.00092239,
+      "askSize": 873149.0
     },
     {
       "symbol": "ajpy",
@@ -415,10 +415,10 @@
       "amount": 0.0,
       "vol": 0.0,
       "count": 0,
-      "bid": 15.05,
-      "bidSize": 15.2,
-      "ask": 15.11,
-      "askSize": 15.2
+      "bid": 15.01,
+      "bidSize": 56.8,
+      "ask": 15.19,
+      "askSize": 56.8
     },
     {
       "symbol": "pepejpy",
@@ -429,9 +429,9 @@
       "amount": 1633045.0,
       "vol": 1099.9960578,
       "count": 96,
-      "bid": 0.00067969,
+      "bid": 0.00068127,
       "bidSize": 570090.0,
-      "ask": 0.00068242,
+      "ask": 0.000684,
       "askSize": 570090.0
     },
     {
@@ -445,7 +445,7 @@
       "count": 37,
       "bid": 10540.0,
       "bidSize": 0.504,
-      "ask": 10625.0,
+      "ask": 10627.0,
       "askSize": 0.001
     },
     {
@@ -457,10 +457,10 @@
       "amount": 0.00096,
       "vol": 12691.29079,
       "count": 96,
-      "bid": 13030570.0,
-      "bidSize": 0.00054,
-      "ask": 13189462.0,
-      "askSize": 0.00019
+      "bid": 13093549.0,
+      "bidSize": 0.00095,
+      "ask": 13212721.0,
+      "askSize": 0.00036
     },
     {
       "symbol": "bnbjpy",
@@ -471,10 +471,10 @@
       "amount": 0.97,
       "vol": 116480.84,
       "count": 97,
-      "bid": 120400.0,
-      "bidSize": 0.0293,
-      "ask": 120890.0,
-      "askSize": 0.0386
+      "bid": 120044.0,
+      "bidSize": 0.0906,
+      "ask": 121926.0,
+      "askSize": 0.0257
     },
     {
       "symbol": "skyjpy",
@@ -486,8 +486,8 @@
       "vol": 0.0,
       "count": 0,
       "bid": 12.48,
-      "bidSize": 388.0,
-      "ask": 13.11,
+      "bidSize": 431.0,
+      "ask": 13.13,
       "askSize": 57.0
     },
     {
@@ -499,10 +499,10 @@
       "amount": 761577.5007232021,
       "vol": 112934.93737939,
       "count": 89,
-      "bid": 0.1486,
-      "bidSize": 380.0707,
-      "ask": 0.1493,
-      "askSize": 380.0785
+      "bid": 0.1475,
+      "bidSize": 2005.9749,
+      "ask": 0.1504,
+      "askSize": 2005.9777
     },
     {
       "symbol": "iostjpy",
@@ -527,9 +527,9 @@
       "amount": 0.95,
       "vol": 17887.28,
       "count": 95,
-      "bid": 18815.0,
+      "bid": 18846.0,
       "bidSize": 0.08,
-      "ask": 18890.0,
+      "ask": 18922.0,
       "askSize": 0.09
     },
     {
@@ -541,8 +541,8 @@
       "amount": 0.0,
       "vol": 0.0,
       "count": 0,
-      "bid": 8.93,
-      "bidSize": 15.3791,
+      "bid": 8.94,
+      "bidSize": 15.3662,
       "ask": 8.95,
       "askSize": 0.8057
     },
@@ -555,10 +555,10 @@
       "amount": 0.0,
       "vol": 0.0,
       "count": 0,
-      "bid": 325.04,
+      "bid": 325.98,
       "bidSize": 0.694,
-      "ask": 326.34,
-      "askSize": 0.703
+      "ask": 327.29,
+      "askSize": 0.691
     },
     {
       "symbol": "batjpy",
@@ -569,10 +569,10 @@
       "amount": 128.14,
       "vol": 1908.8668,
       "count": 9,
-      "bid": 14.34,
-      "bidSize": 2.55,
-      "ask": 14.41,
-      "askSize": 2.55
+      "bid": 14.27,
+      "bidSize": 9.47,
+      "ask": 14.49,
+      "askSize": 9.47
     },
     {
       "symbol": "arbjpy",
@@ -583,10 +583,10 @@
       "amount": 31.6,
       "vol": 1029.564,
       "count": 96,
-      "bid": 31.73,
-      "bidSize": 10.7,
-      "ask": 32.24,
-      "askSize": 10.7
+      "bid": 32.02,
+      "bidSize": 12.2,
+      "ask": 32.14,
+      "askSize": 12.2
     },
     {
       "symbol": "dotjpy",
@@ -597,9 +597,9 @@
       "amount": 2.7736,
       "vol": 521.333552,
       "count": 7,
-      "bid": 190.42,
+      "bid": 190.9,
       "bidSize": 0.1,
-      "ask": 191.38,
+      "ask": 191.85,
       "askSize": 0.1
     },
     {
@@ -611,10 +611,10 @@
       "amount": 3.954,
       "vol": 1085.14595,
       "count": 97,
-      "bid": 269.29,
-      "bidSize": 0.485,
-      "ask": 273.36,
-      "askSize": 0.482
+      "bid": 267.42,
+      "bidSize": 1.089,
+      "ask": 275.56,
+      "askSize": 1.102
     },
     {
       "symbol": "shxjpy",
@@ -625,12 +625,12 @@
       "amount": 927909.0,
       "vol": 774310.2773,
       "count": 76,
-      "bid": 0.837,
-      "bidSize": 1520.0,
-      "ask": 0.8403,
-      "askSize": 1520.0
+      "bid": 0.8339,
+      "bidSize": 5681.0,
+      "ask": 0.844,
+      "askSize": 5681.0
     }
   ],
   "status": "ok",
-  "ts": 1790746986850
+  "ts": 1790747075606
 }
