@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-09-30T15:45:50.711628+00:00",
+  "created_at": "2026-09-30T15:47:39.003723+00:00",
   "protocol": "60/20/20 chronological split; horizon-purged train/validation; next-open long-only fills; confidence selected on validation only",
   "limitation": "Exploratory daily expanding-window research, not independent repeated tests. Costs assumed, not reconstructed from historical order books.",
   "live_trading_enabled": false,
@@ -148,8 +148,8 @@
         "candle": "2026-09-30 15:30:00+00:00",
         "probability_positive_net_return": 0.11760010518864192,
         "signal": "HOLD",
-        "observed_spread_bps": 0.0007560058141383143,
-        "volume_24h_jpy": 1879085065.43195
+        "observed_spread_bps": 0.0007560048996677547,
+        "volume_24h_jpy": 1877241429.06537
       },
       "live_trading_enabled": false
     },
@@ -297,8 +297,8 @@
         "candle": "2026-09-30 14:00:00+00:00",
         "probability_positive_net_return": 0.41501400634217095,
         "signal": "HOLD",
-        "observed_spread_bps": 0.0007560058141383143,
-        "volume_24h_jpy": 1879085065.43195
+        "observed_spread_bps": 0.0007560048996677547,
+        "volume_24h_jpy": 1877241429.06537
       },
       "live_trading_enabled": false
     },
@@ -446,8 +446,8 @@
         "candle": "2026-09-30 15:40:00+00:00",
         "probability_positive_net_return": 0.039345696392647636,
         "signal": "HOLD",
-        "observed_spread_bps": 0.0007560058141383143,
-        "volume_24h_jpy": 1879085065.43195
+        "observed_spread_bps": 0.0007560048996677547,
+        "volume_24h_jpy": 1877241429.06537
       },
       "live_trading_enabled": false
     },
@@ -595,7 +595,7 @@
         "candle": "2026-09-30 15:30:00+00:00",
         "probability_positive_net_return": 0.23758665805374593,
         "signal": "HOLD",
-        "observed_spread_bps": 22.023912886953028,
+        "observed_spread_bps": 18.988532871517997,
         "volume_24h_jpy": 26289099.13297
       },
       "live_trading_enabled": false
@@ -744,7 +744,7 @@
         "candle": "2026-09-30 14:00:00+00:00",
         "probability_positive_net_return": 0.27897055906158447,
         "signal": "HOLD",
-        "observed_spread_bps": 22.023912886953028,
+        "observed_spread_bps": 18.988532871517997,
         "volume_24h_jpy": 26289099.13297
       },
       "live_trading_enabled": false
@@ -894,7 +894,7 @@
         "candle": "2026-09-30 15:40:00+00:00",
         "probability_positive_net_return": 0.06563092892694421,
         "signal": "HOLD",
-        "observed_spread_bps": 22.023912886953028,
+        "observed_spread_bps": 18.988532871517997,
         "volume_24h_jpy": 26289099.13297
       },
       "live_trading_enabled": false

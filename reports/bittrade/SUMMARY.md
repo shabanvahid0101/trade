@@ -1,6 +1,6 @@
 # BitTrade spot research
 
-2026-09-30T15:45:50.711628+00:00
+2026-09-30T15:47:39.003723+00:00
 
 Exploratory daily expanding-window research, not independent repeated tests. Costs assumed, not reconstructed from historical order books.
 

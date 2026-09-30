@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "created_at": "2026-09-30T15:47:40.421293+00:00",
+  "config": {
+    "mode": "experimental",
+    "initial_jpy": 100000.0,
+    "position_fraction": 0.1,
+    "max_positions": 3,
+    "fee_rate": 0.001,
+    "slippage_bps": 5,
+    "stop_loss_pct": 0.01,
+    "take_profit_pct": 0.02,
+    "exit_probability": 0.4,
+    "max_drawdown_pct": 5.0,
+    "max_loss_streak": 5,
+    "max_spread_bps": 40.0,
+    "min_24h_jpy": 10000000.0
+  },
+  "cash_jpy": 100000.0,
+  "positions": {},
+  "closed_trades": [],
+  "seen_signals": {
+    "btcjpy_1h": "2026-09-30 14:00:00+00:00",
+    "xrpjpy_1h": "2026-09-30 14:00:00+00:00",
+    "xrpjpy_15m": "2026-09-30 15:30:00+00:00",
+    "btcjpy_15m": "2026-09-30 15:30:00+00:00",
+    "xrpjpy_5m": "2026-09-30 15:40:00+00:00",
+    "btcjpy_5m": "2026-09-30 15:40:00+00:00"
+  },
+  "outbox": [
+    {
+      "id": "bittrade-paper-start-v1",
+      "kind": "activation",
+      "created_at": "2026-09-30T15:47:41.222847+00:00",
+      "text": "✅ پیپر تریدینگ BitTrade و اعلان ورود/خروج فعال شد.\nسرمایه مجازی: 100,000 ین | حالت: experimental\nفقط معامله کاغذی؛ ورود اجباری انجام نمی‌شود. بررسی هر ۳۰ دقیقه است.\nسوددهی مدل هنوز تأیید نشده است. پیام ورود و خروج شامل هزینه‌ها خواهد بود.",
+      "sent_at": null,
+      "attempts": 0
+    }
+  ],
+  "peak_equity_jpy": 100000.0,
+  "max_drawdown_pct": 0.0,
+  "paused": false,
+  "live_trading_enabled": false,
+  "updated_at": "2026-09-30T15:47:41.222847+00:00",
+  "decisions": {
+    "btcjpy_1h": "probability_below_threshold",
+    "xrpjpy_1h": "probability_below_threshold",
+    "xrpjpy_15m": "probability_below_threshold",
+    "btcjpy_15m": "probability_below_threshold",
+    "xrpjpy_5m": "probability_below_threshold",
+    "btcjpy_5m": "probability_below_threshold"
+  },
+  "research_fresh": true,
+  "exits_only": false,
+  "research_blocked": {
+    "ethjpy_15m": {
+      "reason": "Cannot assume fills on zero-volume candles",
+      "signal": "HOLD"
+    },
+    "ethjpy_1h": {
+      "reason": "Cannot assume fills on zero-volume candles",
+      "signal": "HOLD"
+    },
+    "ethjpy_5m": {
+      "reason": "Missing features; insufficient trading activity",
+      "signal": "HOLD"
+    }
+  },
+  "research_errors": {},
+  "metrics": {
+    "equity_jpy": 100000.0,
+    "cash_jpy": 100000.0,
+    "realized_pnl_jpy": 0,
+    "unrealized_pnl_jpy": 0.0,
+    "return_pct": 0.0,
+    "closed_trades": 0,
+    "open_positions": 0,
+    "profit_factor": null,
+    "win_rate_pct": null,
+    "drawdown_pct": 0.0,
+    "max_drawdown_pct": 0.0,
+    "stale_marks": []
+  }
+}
