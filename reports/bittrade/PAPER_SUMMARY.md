@@ -1,6 +1,6 @@
 # BitTrade forward paper trading
 
-2026-09-30T15:47:41.222847+00:00
+2026-09-30T17:00:37.741375+00:00
 
 Mode: **experimental**. Virtual JPY only. Live trading: disabled.
 
@@ -28,6 +28,5 @@ Backtest results and this forward portfolio are separate; repeated retraining is
 - btcjpy_15m: probability_below_threshold
 - btcjpy_1h: probability_below_threshold
 - btcjpy_5m: probability_below_threshold
-- xrpjpy_15m: probability_below_threshold
 - xrpjpy_1h: probability_below_threshold
 - xrpjpy_5m: probability_below_threshold

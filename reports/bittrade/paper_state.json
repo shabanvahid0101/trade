@@ -20,12 +20,12 @@
   "positions": {},
   "closed_trades": [],
   "seen_signals": {
-    "btcjpy_1h": "2026-09-30 14:00:00+00:00",
-    "xrpjpy_1h": "2026-09-30 14:00:00+00:00",
+    "btcjpy_1h": "2026-09-30 16:00:00+00:00",
+    "xrpjpy_1h": "2026-09-30 16:00:00+00:00",
     "xrpjpy_15m": "2026-09-30 15:30:00+00:00",
-    "btcjpy_15m": "2026-09-30 15:30:00+00:00",
-    "xrpjpy_5m": "2026-09-30 15:40:00+00:00",
-    "btcjpy_5m": "2026-09-30 15:40:00+00:00"
+    "btcjpy_15m": "2026-09-30 16:45:00+00:00",
+    "xrpjpy_5m": "2026-09-30 16:55:00+00:00",
+    "btcjpy_5m": "2026-09-30 16:55:00+00:00"
   },
   "outbox": [
     {
@@ -41,14 +41,13 @@
   "max_drawdown_pct": 0.0,
   "paused": false,
   "live_trading_enabled": false,
-  "updated_at": "2026-09-30T15:47:41.222847+00:00",
+  "updated_at": "2026-09-30T17:00:37.741375+00:00",
   "decisions": {
     "btcjpy_1h": "probability_below_threshold",
-    "xrpjpy_1h": "probability_below_threshold",
-    "xrpjpy_15m": "probability_below_threshold",
+    "btcjpy_5m": "probability_below_threshold",
     "btcjpy_15m": "probability_below_threshold",
-    "xrpjpy_5m": "probability_below_threshold",
-    "btcjpy_5m": "probability_below_threshold"
+    "xrpjpy_1h": "probability_below_threshold",
+    "xrpjpy_5m": "probability_below_threshold"
   },
   "research_fresh": true,
   "exits_only": false,
@@ -63,6 +62,10 @@
     },
     "ethjpy_5m": {
       "reason": "Missing features; insufficient trading activity",
+      "signal": "HOLD"
+    },
+    "xrpjpy_15m": {
+      "reason": "Cannot assume fills on zero-volume candles",
       "signal": "HOLD"
     }
   },
