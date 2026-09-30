@@ -24,10 +24,12 @@ jobs:
       OPENBLAS_NUM_THREADS: "2"
     steps:
       - uses: actions/checkout@v4
+        id: checkout
         with:
           ref: main
           fetch-depth: 1
       - uses: actions/setup-python@v5
+        id: python
         with:
           python-version: "3.12"
 
@@ -36,22 +38,58 @@ jobs:
         run: python bittrade_data.py
 
       - name: Install research dependencies
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '29 2 * * *'
+        id: dependencies
+        if: ${{ !cancelled() && steps.python.outcome == 'success' }}
         run: python -m pip install -r requirements-bittrade.txt
 
       - name: Verify data and execution accounting
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '29 2 * * *'
-        run: python -m unittest discover -s tests -p test_bittrade.py -v
+        id: checks
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: python -m unittest discover -s tests -p 'test_bittrade*.py' -v
 
       - name: Train and evaluate spot models
         id: research
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '29 2 * * *'
+        # Refresh probabilities on each run. Never trade yesterday's report.
+        if: ${{ !cancelled() && steps.collect.outcome == 'success' && steps.checks.outcome == 'success' }}
         run: |
           python bittrade_research.py
           cat reports/bittrade/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Advance experimental paper portfolio
+        id: paper
+        # The stdlib-only exit manager still runs after collection/training fails.
+        if: ${{ !cancelled() && steps.python.outcome == 'success' && steps.checkout.outcome == 'success' && steps.checks.outcome != 'failure' }}
+        env:
+          ALLOW_ENTRIES: ${{ steps.collect.outcome == 'success' && steps.research.outcome == 'success' && steps.checks.outcome == 'success' }}
+        run: |
+          extra=()
+          if [ "$ALLOW_ENTRIES" != "true" ]; then
+            extra+=(--exits-only)
+          fi
+          python bittrade_paper.py step --mode experimental "${extra[@]}"
+          cat reports/bittrade/PAPER_SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Persist data, portfolio and notification outbox before delivery
+        id: persist
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
+        run: bash .github/scripts/commit-bittrade.sh snapshot
+
+      - name: Send pending BitTrade entry and exit notifications
+        id: notify
+        if: ${{ !cancelled() && steps.persist.outcome == 'success' && steps.paper.outcome == 'success' }}
+        env:
+          BITTRADE_TELEGRAM_ENABLED: "1"
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python bittrade_paper.py notify
+
+      - name: Persist delivery receipts even after partial Telegram failure
+        if: ${{ !cancelled() && steps.persist.outcome == 'success' && (steps.notify.outcome == 'success' || steps.notify.outcome == 'failure') }}
+        run: bash .github/scripts/commit-bittrade.sh receipts
+
       - name: Preserve diagnostic reports and models
-        if: always()
+        # Daily/manual artifacts; the ledger/reports persist in Git every run.
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '29 2 * * *' || failure()) }}
         uses: actions/upload-artifact@v4
         with:
           name: bittrade-${{ github.run_id }}
@@ -60,26 +98,3 @@ jobs:
             reports/bittrade/
           retention-days: 30
           if-no-files-found: warn
-
-      - name: Commit collected data and research reports
-        # Training failure must not throw away successfully collected history.
-        if: always() && steps.collect.outcome == 'success'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dataset/bittrade
-          if [ -f reports/bittrade/research_report.json ]; then
-            git add reports/bittrade/research_report.json reports/bittrade/SUMMARY.md
-          fi
-          if ! git diff --cached --quiet; then
-            git commit -m "Refresh BitTrade candles and research"
-            # Only this workflow writes these paths; rebase preserves other jobs.
-            for attempt in 1 2 3; do
-              git pull --rebase origin main
-              if git push origin HEAD:main; then
-                exit 0
-              fi
-              sleep 5
-            done
-            exit 1
-          fi
