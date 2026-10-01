@@ -16,9 +16,10 @@
     "max_spread_bps": 40.0,
     "min_24h_jpy": 10000000.0
   },
-  "cash_jpy": 90098.61636342056,
-  "positions": {
-    "btcjpy_1h": {
+  "cash_jpy": 99968.18422136531,
+  "positions": {},
+  "closed_trades": [
+    {
       "id": "3d44ed3ed4aef4a9",
       "symbol": "btcjpy",
       "timeframe": "1h",
@@ -41,17 +42,23 @@
         "no_positive_net_edge_on_test",
         "test_profit_factor_below_1_1_or_undefined",
         "test_drawdown_exceeds_2_percent"
-      ]
+      ],
+      "closed_at": "2026-10-01T00:51:01.241784+00:00",
+      "exit_price": 13172596.407,
+      "exit_fee_jpy": 9.87944730525,
+      "net_proceeds_jpy": 9869.56785794475,
+      "net_pnl_jpy": -31.815778634685557,
+      "net_return_pct": -0.32132659234762,
+      "exit_reason": "model_exit"
     }
-  },
-  "closed_trades": [],
+  ],
   "seen_signals": {
-    "btcjpy_1h": "2026-09-30 20:00:00+00:00",
-    "xrpjpy_1h": "2026-09-30 20:00:00+00:00",
+    "btcjpy_1h": "2026-09-30 23:00:00+00:00",
+    "xrpjpy_1h": "2026-09-30 23:00:00+00:00",
     "xrpjpy_15m": "2026-09-30 15:30:00+00:00",
-    "btcjpy_15m": "2026-09-30 21:00:00+00:00",
-    "xrpjpy_5m": "2026-09-30 21:20:00+00:00",
-    "btcjpy_5m": "2026-09-30 21:20:00+00:00"
+    "btcjpy_15m": "2026-10-01 00:30:00+00:00",
+    "xrpjpy_5m": "2026-10-01 00:45:00+00:00",
+    "btcjpy_5m": "2026-10-01 00:45:00+00:00"
   },
   "outbox": [
     {
@@ -69,18 +76,26 @@
       "text": "🟢 ورود کاغذی BitTrade | btcjpy_1h\nحالت: experimental — پول مجازی\nقیمت ورود: 13,188,656.1926 ین\nمقدار: 0.00075\nهزینه با کارمزد ورود: 9,901.38 ین\nاحتمال مدل: 63.8% | آستانه: 60%\nحد ضرر پایشی: 1% | حد سود پایشی: 2%\nحداکثر نگهداری: 6 کندل\nهزینه خروج نیز محاسبه می‌شود؛ اجرای سفارش واقعی نیست.\nشناسه: 3d44ed3ed4aef4a9",
       "sent_at": "2026-09-30T21:25:55.666922+00:00",
       "attempts": 1
+    },
+    {
+      "id": "3d44ed3ed4aef4a9:exit",
+      "kind": "exit",
+      "created_at": "2026-10-01T00:51:01.241784+00:00",
+      "text": "🔴 خروج کاغذی BitTrade | btcjpy_1h\nعلت: افت احتمال مدل\nقیمت خروج: 13,172,596.4070 ین\nسود/زیان خالص: -31.82 ین (-0.32٪)\nسود/زیان بسته‌شده حساب: -31.82 ین\nارزش حساب: 99,968.18 ین | بازده: -0.03٪\nتعداد معاملات بسته‌شده: 1\nشناسه: 3d44ed3ed4aef4a9",
+      "sent_at": null,
+      "attempts": 0
     }
   ],
   "peak_equity_jpy": 100000.0,
   "max_drawdown_pct": 0.03216250793331987,
   "paused": false,
   "live_trading_enabled": false,
-  "updated_at": "2026-09-30T21:25:52.896674+00:00",
+  "updated_at": "2026-10-01T00:51:01.241784+00:00",
   "decisions": {
-    "btcjpy_1h": "paper_opened",
-    "xrpjpy_1h": "probability_below_threshold",
-    "xrpjpy_5m": "probability_below_threshold",
+    "btcjpy_1h": "probability_below_threshold",
     "btcjpy_15m": "probability_below_threshold",
+    "xrpjpy_5m": "probability_below_threshold",
+    "xrpjpy_1h": "probability_below_threshold",
     "btcjpy_5m": "probability_below_threshold"
   },
   "research_fresh": true,
@@ -105,16 +120,16 @@
   },
   "research_errors": {},
   "metrics": {
-    "equity_jpy": 99967.83749206668,
-    "cash_jpy": 90098.61636342056,
-    "realized_pnl_jpy": 0,
-    "unrealized_pnl_jpy": -32.162507933309826,
-    "return_pct": -0.03216250793331987,
-    "closed_trades": 0,
-    "open_positions": 1,
-    "profit_factor": null,
-    "win_rate_pct": null,
-    "drawdown_pct": 0.03216250793331987,
+    "equity_jpy": 99968.18422136531,
+    "cash_jpy": 99968.18422136531,
+    "realized_pnl_jpy": -31.815778634685557,
+    "unrealized_pnl_jpy": 0.0,
+    "return_pct": -0.03181577863468066,
+    "closed_trades": 1,
+    "open_positions": 0,
+    "profit_factor": 0.0,
+    "win_rate_pct": 0.0,
+    "drawdown_pct": 0.03181577863468066,
     "max_drawdown_pct": 0.03216250793331987,
     "stale_marks": []
   }
