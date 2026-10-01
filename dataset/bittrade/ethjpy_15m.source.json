@@ -7,16 +7,16 @@
     "timezone": "UTC"
   },
   "endpoint": "https://api-cloud.bittrade.co.jp/market/history/kline",
-  "sha256": "f531a935f96a933e6af4cb56fa7ff4a4a54dd34c222c4aed991b20c5402e84cf",
-  "server_timestamp_ms": 1790864853866,
+  "sha256": "97e50df97199a771aa8f541cd5e628068655812b8be38e57e80d608b9725201a",
+  "server_timestamp_ms": 1790870740876,
   "api_trading": "enabled",
   "quality": {
-    "rows": 2130,
+    "rows": 2137,
     "first": "2026-09-09T09:45:00+00:00",
-    "last": "2026-10-01T14:00:00+00:00",
+    "last": "2026-10-01T15:45:00+00:00",
     "missing_candles": 0,
     "gaps": [],
-    "zero_volume_candles": 1044,
-    "last_close_age_seconds": 753.8659999370575
+    "zero_volume_candles": 1049,
+    "last_close_age_seconds": 340.87599992752075
   }
 }
